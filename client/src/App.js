@@ -4,6 +4,7 @@ import './assets/css/App.css';
 
 import LoginPage from './LoginPage'
 import PlayerListPage from './PlayerListPage'
+import MediatorClient from './mediatorClientService'
 
 class App extends Component {
   constructor(props) {
@@ -21,7 +22,7 @@ class App extends Component {
   }
 
   logout() {
-    // TODO call mediator
+    MediatorClient.logout(this.state.player);
     this.setState({player : null});
   }
 

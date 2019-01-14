@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 
 import './assets/css/LoginPage.css';
 
+import MediatorClient from './mediatorClientService'
+
 class LoginPage extends Component {
 
   constructor(props) {
@@ -19,28 +21,10 @@ class LoginPage extends Component {
 
   onSubmit(event) {
     event.preventDefault();
-
-    fetch("http://localhost:3016/login", {
-      method: "POST",
-      mode: "cors",
-      credentials: "same-origin",
-      body: JSON.stringify({
-        name: this.state.login,
-        password: this.state.password
-      })
-    }).then((result) => {
-        // TODO how to get detailed error description ?
-        if( result.status!==200 ) {
-          this.setState({errorMessage : result.statusText});
-        } else {
-          this.props.parent.setPlayer(this.state.login);
-        }
-      }, (error) => {
-
-        console.log("error", error);
-
-        this.setState({errorMessage : error});
-      });
+    MediatorClient.login(this.state.login, this.state.password,
+      (player) => {this.props.parent.setPlayer(player);},
+      (errorMessage) => {this.setState({errorMessage : errorMessage});}
+    );
   }
 
   render() {

@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 
 import './assets/css/PlayerListPage.css';
 
+import MediatorClient from './mediatorClientService'
+
 class PlayerListPage extends Component {
 
   render() {
