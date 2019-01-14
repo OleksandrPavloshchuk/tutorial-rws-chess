@@ -29,12 +29,16 @@ class LoginPage extends Component {
         password: this.state.password
       })
     }).then((result) => {
-        if( !result || result.length>0 ) {
-          this.setState({errorMessage : result});
+        // TODO how to get detailed error description ?
+        if( result.status!==200 ) {
+          this.setState({errorMessage : result.statusText});
         } else {
           this.props.parent.setPlayer(this.state.login);
         }
       }, (error) => {
+
+        console.log("error", error);
+
         this.setState({errorMessage : error});
       });
   }

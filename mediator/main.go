@@ -16,7 +16,9 @@ var upgrader = websocket.Upgrader{
 }
 
 func login(msg []byte) error {
-  var player players.Player
+
+  player := players.Player{}
+
   if err := json.Unmarshal( msg, &player ); err != nil {
     return err
   } else {
@@ -37,13 +39,13 @@ func registerLogin() {
     if msg,err := ioutil.ReadAll(r.Body); err != nil {
       log.Printf("LOGIN error: %v", err)
     } else {
-      s := ""
-      err := login(msg)
-      if err != nil {
-        s = err.Error()
-      }
       w.Header().Set("Access-Control-Allow-Origin","*")
-      io.WriteString(w, s)
+      err := login(msg)
+      if err == nil {
+        w.WriteHeader(http.StatusOK)
+      } else {
+        http.Error(w, err.Error(), http.StatusForbidden)
+      }
     }
     // TODO send waiting player list for every participant
 

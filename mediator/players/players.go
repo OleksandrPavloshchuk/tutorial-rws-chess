@@ -15,34 +15,34 @@ var activePlayers map[string]mode
 
 // TODO (2019/01/14) check credentials from database
 type Player struct {
-  name string
-  password string
+  Name string `json:"name"`
+  Password string `json:"password"`
 }
 var registeredPlayers [3]Player
 
 func Init() {
   activePlayers = make(map[string]mode, 0)
-  registeredPlayers[0] = Player { name:"player-1", password: "123456"}
-  registeredPlayers[1] = Player { name:"player-2", password: "654321"}
-  registeredPlayers[2] = Player { name:"me", password: "1"}
+  registeredPlayers[0] = Player { Name:"player-1", Password: "123456"}
+  registeredPlayers[1] = Player { Name:"player-2", Password: "654321"}
+  registeredPlayers[2] = Player { Name:"me", Password: "1"}
 }
 
 func Login(p Player) error {
 
   // Is this player active?
-  _, active := activePlayers[p.name]
+  _, active := activePlayers[p.Name]
   if active {
     return errors.New("This player is already logged in")
   }
 
   // Check the password and register
   for _, f := range registeredPlayers {
-    if f.name == p.name && f.password == p.password {
-      activePlayers[p.name] = waiting
+    if f.Name == p.Name && f.Password == p.Password {
+      activePlayers[p.Name] = waiting
       return nil
     }
   }
-  
+
   return errors.New("Login failed")
 }
 
