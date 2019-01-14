@@ -3,9 +3,6 @@ import React, { Component } from 'react';
 import './assets/css/PlayerListPage.css';
 
 class PlayerListPage extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   render() {
       return (

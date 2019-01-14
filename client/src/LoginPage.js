@@ -6,15 +6,11 @@ class LoginPage extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {login: null, password: null, errorMessage: null };
+    this.state = {login: "", password: "", errorMessage: null };
 
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
 
-    this.allowedCreds = {
-      "user-1": "123456",
-      "user-2": "654321"
-    };    
   }
 
   onChange(event) {
@@ -24,15 +20,23 @@ class LoginPage extends Component {
   onSubmit(event) {
     event.preventDefault();
 
-    // TODO (2019/01/14) check credentials using mediator
-    const errorMessage = this.allowedCreds[this.state.login]===this.state.password
-      ? null
-      : "Login failed";
-    if( errorMessage ) {
-      this.setState({errorMessage : errorMessage});
-    } else {
-      this.props.parent.setPlayer(this.state.login);
-    }
+    fetch("http://localhost:3016/login", {
+      method: "POST",
+      mode: "cors",
+      credentials: "same-origin",
+      body: JSON.stringify({
+        name: this.state.login,
+        password: this.state.password
+      })
+    }).then((result) => {
+        if( !result || result.length>0 ) {
+          this.setState({errorMessage : result});
+        } else {
+          this.props.parent.setPlayer(this.state.login);
+        }
+      }, (error) => {
+        this.setState({errorMessage : error});
+      });
   }
 
   render() {

@@ -2,6 +2,7 @@ package main
 
 import (
   "io"
+  "io/ioutil"
   "log"
   "net/http"
   "encoding/json"
@@ -33,24 +34,21 @@ func registerAbout() {
 
 func registerLogin() {
   http.HandleFunc("/login", func (w http.ResponseWriter, r *http.Request) {
-    if conn, err := upgrader.Upgrade(w, r, nil); err != nil {
+    if msg,err := ioutil.ReadAll(r.Body); err != nil {
       log.Printf("LOGIN error: %v", err)
     } else {
-      // Read message from browser
-      if msgType, msg, err := conn.ReadMessage(); err != nil {
-        log.Printf("LOGIN error: %v", err)
-      } else {
-        s := ""
-        err := login(msg)
-        if err != nil {
-          s = err.Error()
-        }
-        if err = conn.WriteMessage(msgType, []byte(s)); err != nil {
-          log.Printf("LOGIN error: %v", err)
-        }
+      s := ""
+      err := login(msg)
+      if err != nil {
+        s = err.Error()
       }
+      w.Header().Set("Access-Control-Allow-Origin","*")
+      io.WriteString(w, s)
     }
     // TODO send waiting player list for every participant
+
+    // TODO remove trace
+    log.Printf("TRACE: active logins = %v\n", players.RetrieveWaitingPlayers(""))
   })
 }
 
@@ -65,6 +63,9 @@ func registerLogout() {
       } else {
         players.Logout(string(msg))
         // TODO send waiting player list for every participant
+
+        // TODO remove trace
+        log.Printf("TRACE: active logins = %v\n", players.RetrieveWaitingPlayers(""))
       }
     }
   })
@@ -96,6 +97,7 @@ func registerPlayerList() {
 
 func main() {
   players.Init()
+  upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 
   registerAbout()
   registerLogin()

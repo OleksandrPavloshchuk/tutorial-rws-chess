@@ -17,7 +17,6 @@ class App extends Component {
   }
 
   setPlayer(player) {
-    // TODO call mediator
     this.setState({player : player});
   }
 
