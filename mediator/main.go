@@ -41,28 +41,19 @@ func registerWebSocket() {
       if err := json.Unmarshal( msgData, &msgSrc ); err != nil {
         log.Printf("web socket: can't parse message. Ignored: %v\n", err)
       } else {
-
-        log.Printf("WEB SOCKET: got message: %v\n", msgSrc)
-
         msgRes, err := players.DispatchMessage(msgSrc, conn)
-
-        log.Printf("WEB SOCKET: dispatch message result: %v, (%v)\n", msgRes, err)
-
         if err != nil {
           log.Printf("dispatch error. Skipped: %v\n", err)
         } else {
-
-          if msgRes.What!="" {
-            if msgRes.What=="LOGOUT" {
-              conn.Close()
-              return
-            }
-            msgData,_ = json.Marshal(msgRes)
-            err = conn.WriteMessage(msgType, msgData)
-            if err!=nil {
-              log.Printf("web socket error = %v\n", err)
-              return
-            }
+          if msgRes.What=="LOGOUT" {
+            conn.Close()
+            return
+          }
+          msgData,_ = json.Marshal(msgRes)
+          err = conn.WriteMessage(msgType, msgData)
+          if err!=nil {
+            log.Printf("web socket error = %v\n", err)
+            return
           }
         }
       }
