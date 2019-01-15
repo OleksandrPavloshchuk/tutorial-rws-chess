@@ -44,18 +44,20 @@ export default class PlayerListPage extends Component {
   }
 
   render() {
-    const items = this.state.players.map( name => <li key={name}>{name}</li>)
+    const items = this.state.players.map( name =>
+      <a href="#"
+        className="list-group-item list-group-item-action" key={name}>{name}</a>
+    )
 
     return (
       <div className="container">
         <nav className="navbar navbar-light bg-light navbar-small">
+          <span className="navbar-brand">Tutorial RWS Chess</span>
           <span className="navbar-text">{this.props.parent.state.player}</span>
           <button className="btn btn-outline-secondary" onClick={this.props.parent.logout}>Logout</button>
         </nav>
-        <div className="container">
-          <ol>
-            {items}
-          </ol>
+        <div className="list-group">
+          {items}
         </div>
       </div>
     );
