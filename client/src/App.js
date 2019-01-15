@@ -11,6 +11,7 @@ export default class App extends Component {
   constructor(props) {
     super(props);
     this.mediatorClient = new MediatorClient();
+    this.playerListPage = <PlayerListPage parent={this}/>;
 
     this.state = {
         player: null
@@ -29,10 +30,31 @@ export default class App extends Component {
     this.setState({player : null});
   }
 
+  playersAdd(players) {
+
+    console.log("TRACE add players", players);
+
+    if( !this.state.player ) {
+      return;
+    }
+    // TODO
+  }
+
+  playersRemove(players) {
+
+    console.log("TRACE remove players", players);
+
+    if( !this.state.player ) {
+      return;
+    }
+    // TODO
+  }
+
   render() {
+
     return (
       <div className="container">
-        {this.state.player && <PlayerListPage parent={this}/>}
+        {this.state.player && this.playerListPage}
         {!this.state.player && <LoginPage parent={this}/>}
       </div>
     );

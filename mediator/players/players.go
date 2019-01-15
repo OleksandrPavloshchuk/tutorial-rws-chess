@@ -1,61 +1,105 @@
 package players
 
 import (
+  "log"
   "errors"
+  "encoding/json"
+  "github.com/gorilla/websocket"
 )
-
-type mode int
 
 const (
   waiting = iota
   playing = iota
 )
 
-var activePlayers map[string]mode
+type Message struct {
+  What string `json:"what"`
+  Players []string `json:"players"`
+  Password string `json:"password"`
+  ErrorText string `json:"errorText"`
+}
 
 // TODO (2019/01/14) check credentials from database
-type Player struct {
-  Name string `json:"name"`
-  Password string `json:"password"`
+var passwords map[string]string
+
+type playerSession struct {
+  name string
+  connection *websocket.Conn
+  mode int
 }
-var registeredPlayers [3]Player
+
+var activePlayers map[string]playerSession
 
 func Init() {
-  activePlayers = make(map[string]mode, 0)
-  registeredPlayers[0] = Player { Name:"player-1", Password: "123456"}
-  registeredPlayers[1] = Player { Name:"player-2", Password: "654321"}
-  registeredPlayers[2] = Player { Name:"me", Password: "1"}
+  activePlayers = make(map[string]playerSession, 0)
+  passwords = make(map[string]string, 3)
+  passwords["player-1"]="123456"
+  passwords["player-2"]="654321"
+  passwords["me"]="1"
 }
 
-func Login(p Player) error {
+func sendMessageToClients(msg Message, without string) {
+  content, _ := json.Marshal(msg)
+  for name, session := range activePlayers {
+    if name != without {
+      session.connection.WriteMessage(websocket.TextMessage, content)
+    }
+  }
+}
 
-  // Is this player active?
-  /* TODO temporary commented
-  _, active := activePlayers[p.Name]
-  if active {
+func DispatchMessage(msg Message, connection *websocket.Conn) (Message, error) {
+  switch msg.What {
+  case "ASK_LOGIN":
+    err := login(msg.Players[0], msg.Password, connection)
+    if err!=nil {
+      return Message{ What: "LOGIN_ERROR", ErrorText: err.Error() }, nil
+    } else {
+      return Message{ What: "LOGIN_OK" }, nil
+    }
+  case "ASK_LOGOUT":
+    logout(msg.Players[0])
+    return Message{ What: "LOGOUT" },nil
+  case "ASK_PLAYERS":
+    players := retrievePlayers(msg.Players[0])
+    return Message{What: "PLAYERS_ADD", Players: players}, nil
+  default:
+    log.Println("DISPATCH: unexpected message: %v\n", msg)
+    return Message{}, errors.New("unexpected message")
+  }
+}
+
+func login(name string, password string, connection *websocket.Conn) error {
+
+  _,found := activePlayers[name]
+  if found {
     return errors.New("This player is already logged in")
   }
-  */
 
   // Check the password and register
-  for _, f := range registeredPlayers {
-    if f.Name == p.Name && f.Password == p.Password {
-      activePlayers[p.Name] = waiting
+  foundPassword, found := passwords[name]
+
+  if found && foundPassword==password {
+      sendMessageToClients(Message{ What: "PLAYERS_ADD", Players: []string{name}},  name)
+
+      activePlayers[name] = playerSession{ name: name, connection: connection, mode: waiting }
+      log.Printf("login: %v\n", name)
+
       return nil
-    }
   }
 
   return errors.New("Login failed")
 }
 
-func Logout(name string) {
+func logout(name string) {
+  sendMessageToClients(Message{ What: "PLAYERS_REMOVE", Players: []string{name}},  name)
   delete(activePlayers, name)
+  log.Printf("logout: %v\n", name)
 }
 
-func RetrieveWaitingPlayers(myName string) []string {
-  r := make([]string, 0)
-  for k, v := range activePlayers {
-    if waiting == v && myName != k {
+func retrievePlayers(name string) []string {
+  r := make([]string,0)
+  for k, session := range activePlayers {
+    if waiting == session.mode && name != k {
       r = append( r, k)
     }
   }

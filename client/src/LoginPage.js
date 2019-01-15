@@ -21,8 +21,12 @@ export default class LoginPage extends Component {
 
   onSubmit(event) {
     event.preventDefault();
-    this.mediatorClient.login(this.state.login, this.state.password,
+    this.mediatorClient.login(
+      this.state.login,
+      this.state.password,
       (player) => {this.props.parent.setPlayer(player);},
+      (players) => {this.props.parent.playersAdd(players);},
+      (players) => {this.props.parent.playersRemove(players);},
       (errorMessage) => {this.setState({errorMessage : errorMessage});}
     );
   }

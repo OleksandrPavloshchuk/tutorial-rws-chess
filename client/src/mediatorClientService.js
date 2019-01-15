@@ -1,65 +1,67 @@
 
-const mediatorURL = "localhost:3016";
+var socket;
 
 export default class MediatorClient {
 
-  login(player, password, onSuccess, onError) {
+  login(player, password, onLoginOK, onPlayersAdd, onPlayersRemove, onError) {
 
-/* TODO (2019/01/15) use axios here instead of fetch. Resolve CORS issue.
-    axios("http://" + mediatorURL + "/login", {
-        method: "POST",
-        mode: "cors",
-        credentials: "same-origin",
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Content-Type': 'application/json',
-        },
-//        withCredentials: true,
-        body: JSON.stringify({
-          name: player,
+    socket = new WebSocket("ws://localhost:3016/ws");
+    socket.onopen = event => {
+        console.log("Connected to", event.currentTarget.url);
+
+        var str = JSON.stringify({
+          what: 'ASK_LOGIN',
+          players: [player],
           password: password
-        })
-      })
-      .then(res => {
-        console.log("res", res);
-        if( !res.data ) {
-          onSuccess(player);
-        } else {
-          onError(res.data);
-        }
-      })
-      .catch( error => {
-        console.log("error", error);
-        onError(error);
-      });
-      */
-    fetch("http://" + mediatorURL + "/login", {
-      method: "POST",
-      mode: "cors",
-      credentials: "same-origin",
-      body: JSON.stringify({
-        name: player,
-        password: password
-      })
-    }).then( result => {
-        // TODO how to get detailed error description ?
-        if( result.status===200 ) {
-          onSuccess(player);
-        } else {
-          onError(result.statusText);
-        }
-      }, error => {
-        onError(new String(error));
-      });
+        });
+        socket.send(str);
+    };
+    socket.onclose = event => {
+        console.log("Disconnected");
+    };
+    socket.onerror = event => {
+        console.log("Socket error", event);
+        onError(event);
+    };
+    socket.onmessage = event => {
+      var msg = JSON.parse(event.data);
+      switch( msg.what ) {
+        case "LOGIN_OK":
+          onLoginOK(player);
+          break;
+        case "LOGIN_ERROR":
+          onError(msg.errorText);
+          socket = null;
+          break;
+        case "PLAYERS_ADD":
+          onPlayersAdd(msg.players);
+          break;
+        case "PLAYERS_REMOVE":
+          onPlayersRemove(msg.players);
+          break;
+        default:
+          console.log("WARNING unknown message: ", msg, "ignored");
+      }
+    };
   }
 
   logout(player) {
-    // TODO
+    var str = JSON.stringify({
+      what: 'ASK_LOGOUT',
+      players: [player],
+      password: null
+    });
+    socket.send(str);
+    socket = null;
   }
 
   retrieveWaitingPlayers(player) {
-    // TODO:
-    return [];
+    var str = JSON.stringify({
+      what: 'ASK_PLAYERS',
+      players: [player],
+      password: null
+    });
+    socket.send(str);
   }
 
 }
