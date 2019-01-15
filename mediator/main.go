@@ -39,6 +39,7 @@ func registerLogin() {
     if msg,err := ioutil.ReadAll(r.Body); err != nil {
       log.Printf("LOGIN error: %v", err)
     } else {
+      w.Header().Set("Content-Type", "text/plain; charset=utf-8")
       w.Header().Set("Access-Control-Allow-Origin","*")
       err := login(msg)
       if err == nil {
