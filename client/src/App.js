@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import LoginPage from './LoginPage'
+import PlayerListPage from './PlayerListPage'
 import MediatorClient from './mediatorClientService'
 
 export default class App extends Component {
@@ -13,7 +14,6 @@ export default class App extends Component {
 
     this.state = {
         player: null,
-        players: []
     };
 
     this.setPlayer = this.setPlayer.bind(this);
@@ -33,53 +33,29 @@ export default class App extends Component {
   }
 
   playersAdd(players) {
-
     if( !this.state.player ) {
       return;
     }
-    var p = [];
-    this.state.players.forEach(i => p.push(i));
-    players.forEach(i => {
-      if (!p.includes(i) ) {
-        p.push(i);
-      }
-    });
-    this.setState({players:p});
+    this.playerListPage.playersAdd(players);
   }
 
   playersRemove(players) {
-
     if( !this.state.player ) {
       return;
     }
-    var p = [];
-    this.state.players.forEach(i => {
-      if (!players.includes(i) ) {
-        p.push(i);
-      }
-    });
-    this.setState({players:p});
+    this.playerListPage.playersRemove(players);
   }
 
   render() {
-    const items = this.state.players.map( name => <li key={name}>{name}</li>)
 
     return (
       <div className="container">
         {this.state.player &&
-          <div className="container">
-            <nav className="navbar navbar-light bg-light navbar-small">
-              <span className="navbar-text">{this.state.player}</span>
-              <button className="btn btn-outline-secondary" onClick={this.logout}>Logout</button>
-            </nav>
-            <div className="container">
-              <ol>
-                {items}
-              </ol>
-            </div>
-          </div>
+          <PlayerListPage parent={this} onRef={ref => (this.playerListPage = ref)} />
         }
-        {!this.state.player && <LoginPage parent={this}/>}
+        {!this.state.player &&
+          <LoginPage parent={this}/>
+        }
       </div>
     );
   }
