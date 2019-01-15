@@ -34,8 +34,6 @@ export default class App extends Component {
 
   playersAdd(players) {
 
-    console.log("TRACE add players", players);
-
     if( !this.state.player ) {
       return;
     }
@@ -50,7 +48,6 @@ export default class App extends Component {
   }
 
   playersRemove(players) {
-    console.log("TRACE remove players", players);
 
     if( !this.state.player ) {
       return;

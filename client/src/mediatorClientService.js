@@ -1,67 +1,47 @@
 
+const socketErrorText = "Can't connect to server";
+
 var socket;
+
+function sendMessage(what, player, password) {
+  var v = {what: what, players: [player]};
+  if( password ) {
+    v.password = password;
+  }
+  socket.send(JSON.stringify(v));
+}
 
 export default class MediatorClient {
 
   login(player, password, onLoginOK, onPlayersAdd, onPlayersRemove, onError) {
 
     socket = new WebSocket("ws://localhost:3016/ws");
-    socket.onopen = event => {
-        console.log("Connected to", event.currentTarget.url);
 
-        var str = JSON.stringify({
-          what: 'ASK_LOGIN',
-          players: [player],
-          password: password
-        });
-        socket.send(str);
+    socket.onopen = event => {
+      console.log("Connected to", event.currentTarget.url);
+      sendMessage("ASK_LOGIN", player, password);
     };
-    socket.onclose = event => {
-        console.log("Disconnected");
-    };
-    socket.onerror = event => {
-        console.log("Socket error", event);
-        onError(event);
-    };
+    socket.onclose = event => { console.log("Disconnected"); };
+    socket.onerror = event => { onError(socketErrorText); };
     socket.onmessage = event => {
       var msg = JSON.parse(event.data);
       switch( msg.what ) {
-        case "LOGIN_OK":
-          onLoginOK(player);
-          break;
-        case "LOGIN_ERROR":
-          onError(msg.errorText);
-          socket = null;
-          break;
-        case "PLAYERS_ADD":
-          onPlayersAdd(msg.players);
-          break;
-        case "PLAYERS_REMOVE":
-          onPlayersRemove(msg.players);
-          break;
-        default:
-          console.log("WARNING unknown message: ", msg, "ignored");
+        case "LOGIN_OK": onLoginOK(player); break;
+        case "LOGIN_ERROR": onError(msg.errorText); socket = null; break;
+        case "PLAYERS_ADD": onPlayersAdd(msg.players); break;
+        case "PLAYERS_REMOVE": onPlayersRemove(msg.players); break;
+        default: console.log("WARNING unknown message: ", msg, "ignored");
       }
     };
   }
 
   logout(player) {
-    var str = JSON.stringify({
-      what: 'ASK_LOGOUT',
-      players: [player],
-      password: null
-    });
-    socket.send(str);
+    sendMessage( "ASK_LOGOUT", player );
     socket = null;
   }
 
   retrieveWaitingPlayers(player) {
-    var str = JSON.stringify({
-      what: 'ASK_PLAYERS',
-      players: [player],
-      password: null
-    });
-    socket.send(str);
+    sendMessage( "ASK_PLAYERS", player );
   }
 
 }

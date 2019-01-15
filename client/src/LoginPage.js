@@ -24,10 +24,13 @@ export default class LoginPage extends Component {
     this.mediatorClient.login(
       this.state.login,
       this.state.password,
-      (player) => {this.props.parent.setPlayer(player);},
-      (players) => {this.props.parent.playersAdd(players);},
-      (players) => {this.props.parent.playersRemove(players);},
-      (errorMessage) => {this.setState({errorMessage : errorMessage});}
+      player => {this.props.parent.setPlayer(player);},
+      players => {this.props.parent.playersAdd(players);},
+      players => {this.props.parent.playersRemove(players);},
+      errorMessage => {
+        this.setState({errorMessage : errorMessage});
+        console.log("LOGIN", errorMessage);
+      }
     );
   }
 
