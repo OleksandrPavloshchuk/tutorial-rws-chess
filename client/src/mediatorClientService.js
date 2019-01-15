@@ -1,6 +1,6 @@
 const mediatorURL = "localhost:3016";
 
-class MediatorClient {
+export default class MediatorClient {
 
   login(player, password, onSuccess, onError) {
     fetch("http://localhost:3016/login", {
@@ -16,9 +16,11 @@ class MediatorClient {
         if( result.status===200 ) {
           onSuccess(player);
         } else {
+          console.log( 'result', result );
           onError(result.statusText);
         }
       }, (error) => {
+        console.log( 'error', error );
         onError(error);
       });
   }
@@ -33,5 +35,3 @@ class MediatorClient {
   }
 
 }
-
-export default MediatorClient;

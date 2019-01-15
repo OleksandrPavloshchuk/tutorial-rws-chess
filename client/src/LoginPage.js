@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 
-import './assets/css/LoginPage.css';
-
 import MediatorClient from './mediatorClientService'
 
-class LoginPage extends Component {
+export default class LoginPage extends Component {
 
   constructor(props) {
     super(props);
@@ -31,20 +29,23 @@ class LoginPage extends Component {
 
   render() {
     return (
-      <form className="Login" method="POST" action="#" onSubmit={this.onSubmit}>
+      <form method="POST" action="#" onSubmit={this.onSubmit}>
         {this.state.errorMessage &&
-        <div className="error">{this.state.errorMessage}</div>
+        <div className="alert alert-danger">{this.state.errorMessage}</div>
         }
-        <label htmlFor="login">Login:</label>
-        <input type="text" name="login" value={this.state.login} onChange={this.onChange} />
-        <label htmlFor="password">Password:</label>
-        <input type="password" name="password" value={this.state.password} onChange={this.onChange} />
-        <input type="submit"/>
-        <input type="reset"/>
+        <div className="form-group">
+          <label htmlFor="login">Login:</label>
+          <input className="form-control" type="text" name="login" value={this.state.login} onChange={this.onChange} />
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">Password:</label>
+          <input className="form-control" type="password" name="password" value={this.state.password} onChange={this.onChange} />
+        </div>
+        <div className="form-group">
+          <input type="submit" className="btn btn-primary"/>
+        </div>
       </form>
     );
   }
 
-};
-
-export default LoginPage;
+}

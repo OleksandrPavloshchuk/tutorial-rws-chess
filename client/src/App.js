@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
+// import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
-import './assets/css/App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import LoginPage from './LoginPage'
 import PlayerListPage from './PlayerListPage'
 import MediatorClient from './mediatorClientService'
 
-class App extends Component {
+export default class App extends Component {
   constructor(props) {
     super(props);
     this.mediatorClient = new MediatorClient();
@@ -30,12 +31,10 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App">
+      <div className="container">
         {this.state.player && <PlayerListPage parent={this}/>}
         {!this.state.player && <LoginPage parent={this}/>}
       </div>
     );
   }
 }
-
-export default App;

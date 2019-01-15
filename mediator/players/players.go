@@ -30,10 +30,12 @@ func Init() {
 func Login(p Player) error {
 
   // Is this player active?
+  /* TODO temporary commented
   _, active := activePlayers[p.Name]
   if active {
     return errors.New("This player is already logged in")
   }
+  */
 
   // Check the password and register
   for _, f := range registeredPlayers {
