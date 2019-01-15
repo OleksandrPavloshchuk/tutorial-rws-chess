@@ -45,8 +45,8 @@ export default class PlayerListPage extends Component {
 
   render() {
     const items = this.state.players.map( name =>
-      <a href="#"
-        className="list-group-item list-group-item-action" key={name}>{name}</a>
+      <button
+        className="list-group-item list-group-item-action" key={name}>{name}</button>
     )
 
     return (
