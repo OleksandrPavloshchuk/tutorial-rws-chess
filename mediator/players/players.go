@@ -1,6 +1,7 @@
 package players
 
 import (
+  "net"
   "log"
   "errors"
   "encoding/json"
@@ -43,6 +44,17 @@ func sendMessageToClients(msg Message, without string) {
   for name, session := range activePlayers {
     if name != without {
       session.connection.WriteMessage(websocket.TextMessage, content)
+    }
+  }
+}
+
+func RemovePlayer(addr net.Addr) {
+  // Find player:
+  for name,session := range activePlayers {
+    if session.connection.RemoteAddr()==addr {
+      log.Printf("Connection to player %v is lost\n", name)
+      logout(name)
+      sendMessageToClients(Message{ What: "PLAYERS_REMOVE", Players: []string{name}}, name)
     }
   }
 }

@@ -33,7 +33,9 @@ func registerWebSocket() {
     for {
       msgType, msgData, err := conn.ReadMessage()
       if err!=nil {
-        log.Printf("web socket error = %v\n", err)
+        players.RemovePlayer(conn.RemoteAddr())
+        conn.Close()
+        log.Printf("web socket error: %v. Close connection.\n", err)
         return
       }
 
