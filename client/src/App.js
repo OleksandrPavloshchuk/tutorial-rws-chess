@@ -9,6 +9,8 @@ import MediatorClient from './mediatorClientService'
 class App extends Component {
   constructor(props) {
     super(props);
+    this.mediatorClient = new MediatorClient();
+
     this.state = {
         player: null
     };
@@ -22,7 +24,7 @@ class App extends Component {
   }
 
   logout() {
-    MediatorClient.logout(this.state.player);
+    this.mediatorClient.logout(this.state.player);
     this.setState({player : null});
   }
 

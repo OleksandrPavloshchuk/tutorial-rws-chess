@@ -6,6 +6,11 @@ import MediatorClient from './mediatorClientService'
 
 class PlayerListPage extends Component {
 
+  constructor(props) {
+    super(props);
+    this.mediatorClient = new MediatorClient();
+  }
+
   render() {
       return (
         <div className="PlayerListPage">

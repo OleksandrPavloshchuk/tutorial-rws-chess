@@ -8,6 +8,8 @@ class LoginPage extends Component {
 
   constructor(props) {
     super(props);
+    this.mediatorClient = new MediatorClient();
+
     this.state = {login: "", password: "", errorMessage: null };
 
     this.onChange = this.onChange.bind(this);
@@ -21,7 +23,7 @@ class LoginPage extends Component {
 
   onSubmit(event) {
     event.preventDefault();
-    MediatorClient.login(this.state.login, this.state.password,
+    this.mediatorClient.login(this.state.login, this.state.password,
       (player) => {this.props.parent.setPlayer(player);},
       (errorMessage) => {this.setState({errorMessage : errorMessage});}
     );
