@@ -45,8 +45,14 @@ export default class PlayerListPage extends Component {
 
   render() {
     const items = this.state.players.map( name =>
-      <button
-        className="list-group-item list-group-item-action" key={name}>{name}</button>
+      <li
+        className="list-group-item list-group-item-action" key={name}>
+        {name}
+        <div className="btn-group float-right" role="group">
+          <button className="btn btn-outline-success">Play White</button>
+          <button className="btn btn-outline-success">Play Black</button>
+        </div>
+      </li>
     )
 
     return (
@@ -56,9 +62,9 @@ export default class PlayerListPage extends Component {
           <span className="navbar-text">{this.props.parent.state.player}</span>
           <button className="btn btn-outline-secondary" onClick={this.props.parent.logout}>Logout</button>
         </nav>
-        <div className="list-group">
+        <ul className="list-group">
           {items}
-        </div>
+        </ul>
       </div>
     );
   }
