@@ -43,13 +43,13 @@ export default class App extends Component {
   }
 
   playersAdd(players) {
-    if( this.state.player ) {
+    if( this.state.player && this.playerListPage && this.playerListPage.playersAdd ) {
       this.playerListPage.playersAdd(players);
     }
   }
 
   playersRemove(players) {
-    if( this.state.player ) {
+    if( this.state.player && this.playerListPage && this.playerListPage.playersRemove) {
       this.playerListPage.playersRemove(players);
     }
   }

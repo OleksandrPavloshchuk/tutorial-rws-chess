@@ -27,14 +27,12 @@ func registerWebSocket() {
   http.HandleFunc("/ws", func (w http.ResponseWriter, r *http.Request) {
     conn, err := upgrader.Upgrade(w, r, nil)
     if err!=nil {
-      log.Printf("web socket error = %v\n", err)
+      log.Printf("web socket error: %v\n", err)
       return;
     }
     for {
       msgType, msgData, err := conn.ReadMessage()
-      if err!=nil {
-        log.Printf("web socket error: %v. Close connection.\n", err)
-        players.RemovePlayer(conn.RemoteAddr())
+      if exitIfError(err, conn) {
         return
       }
 
@@ -46,10 +44,7 @@ func registerWebSocket() {
           return;
         } else if msgRes!=nil {
           msgData,_ = json.Marshal(*msgRes)
-          err = conn.WriteMessage(msgType, msgData)
-          if err!=nil {
-            log.Printf("web socket error: %v. Close connection.\n", err)
-            players.RemovePlayer(conn.RemoteAddr())
+          if exitIfError( conn.WriteMessage(msgType, msgData), conn ) {
             return
           }
         }
@@ -58,18 +53,27 @@ func registerWebSocket() {
   })
 }
 
+func exitIfError(err error, conn *websocket.Conn) bool {
+  if err==nil {
+    return false
+  }
+  log.Printf("web socket error: %v. Close connection.\n", err)
+  players.RemovePlayer(conn.RemoteAddr())
+  return true
+}
+
 func main() {
   players.Init()
 
   registerAbout()
   registerWebSocket()
 
+  log.Printf(ABOUT)
+
   http.ListenAndServe(":3016", nil)
 }
 
 const ABOUT = `
-Chess React.js + Web Sockets + Go mediator.
-
-Usage:
-  /ws - web socket channels
-`
+--------
+Chess React.js + Web Sockets + Go mediator
+--------`
