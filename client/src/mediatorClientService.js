@@ -4,7 +4,7 @@ const socketErrorText = "Can't connect to server";
 var socket;
 
 function sendMessage(what, player, password) {
-  var v = {what: what, players: [player]};
+  var v = {what: what, from: player};
   if( password ) {
     v.password = password;
   }
@@ -30,6 +30,11 @@ export default class MediatorClient {
         case "LOGIN_ERROR": onError(msg.errorText); socket = null; break;
         case "PLAYERS_ADD": onPlayersAdd(msg.players); break;
         case "PLAYERS_REMOVE": onPlayersRemove(msg.players); break;
+        // TODO:
+        case "GAME_START":
+        case "SURRENDER":
+        case "DEUCE":
+        case "MOVE":
         default: console.log("WARNING unknown message: ", msg, "ignored");
       }
     };
