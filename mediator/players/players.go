@@ -18,6 +18,7 @@ type Message struct {
   Players []string `json:"players"`
   Password string `json:"password"`
   ErrorText string `json:"errorText"`
+  Move string `json:"move"`
 }
 
 // TODO (2019/01/14) check credentials from database
@@ -39,10 +40,11 @@ func Init() {
   passwords["me"]="1"
 }
 
-func sendMessageToClients(msg Message, without string) {
+func sendMessageToClients(what string, player string) {
+  msg := Message{ What: what, Players: []string{player}}
   content, _ := json.Marshal(msg)
   for name, session := range activePlayers {
-    if name != without {
+    if name != player {
       session.connection.WriteMessage(websocket.TextMessage, content)
     }
   }
@@ -54,7 +56,7 @@ func RemovePlayer(addr net.Addr) {
     if session.connection.RemoteAddr()==addr {
       log.Printf("Connection to player %v is lost\n", name)
       logout(name)
-      sendMessageToClients(Message{ What: "PLAYERS_REMOVE", Players: []string{name}}, name)
+      sendMessageToClients("PLAYERS_REMOVE", name)
     }
   }
 }
@@ -74,6 +76,28 @@ func DispatchMessage(msg Message, connection *websocket.Conn) (Message, error) {
   case "ASK_PLAYERS":
     players := retrievePlayers(msg.Players[0])
     return Message{What: "PLAYERS_ADD", Players: players}, nil
+  case "GAME_START":
+    for _,p := range msg.Players {
+      s, found := activePlayers[p]
+      if found {
+        s.mode = playing
+        activePlayers[p] = s
+      }
+      sendMessageToClients("PLAYERS_REMOVE", p)
+    }
+    return Message{ What: "NONE" },nil
+  case "MOVE":
+    p := msg.Players[0]
+    session,found := activePlayers[p]
+    if found {
+      content, _ := json.Marshal(msg)
+      session.connection.WriteMessage(websocket.TextMessage, content)
+    } else {
+      // Probably this player is already gone
+      sendMessageToClients("PLAYERS_REMOVE", p)
+    }
+    return Message{ What: "NONE" },nil
+    // TODO (2019/01/16) proposals to surrender or deuce
   default:
     log.Println("DISPATCH: unexpected message: %v\n", msg)
     return Message{}, errors.New("unexpected message")
@@ -91,7 +115,7 @@ func login(name string, password string, connection *websocket.Conn) error {
   foundPassword, found := passwords[name]
 
   if found && foundPassword==password {
-      sendMessageToClients(Message{ What: "PLAYERS_ADD", Players: []string{name}},  name)
+      sendMessageToClients("PLAYERS_ADD", name)
 
       activePlayers[name] = playerSession{ name: name, connection: connection, mode: waiting }
       log.Printf("login: %v\n", name)
@@ -103,7 +127,7 @@ func login(name string, password string, connection *websocket.Conn) error {
 }
 
 func logout(name string) {
-  sendMessageToClients(Message{ What: "PLAYERS_REMOVE", Players: []string{name}},  name)
+  sendMessageToClients("PLAYERS_REMOVE", name)
   delete(activePlayers, name)
   log.Printf("logout: %v\n", name)
 }

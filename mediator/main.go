@@ -51,11 +51,13 @@ func registerWebSocket() {
             conn.Close()
             return
           }
-          msgData,_ = json.Marshal(msgRes)
-          err = conn.WriteMessage(msgType, msgData)
-          if err!=nil {
-            log.Printf("web socket error = %v\n", err)
-            return
+          if msgRes.What!="NONE" {
+            msgData,_ = json.Marshal(msgRes)
+            err = conn.WriteMessage(msgType, msgData)
+            if err!=nil {
+              log.Printf("web socket error = %v\n", err)
+              return
+            }
           }
         }
       }
