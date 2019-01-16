@@ -15,8 +15,8 @@ const (
 
 type Message struct {
   What string `json:"what"`
-  Sender string `json:from`
-  Receiver string `json:to`
+  Sender string `json:sender`
+  Receiver string `json:receiver`
   Players []string `json:"players"`
   Password string `json:"password"`
   ErrorText string `json:"errorText"`

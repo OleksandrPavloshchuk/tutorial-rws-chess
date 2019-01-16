@@ -4,10 +4,13 @@ const socketErrorText = "Can't connect to server";
 var socket;
 
 function sendMessage(what, player, password) {
-  var v = {what: what, from: player};
+  var v = {what: what, sender: player};
   if( password ) {
     v.password = password;
   }
+
+  console.log("SEND=", v);
+
   socket.send(JSON.stringify(v));
 }
 
