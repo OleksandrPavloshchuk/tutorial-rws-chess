@@ -72,7 +72,7 @@ func DispatchMessage(msg *Message, connection *websocket.Conn) (*Message, bool) 
     return &res, false
   case "ASK_LOGOUT":
     name := msg.Players[0]
-    log.Printf("Player %v is log out\n", name)
+    log.Printf("logout: %v\n", name)
     removePlayer(name)
     return nil, true
   case "ASK_PLAYERS":

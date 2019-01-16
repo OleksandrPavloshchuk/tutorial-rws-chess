@@ -17,6 +17,7 @@ export default class PlayerListPage extends Component {
 
   componentDidMount() {
     this.props.onRef(this);
+    this.mediatorClient.retrieveWaitingPlayers(this.props.parent.state.player);    
   }
   componentWillUnmount() {
     this.props.onRef(undefined);
@@ -49,8 +50,12 @@ export default class PlayerListPage extends Component {
         className="list-group-item list-group-item-action" key={name}>
         {name}
         <div className="btn-group float-right" role="group">
-          <button className="btn btn-outline-success">Play White</button>
-          <button className="btn btn-outline-success">Play Black</button>
+          <button className="btn btn-outline-success"
+            onClick={i => this.props.parent.startGame(this.props.parent.state.player, i)}
+          >Play White</button>
+          <button className="btn btn-outline-success"
+            onClick={ i => this.props.parent.startGame(i, this.props.parent.state.player)}
+          >Play Black</button>
         </div>
       </li>
     )

@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import LoginPage from './LoginPage'
 import PlayerListPage from './PlayerListPage'
+import BoardPage from './BoardPage'
 import MediatorClient from './mediatorClientService'
 
 export default class App extends Component {
@@ -14,6 +15,8 @@ export default class App extends Component {
 
     this.state = {
         player: null,
+        white: null,
+        black: null
     };
 
     this.setPlayer = this.setPlayer.bind(this);
@@ -24,7 +27,13 @@ export default class App extends Component {
 
   setPlayer(player) {
     this.setState({player : player});
-    this.mediatorClient.retrieveWaitingPlayers(player)
+  }
+
+  startGame(white,black) {
+    this.setState({
+        white: white,
+        black: black
+    });
   }
 
   logout() {
@@ -50,11 +59,14 @@ export default class App extends Component {
 
     return (
       <div className="container">
-        {this.state.player &&
-          <PlayerListPage parent={this} onRef={ref => (this.playerListPage = ref)} />
-        }
         {!this.state.player &&
           <LoginPage parent={this}/>
+        }
+        {(this.state.player && (!this.state.white || !this.state.black)) &&
+          <PlayerListPage parent={this} onRef={ref => (this.playerListPage = ref)} />
+        }
+        {(this.state.white && this.state.black) &&
+          <BoardPage parent={this} onRef={ref => (this.playerListPage = ref)} />
         }
       </div>
     );
