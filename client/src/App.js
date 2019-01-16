@@ -23,6 +23,7 @@ export default class App extends Component {
     this.logout = this.logout.bind(this);
     this.playersAdd = this.playersAdd.bind(this);
     this.playersRemove = this.playersRemove.bind(this);
+    this.startGame = this.startGame.bind(this);
   }
 
   setPlayer(player) {
@@ -42,17 +43,15 @@ export default class App extends Component {
   }
 
   playersAdd(players) {
-    if( !this.state.player ) {
-      return;
+    if( this.state.player ) {
+      this.playerListPage.playersAdd(players);
     }
-    this.playerListPage.playersAdd(players);
   }
 
   playersRemove(players) {
-    if( !this.state.player ) {
-      return;
+    if( this.state.player ) {
+      this.playerListPage.playersRemove(players);
     }
-    this.playerListPage.playersRemove(players);
   }
 
   render() {
