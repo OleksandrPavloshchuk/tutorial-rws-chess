@@ -33,9 +33,8 @@ func registerWebSocket() {
     for {
       msgType, msgData, err := conn.ReadMessage()
       if err!=nil {
-        players.RemovePlayer(conn.RemoteAddr())
-        conn.Close()
         log.Printf("web socket error: %v. Close connection.\n", err)
+        players.RemovePlayer(conn.RemoteAddr())
         return
       }
 
@@ -43,21 +42,15 @@ func registerWebSocket() {
       if err := json.Unmarshal( msgData, &msgSrc ); err != nil {
         log.Printf("web socket: can't parse message. Ignored: %v\n", err)
       } else {
-        msgRes, err := players.DispatchMessage(msgSrc, conn)
-        if err != nil {
-          log.Printf("dispatch error. Skipped: %v\n", err)
-        } else {
-          if msgRes.What=="LOGOUT" {
-            conn.Close()
+        if msgRes, doExit := players.DispatchMessage(&msgSrc, conn); doExit {
+          return;
+        } else if msgRes!=nil {
+          msgData,_ = json.Marshal(*msgRes)
+          err = conn.WriteMessage(msgType, msgData)
+          if err!=nil {
+            log.Printf("web socket error: %v. Close connection.\n", err)
+            players.RemovePlayer(conn.RemoteAddr())
             return
-          }
-          if msgRes.What!="NONE" {
-            msgData,_ = json.Marshal(msgRes)
-            err = conn.WriteMessage(msgType, msgData)
-            if err!=nil {
-              log.Printf("web socket error = %v\n", err)
-              return
-            }
           }
         }
       }

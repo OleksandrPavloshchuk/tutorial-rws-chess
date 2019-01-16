@@ -55,52 +55,68 @@ func RemovePlayer(addr net.Addr) {
   for name,session := range activePlayers {
     if session.connection.RemoteAddr()==addr {
       log.Printf("Connection to player %v is lost\n", name)
-      logout(name)
-      sendMessageToClients("PLAYERS_REMOVE", name)
+      removePlayer(name)
     }
   }
 }
 
-func DispatchMessage(msg Message, connection *websocket.Conn) (Message, error) {
+func DispatchMessage(msg *Message, connection *websocket.Conn) (*Message, bool) {
   switch msg.What {
   case "ASK_LOGIN":
     err := login(msg.Players[0], msg.Password, connection)
+    res := Message{What:"LOGIN_OK"}
     if err!=nil {
-      return Message{ What: "LOGIN_ERROR", ErrorText: err.Error() }, nil
-    } else {
-      return Message{ What: "LOGIN_OK" }, nil
+      res.What = "LOGIN_ERROR"
+      res.ErrorText = err.Error()
     }
+    return &res, false
   case "ASK_LOGOUT":
-    logout(msg.Players[0])
-    return Message{ What: "LOGOUT" },nil
+    name := msg.Players[0]
+    log.Printf("Player %v is log out\n", name)
+    removePlayer(name)
+    return nil, true
   case "ASK_PLAYERS":
-    players := retrievePlayers(msg.Players[0])
-    return Message{What: "PLAYERS_ADD", Players: players}, nil
+    res := Message{What: "PLAYERS_ADD", Players: retrievePlayers(msg.Players[0])}
+    return &res, false
   case "GAME_START":
-    for _,p := range msg.Players {
-      s, found := activePlayers[p]
-      if found {
-        s.mode = playing
-        activePlayers[p] = s
-      }
-      sendMessageToClients("PLAYERS_REMOVE", p)
-    }
-    return Message{ What: "NONE" },nil
+    changePlayersMode(msg, "PLAYERS_REMOVE", playing)
+    return nil, false
   case "MOVE":
-    p := msg.Players[0]
-    session,found := activePlayers[p]
-    if found {
-      content, _ := json.Marshal(msg)
-      session.connection.WriteMessage(websocket.TextMessage, content)
-    } else {
-      // Probably this player is already gone
-      sendMessageToClients("PLAYERS_REMOVE", p)
-    }
-    return Message{ What: "NONE" },nil
-    // TODO (2019/01/16) proposals to surrender or deuce
+  case "ASK_SURRENDER":
+  case "ASK_DEUCE":
+    sendGameRelatedMessage(msg, connection)
+    return nil, false
+  case "SURRENDER":
+  case "DEUCE":
+    changePlayersMode(msg, "PLAYERS_ADD", waiting)
+    return nil, false
   default:
     log.Println("DISPATCH: unexpected message: %v\n", msg)
-    return Message{}, errors.New("unexpected message")
+    return nil, false
+  }
+  return nil, false
+}
+
+func changePlayersMode(msg *Message, what string, mode int) {
+  for _,p := range msg.Players {
+    s, found := activePlayers[p]
+    if found {
+      s.mode = mode
+      activePlayers[p] = s
+    }
+    sendMessageToClients(what, p)
+  }
+}
+
+func sendGameRelatedMessage(msg *Message, connection *websocket.Conn) {
+  p := msg.Players[0]
+  session,found := activePlayers[p]
+  if !found {
+    // Probably this player is already gone
+    sendMessageToClients("PLAYERS_REMOVE", p)
+  } else if session.mode==playing {
+    content, _ := json.Marshal(msg)
+    session.connection.WriteMessage(websocket.TextMessage, content)
   }
 }
 
@@ -126,10 +142,13 @@ func login(name string, password string, connection *websocket.Conn) error {
   return errors.New("Login failed")
 }
 
-func logout(name string) {
-  sendMessageToClients("PLAYERS_REMOVE", name)
-  delete(activePlayers, name)
-  log.Printf("logout: %v\n", name)
+func removePlayer(name string) {
+  session, found := activePlayers[name]
+  if found {
+    session.connection.Close()
+    sendMessageToClients("PLAYERS_REMOVE", name)
+    delete(activePlayers, name)
+  }
 }
 
 func retrievePlayers(name string) []string {
