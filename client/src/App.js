@@ -24,6 +24,7 @@ export default class App extends Component {
     this.playersAdd = this.playersAdd.bind(this);
     this.playersRemove = this.playersRemove.bind(this);
     this.startGame = this.startGame.bind(this);
+    this.startGameMe = this.startGameMe.bind(this);
   }
 
   setPlayer(player) {

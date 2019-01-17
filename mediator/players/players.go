@@ -15,8 +15,8 @@ const (
 
 type Message struct {
   What string `json:"what"`
-  Sender string `json:sender`
-  Receiver string `json:receiver`
+  Sender string `json:"from"`
+  Receiver string `json:"to"`
   Players []string `json:"players"`
   Password string `json:"password"`
   ErrorText string `json:"errorText"`
@@ -37,10 +37,11 @@ var activePlayers map[string]playerSession
 
 func Init() {
   activePlayers = make(map[string]playerSession, 0)
-  passwords = make(map[string]string, 3)
+  passwords = make(map[string]string, 4)
   passwords["player-1"]="123456"
   passwords["player-2"]="654321"
   passwords["me"]="1"
+  passwords["player-3"]="1"
 }
 
 func RemovePlayer(addr net.Addr) {
