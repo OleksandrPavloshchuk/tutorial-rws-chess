@@ -54,7 +54,6 @@ export default class MediatorClient {
 
   startGame(player, other, white) {
     let v = {what: "GAME_START", from: player, to: other, white: white};
-    console.log("start game", v);
     socket.send(JSON.stringify(v));
   }
 

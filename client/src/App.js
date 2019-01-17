@@ -14,9 +14,9 @@ export default class App extends Component {
     this.mediatorClient = new MediatorClient();
 
     this.state = {
-        player: null,
-        white: null,
-        black: null
+        player: undefined,
+        otherPlayer: undefined,
+        whiteMe: undefined
     };
 
     this.setPlayer = this.setPlayer.bind(this);
@@ -25,6 +25,7 @@ export default class App extends Component {
     this.playersRemove = this.playersRemove.bind(this);
     this.startGame = this.startGame.bind(this);
     this.startGameMe = this.startGameMe.bind(this);
+    this.endGame = this.endGame.bind(this);
   }
 
   setPlayer(player) {
@@ -38,14 +39,22 @@ export default class App extends Component {
 
   startGame(other, white) {
     this.setState({
-        white: white ? this.state.player : other,
-        black: white ? other : this.state.player
+      whiteMe: white,
+      otherPlayer: other
     });
+  }
+
+  endGame(what) {
+    this.setState({
+      whiteMe: undefined,
+      otherPlayer: undefined
+    });
+    this.mediatorClient.retrieveWaitingPlayers(this.props.parent.state.player);
   }
 
   logout() {
     this.mediatorClient.logout(this.state.player);
-    this.setState({player : null});
+    this.setState({player : undefined});
   }
 
   playersAdd(players) {
@@ -67,10 +76,10 @@ export default class App extends Component {
         {!this.state.player &&
           <LoginPage parent={this}/>
         }
-        {(this.state.player && (!this.state.white || !this.state.black)) &&
+        {(this.state.player && !this.state.otherPlayer) &&
           <PlayerListPage parent={this} onRef={ref => (this.playerListPage = ref)} />
         }
-        {(this.state.white && this.state.black) &&
+        {(this.state.player && this.state.otherPlayer) &&
           <BoardPage parent={this} onRef={ref => (this.playerListPage = ref)} />
         }
       </div>
