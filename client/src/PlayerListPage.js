@@ -52,11 +52,11 @@ export default class PlayerListPage extends Component {
         <div className="btn-group float-right" role="group">
           <button className="btn btn-outline-success"
             onClick={ i =>
-              this.props.parent.startGame(this.props.parent.state.player, name) }
+              this.props.parent.startGameMe(name, true) }
           >Play White</button>
           <button className="btn btn-outline-success"
             onClick={ i =>
-              this.props.parent.startGame(name, this.props.parent.state.player) }
+              this.props.parent.startGameMe(name, false) }
           >Play Black</button>
         </div>
       </li>

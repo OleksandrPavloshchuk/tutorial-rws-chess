@@ -30,10 +30,15 @@ export default class App extends Component {
     this.setState({player : player});
   }
 
-  startGame(white,black) {
+  startGameMe(other, white) {
+    this.mediatorClient.startGame(this.state.player, other, !white);
+    this.startGame(other, white);
+  }
+
+  startGame(other, white) {
     this.setState({
-        white: white,
-        black: black
+        white: white ? this.state.player : other,
+        black: white ? other : this.state.player
     });
   }
 

@@ -4,19 +4,16 @@ const socketErrorText = "Can't connect to server";
 var socket;
 
 function sendMessage(what, player, password) {
-  var v = {what: what, sender: player};
+  let v = {what: what, sender: player};
   if( password ) {
     v.password = password;
   }
-
-  console.log("SEND=", v);
-
   socket.send(JSON.stringify(v));
 }
 
 export default class MediatorClient {
 
-  login(player, password, onLoginOK, onPlayersAdd, onPlayersRemove, onError) {
+  login(player, password, onLoginOK, onPlayersAdd, onPlayersRemove, onGameStart, onError) {
 
     socket = new WebSocket("ws://localhost:3016/ws");
 
@@ -33,8 +30,8 @@ export default class MediatorClient {
         case "LOGIN_ERROR": onError(msg.errorText); socket = null; break;
         case "PLAYERS_ADD": onPlayersAdd(msg.players); break;
         case "PLAYERS_REMOVE": onPlayersRemove(msg.players); break;
+        case "GAME_START": onGameStart(msg.receiver, msg.white); break;
         // TODO:
-        case "GAME_START":
         case "SURRENDER":
         case "DEUCE":
         case "MOVE":
@@ -45,11 +42,17 @@ export default class MediatorClient {
 
   logout(player) {
     sendMessage( "ASK_LOGOUT", player );
-    socket = null;
+    socket = undefined;
   }
 
   retrieveWaitingPlayers(player) {
     sendMessage( "ASK_PLAYERS", player );
+  }
+
+  startGame(player, other, white) {
+    let v = {what: "GAME_START", sender: player, receiver: other, white: white};
+    console.log("start game", v);
+    socket.send(JSON.stringify(v));
   }
 
 }
