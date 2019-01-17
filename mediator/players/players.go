@@ -94,8 +94,9 @@ func changePlayersMode(msg *Message, what string, mode int) {
   changePlayerMode(msg.Sender, what, mode)
   changePlayerMode(msg.Receiver, what, mode)
   content, _ := json.Marshal(msg)
-  session := activePlayers[msg.Receiver]
-  session.connection.WriteMessage(websocket.TextMessage, content)
+  if session,found := activePlayers[msg.Receiver]; found {
+    session.connection.WriteMessage(websocket.TextMessage, content)
+  }
 }
 
 func changePlayerMode(player string, what string, mode int) {

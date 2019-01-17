@@ -25,7 +25,9 @@ export default class App extends Component {
     this.playersRemove = this.playersRemove.bind(this);
     this.startGame = this.startGame.bind(this);
     this.startGameMe = this.startGameMe.bind(this);
-    this.endGame = this.endGame.bind(this);
+    this.moveOther = this.moveOther.bind(this);
+    this.askGameEnd = this.askGameEnd.bind(this);
+    this.gameEnd = this.gameEnd.bind(this);
   }
 
   setPlayer(player) {
@@ -44,12 +46,29 @@ export default class App extends Component {
     });
   }
 
-  endGame(what) {
+  moveOther(move) {
+    console.log("move other", move);
+  }
+
+  askGameEnd(what, ask, message) {
+    if( window.confirm(ask) ) {
+      alert(message);
+      this.setState({
+        whiteMe: undefined,
+        otherPlayer: undefined
+      });
+      this.mediatorClient.sendGameMessage(this.state.player, this.state.otherPlayer, what);
+//      this.mediatorClient.retrieveWaitingPlayers(this.state.player);
+    }
+  }
+
+  gameEnd(message) {
+    alert(message);
     this.setState({
       whiteMe: undefined,
       otherPlayer: undefined
     });
-    this.mediatorClient.retrieveWaitingPlayers(this.props.parent.state.player);
+    this.mediatorClient.retrieveWaitingPlayers(this.state.player);
   }
 
   logout() {
