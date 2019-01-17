@@ -29,6 +29,7 @@ export default class LoginPage extends Component {
       player => {this.props.parent.setPlayer(player);},
       players => {this.props.parent.playersAdd(players);},
       players => {this.props.parent.playersRemove(players);},
+      (other, white) => {this.props.parent.startGame(other, white);},
       errorMessage => {
         this.setState({errorMessage : errorMessage});
         console.log("LOGIN", errorMessage);

@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import LoginPage from './LoginPage'
 import PlayerListPage from './PlayerListPage'
+import BoardPage from './BoardPage'
 import MediatorClient from './mediatorClientService'
 
 export default class App extends Component {
@@ -13,48 +14,73 @@ export default class App extends Component {
     this.mediatorClient = new MediatorClient();
 
     this.state = {
-        player: null,
+        player: undefined,
+        otherPlayer: undefined,
+        whiteMe: undefined
     };
 
     this.setPlayer = this.setPlayer.bind(this);
     this.logout = this.logout.bind(this);
     this.playersAdd = this.playersAdd.bind(this);
     this.playersRemove = this.playersRemove.bind(this);
+    this.startGame = this.startGame.bind(this);
+    this.startGameMe = this.startGameMe.bind(this);
+    this.endGame = this.endGame.bind(this);
   }
 
   setPlayer(player) {
     this.setState({player : player});
-    this.mediatorClient.retrieveWaitingPlayers(player)
+  }
+
+  startGameMe(other, white) {
+    this.mediatorClient.startGame(this.state.player, other, !white);
+    this.startGame(other, white);
+  }
+
+  startGame(other, white) {
+    this.setState({
+      whiteMe: white,
+      otherPlayer: other
+    });
+  }
+
+  endGame(what) {
+    this.setState({
+      whiteMe: undefined,
+      otherPlayer: undefined
+    });
+    this.mediatorClient.retrieveWaitingPlayers(this.props.parent.state.player);
   }
 
   logout() {
     this.mediatorClient.logout(this.state.player);
-    this.setState({player : null});
+    this.setState({player : undefined});
   }
 
   playersAdd(players) {
-    if( !this.state.player ) {
-      return;
+    if( this.state.player && this.playerListPage && this.playerListPage.playersAdd ) {
+      this.playerListPage.playersAdd(players);
     }
-    this.playerListPage.playersAdd(players);
   }
 
   playersRemove(players) {
-    if( !this.state.player ) {
-      return;
+    if( this.state.player && this.playerListPage && this.playerListPage.playersRemove) {
+      this.playerListPage.playersRemove(players);
     }
-    this.playerListPage.playersRemove(players);
   }
 
   render() {
 
     return (
       <div className="container">
-        {this.state.player &&
-          <PlayerListPage parent={this} onRef={ref => (this.playerListPage = ref)} />
-        }
         {!this.state.player &&
           <LoginPage parent={this}/>
+        }
+        {(this.state.player && !this.state.otherPlayer) &&
+          <PlayerListPage parent={this} onRef={ref => (this.playerListPage = ref)} />
+        }
+        {(this.state.player && this.state.otherPlayer) &&
+          <BoardPage parent={this} onRef={ref => (this.playerListPage = ref)} />
         }
       </div>
     );
