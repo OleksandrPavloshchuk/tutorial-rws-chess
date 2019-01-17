@@ -3,8 +3,11 @@ const socketErrorText = "Can't connect to server";
 
 var socket;
 
-function sendMessage(what, player, password) {
-  let v = {what: what, from: player};
+function sendMessage(what, sender, password) {
+  let v = {what: what};
+  if( sender ) {
+    v.from = sender;
+  }
   if( password ) {
     v.password = password;
   }
@@ -46,12 +49,12 @@ export default class MediatorClient {
   }
 
   logout(player) {
-    sendMessage( "ASK_LOGOUT", player );
+    sendMessage( "LOGOUT", player );
     socket = undefined;
   }
 
-  retrieveWaitingPlayers(player) {
-    sendMessage( "ASK_PLAYERS", player );
+  retrieveWaitingPlayers() {
+    sendMessage( "ASK_PLAYERS" );
   }
 
   startGame(player, other, white) {

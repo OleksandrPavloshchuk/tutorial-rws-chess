@@ -1,76 +1,76 @@
 package main
 
 import (
-  "io"
-  "log"
-  "net/http"
-  "encoding/json"
-  "github.com/gorilla/websocket"
-  "./players"
+	"./players"
+	"encoding/json"
+	"github.com/gorilla/websocket"
+	"io"
+	"log"
+	"net/http"
 )
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-  CheckOrigin: func(r *http.Request) bool { return true },
+	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
 func registerAbout() {
-  http.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-    w.WriteHeader(http.StatusOK)
-    io.WriteString(w, ABOUT)
-  })
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		io.WriteString(w, ABOUT)
+	})
 }
 
 func registerWebSocket() {
-  http.HandleFunc("/ws", func (w http.ResponseWriter, r *http.Request) {
-    conn, err := upgrader.Upgrade(w, r, nil)
-    if err!=nil {
-      log.Printf("web socket error: %v\n", err)
-      return;
-    }
-    for {
-      msgType, msgData, err := conn.ReadMessage()
-      if exitIfError(err, conn) {
-        return
-      }
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			log.Printf("web socket error: %v\n", err)
+			return
+		}
+		for {
+			msgType, msgData, err := conn.ReadMessage()
+			if exitIfError(err, conn) {
+				return
+			}
 
-      msgSrc := players.Message{}
-      if err := json.Unmarshal( msgData, &msgSrc ); err != nil {
-        log.Printf("web socket: can't parse message. Ignored: %v\n", err)
-      } else {
-        if msgRes, doExit := players.DispatchMessage(&msgSrc, conn); doExit {
-          return;
-        } else if msgRes!=nil {
-          msgData,_ = json.Marshal(*msgRes)
-          if exitIfError( conn.WriteMessage(msgType, msgData), conn ) {
-            return
-          }
-        }
-      }
-    }
-  })
+			msgSrc := players.Message{}
+			if err := json.Unmarshal(msgData, &msgSrc); err != nil {
+				log.Printf("web socket: can't parse message. Ignored: %v\n", err)
+			} else {
+				if msgRes, doExit := players.DispatchMessage(&msgSrc, conn); doExit {
+					return
+				} else if msgRes != nil {
+					msgData, _ = json.Marshal(*msgRes)
+					if exitIfError(conn.WriteMessage(msgType, msgData), conn) {
+						return
+					}
+				}
+			}
+		}
+	})
 }
 
 func exitIfError(err error, conn *websocket.Conn) bool {
-  if err==nil {
-    return false
-  }
-  log.Printf("web socket error: %v. Close connection.\n", err)
-  players.RemovePlayer(conn.RemoteAddr())
-  return true
+	if err == nil {
+		return false
+	}
+	log.Printf("web socket error: %v. Close connection.\n", err)
+	players.RemovePlayer(conn.RemoteAddr())
+	return true
 }
 
 func main() {
-  players.Init()
+	players.Init()
 
-  registerAbout()
-  registerWebSocket()
+	registerAbout()
+	registerWebSocket()
 
-  log.Printf(ABOUT)
+	log.Printf(ABOUT)
 
-  http.ListenAndServe(":3016", nil)
+	http.ListenAndServe(":3016", nil)
 }
 
 const ABOUT = `

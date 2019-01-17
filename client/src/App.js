@@ -14,9 +14,11 @@ export default class App extends Component {
     this.mediatorClient = new MediatorClient();
 
     this.state = {
-        player: undefined,
-        otherPlayer: undefined,
-        whiteMe: undefined
+      waitingPlayers: [],
+      player: undefined,
+      otherPlayer: undefined,
+      whiteMe: undefined,
+      myMove: undefined
     };
 
     this.setPlayer = this.setPlayer.bind(this);
@@ -42,7 +44,8 @@ export default class App extends Component {
   startGame(other, white) {
     this.setState({
       whiteMe: white,
-      otherPlayer: other
+      otherPlayer: other,
+      myMove: white
     });
   }
 
@@ -58,7 +61,6 @@ export default class App extends Component {
         otherPlayer: undefined
       });
       this.mediatorClient.sendGameMessage(this.state.player, this.state.otherPlayer, what);
-//      this.mediatorClient.retrieveWaitingPlayers(this.state.player);
     }
   }
 
@@ -68,7 +70,6 @@ export default class App extends Component {
       whiteMe: undefined,
       otherPlayer: undefined
     });
-    this.mediatorClient.retrieveWaitingPlayers(this.state.player);
   }
 
   logout() {
@@ -77,15 +78,27 @@ export default class App extends Component {
   }
 
   playersAdd(players) {
-    if( this.state.player && this.playerListPage && this.playerListPage.playersAdd ) {
-      this.playerListPage.playersAdd(players);
+    if( !this.state.player ) {
+      return;
     }
+    var p = [];
+    this.state.waitingPlayers.forEach(i => p.push(i));
+    players.forEach(i => {
+      if ( this.state.player!==i && !p.includes(i) ) {
+        p.push(i);
+      }
+    });
+    this.setState({waitingPlayers:p});
   }
 
   playersRemove(players) {
-    if( this.state.player && this.playerListPage && this.playerListPage.playersRemove) {
-      this.playerListPage.playersRemove(players);
-    }
+    var p = [];
+    this.state.waitingPlayers.forEach(i => {
+      if ( this.state.player!==i && !players.includes(i) ) {
+        p.push(i);
+      }
+    });
+    this.setState({waitingPlayers:p});
   }
 
   render() {
@@ -96,10 +109,10 @@ export default class App extends Component {
           <LoginPage parent={this}/>
         }
         {(this.state.player && !this.state.otherPlayer) &&
-          <PlayerListPage parent={this} onRef={ref => (this.playerListPage = ref)} />
+          <PlayerListPage parent={this} />
         }
         {(this.state.player && this.state.otherPlayer) &&
-          <BoardPage parent={this} onRef={ref => (this.playerListPage = ref)} />
+          <BoardPage parent={this} />
         }
       </div>
     );
