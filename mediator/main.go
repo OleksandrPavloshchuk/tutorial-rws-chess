@@ -40,6 +40,9 @@ func registerWebSocket() {
 			if err := json.Unmarshal(msgData, &msgSrc); err != nil {
 				log.Printf("web socket: can't parse message. Ignored: %v\n", err)
 			} else {
+				// TODO remove trace
+				log.Printf("TRACE: msg=%v\n", msgSrc)
+
 				if msgRes, doExit := players.DispatchMessage(&msgSrc, conn); doExit {
 					return
 				} else if msgRes != nil {

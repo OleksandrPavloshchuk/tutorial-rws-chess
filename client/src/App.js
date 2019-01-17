@@ -56,11 +56,11 @@ export default class App extends Component {
   askGameEnd(what, ask, message) {
     if( window.confirm(ask) ) {
       alert(message);
+      this.mediatorClient.sendGameMessage(this.state.player, this.state.otherPlayer, what);
       this.setState({
         whiteMe: undefined,
         otherPlayer: undefined
       });
-      this.mediatorClient.sendGameMessage(this.state.player, this.state.otherPlayer, what);
     }
   }
 

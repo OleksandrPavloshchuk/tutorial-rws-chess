@@ -11,8 +11,8 @@ export default class BoardPage extends Component {
 
   askSurrender() {
     // TODO 92019/01/17) replace it by React modal
+    this.setState({myMove:false});
     if (window.confirm("Ask surrender?")) {
-      this.setState({myMove:false});
       this.props.parent.mediatorClient.sendGameMessage(
         this.props.parent.state.player, this.props.parent.state.otherPlayer, "ASK_SURRENDER");
     }
@@ -20,8 +20,8 @@ export default class BoardPage extends Component {
 
   askDeuce() {
     // TODO 92019/01/17) replace it by React modal
+    this.setState({myMove:false});
     if (window.confirm("Ask deuce?")) {
-      this.setState({myMove:false});
       this.props.parent.mediatorClient.sendGameMessage(
         this.props.parent.state.player, this.props.parent.state.otherPlayer, "ASK_DEUCE");
     }
