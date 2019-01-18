@@ -16,15 +16,12 @@ export default class Board extends Component {
     squares.push(<LRow key="top" labels={labels}/>);
     for( var i=1; i<=8; i++ ) {
         const l = this.props.app.state.whiteMe ? 9 - i : i;
-        const r = i % 2 === 0
-          ? <Row label={l} key={i} type={0} />
-          : <Row label={l} key={i} type={1} />
-        squares.push(r);
+        squares.push(<Row label={l} key={i} type={i % 2} />);
     }
     squares.push(<LRow key="bottom" labels={labels}/>);
 
     return (
-        <div className="card board">
+        <div className="card board ">
           <div className="card-body">
             <table>
             <tbody>
@@ -61,10 +58,7 @@ class Row extends Component {
   render() {
     let cs = [];
     for( var i=1; i<=8; i++ ) {
-      const c = i % 2 === this.props.type
-        ? <BCell key={'c' + this.props.label + i} />
-        : <WCell key={'c' + this.props.label + i} />
-      cs.push(c);
+      cs.push(<Cell key={'c' + this.props.label + i} white={(i % 2) !== this.props.type} />);
     }
 
     return (
@@ -85,18 +79,10 @@ class LCell extends Component {
   }
 }
 
-class WCell extends Component {
+class Cell extends Component {
   render() {
     return (
-      <td className="cell-white" key={this.props.key}></td>
-    );
-  }
-}
-
-class BCell extends Component {
-  render() {
-    return (
-      <td className="cell-black" key={this.props.key}></td>
+      <td className={this.props.white ? 'cell-white' : 'cell-black'} key={this.props.key}></td>
     );
   }
 }

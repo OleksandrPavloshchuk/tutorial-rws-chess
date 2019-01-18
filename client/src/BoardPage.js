@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 
-import Board from './Board';
-
 import './assets/css/board.css';
+
+import Board from './Board';
+import MoveList from './MoveList';
+
 
 // TODO (2019/01/17) link Reactstrap here
 export default class BoardPage extends Component {
@@ -51,7 +53,10 @@ export default class BoardPage extends Component {
             >Surrender</button>
           </div>
         </nav>
-        <Board app={this.props.parent} />
+        <div class="row">
+          <Board app={this.props.parent} />
+          <MoveList app={this.props.parent} />
+        </div>
         {this.props.parent.state.message &&
           <div className="alert alert-warning alert-dismissible fade show" role="alert">
             {this.props.parent.state.message}
