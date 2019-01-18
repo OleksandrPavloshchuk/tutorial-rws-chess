@@ -54,7 +54,7 @@ func RemovePlayer(addr net.Addr) {
 	}
 }
 
-func DispatchMessage(msg *Message, connection *websocket.Conn) (*Message, bool) {
+func DispatchMessage(msg *Message, unparsedMsg *[]byte, connection *websocket.Conn) (*Message, bool) {
 	switch msg.What {
 	case "ASK_LOGIN":
 		err := login(msg.Sender, msg.Password, connection)
@@ -75,7 +75,7 @@ func DispatchMessage(msg *Message, connection *websocket.Conn) (*Message, bool) 
 		changePlayersMode(msg, "PLAYERS_REMOVE", playing)
 		return nil, false
 	case "MOVE", "ASK_SURRENDER", "ASK_DEUCE":
-		passMessageToReceiver(msg)
+		passMessageToReceiver(msg.Receiver, unparsedMsg)
 		return nil, false
 	case "SURRENDER", "DEUCE":
 		changePlayersMode(msg, "PLAYERS_ADD", waiting)
@@ -103,14 +103,13 @@ func changePlayerMode(player string, mode int) {
 	activePlayers[player] = s
 }
 
-func passMessageToReceiver(msg *Message) {
-	session, found := activePlayers[msg.Receiver]
+func passMessageToReceiver(receiver string, unparsedMsg *[]byte) {
+	session, found := activePlayers[receiver]
 	if !found {
 		// Probably this player is already gone
-		updatePlayers("PLAYERS_REMOVE", []string{msg.Receiver})
+		updatePlayers("PLAYERS_REMOVE", []string{receiver})
 	} else if session.mode == playing {
-		content, _ := json.Marshal(msg)
-		session.connection.WriteMessage(websocket.TextMessage, content)
+		session.connection.WriteMessage(websocket.TextMessage, *unparsedMsg)
 	}
 }
 

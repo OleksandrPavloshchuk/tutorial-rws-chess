@@ -43,7 +43,7 @@ func registerWebSocket() {
 				// TODO remove trace
 				log.Printf("TRACE: msg=%v\n", msgSrc)
 
-				if msgRes, doExit := players.DispatchMessage(&msgSrc, conn); doExit {
+				if msgRes, doExit := players.DispatchMessage(&msgSrc, &msgData, conn); doExit {
 					return
 				} else if msgRes != nil {
 					msgData, _ = json.Marshal(*msgRes)

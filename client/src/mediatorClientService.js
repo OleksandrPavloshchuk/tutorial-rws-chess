@@ -3,6 +3,10 @@ const socketErrorText = "Can't connect to server";
 
 var socket;
 
+function sendContent(v) {
+  socket.send(JSON.stringify(v));
+}
+
 function sendMessage(what, sender, password) {
   let v = {what: what};
   if( sender ) {
@@ -11,7 +15,7 @@ function sendMessage(what, sender, password) {
   if( password ) {
     v.password = password;
   }
-  socket.send(JSON.stringify(v));
+  sendContent(v);
 }
 
 export default class MediatorClient {
@@ -39,7 +43,7 @@ export default class MediatorClient {
         case "GAME_START": onGameStart(msg.from, msg.white); break;
         case "ASK_SURRENDER": onAskGameEnd("SURRENDER", "Accept surrender ?", "You win" ); break;
         case "ASK_DEUCE": onAskGameEnd("DEUCE", "Accept deuce ?", "Deuce" ); break;
-        case "SURRENDER": onGameEnd("You loose" ); break;
+        case "SURRENDER": onGameEnd("You lose" ); break;
         case "DEUCE": onGameEnd("Deuce" ); break;
         // TODO:
         case "MOVE":
@@ -58,8 +62,7 @@ export default class MediatorClient {
   }
 
   startGame(player, other, white) {
-    let v = {what: "GAME_START", from: player, to: other, white: white};
-    socket.send(JSON.stringify(v));
+    sendContent({what: "GAME_START", from: player, to: other, white: white});
   }
 
   sendGameMessage(player, other, what, move ) {
@@ -67,7 +70,7 @@ export default class MediatorClient {
     if( move ) {
       v.move = move;
     }
-    socket.send(JSON.stringify(v));
+    sendContent(v);
   }
 
 }
