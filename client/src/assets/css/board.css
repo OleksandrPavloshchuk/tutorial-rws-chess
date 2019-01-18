@@ -5,12 +5,12 @@
   padding: 1em;
 }
 
-.square-label {
+.cell-label {
   text-align: center;
   vertical-align: middle;
 }
 
-.white-square {
+.cell-white {
   background-color: beige;
   border: 1px seagreen solid;
   text-align: center;
@@ -19,7 +19,7 @@
   height: 3em;
 }
 
-.black-square {
+.cell-black {
   background-color: seagreen;
   border: 1px seagreen solid;
   text-align: center;
