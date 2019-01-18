@@ -19,7 +19,7 @@ type Message struct {
 	Receiver  string   `json:"to"`
 	Players   []string `json:"players"`
 	Password  string   `json:"password"`
-	ErrorText string   `json:"errorText"`
+	Text      string   `json:"text"`
 	Move      string   `json:"move"`
 	White     bool     `json:"white"`
 }

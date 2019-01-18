@@ -1,0 +1,29 @@
+.board {
+  margin: 1em;
+  width: 28em;
+  min-width: 28em;
+  padding: 1em;
+}
+
+.square-label {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.white-square {
+  background-color: beige;
+  border: 1px seagreen solid;
+  text-align: center;
+  vertical-align: middle;
+  width: 3em;
+  height: 3em;
+}
+
+.black-square {
+  background-color: seagreen;
+  border: 1px seagreen solid;
+  text-align: center;
+  vertical-align: middle;
+  width: 3em;
+  height: 3em;
+}

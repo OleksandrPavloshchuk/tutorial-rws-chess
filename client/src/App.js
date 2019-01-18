@@ -18,7 +18,8 @@ export default class App extends Component {
       player: undefined,
       otherPlayer: undefined,
       whiteMe: undefined,
-      myMove: undefined
+      myMove: undefined,
+      message: undefined
     };
 
     this.setPlayer = this.setPlayer.bind(this);
@@ -49,7 +50,7 @@ export default class App extends Component {
     });
   }
 
-  moveOther(move) {
+  moveOther(move,message) {
     this.setState({myMove:true});
     console.log("move other", move);
   }

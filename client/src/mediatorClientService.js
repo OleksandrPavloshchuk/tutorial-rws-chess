@@ -37,7 +37,7 @@ export default class MediatorClient {
       var msg = JSON.parse(event.data);
       switch( msg.what ) {
         case "LOGIN_OK": onLoginOK(player); break;
-        case "LOGIN_ERROR": onError(msg.errorText); socket = null; break;
+        case "LOGIN_ERROR": onError(msg.text); socket = null; break;
         case "PLAYERS_ADD": onPlayersAdd(msg.players); break;
         case "PLAYERS_REMOVE": onPlayersRemove(msg.players); break;
         case "GAME_START": onGameStart(msg.from, msg.white); break;
@@ -45,8 +45,7 @@ export default class MediatorClient {
         case "ASK_DEUCE": onAskGameEnd("DEUCE", "Accept deuce ?", "Deuce" ); break;
         case "SURRENDER": onGameEnd("You lose" ); break;
         case "DEUCE": onGameEnd("Deuce" ); break;
-        // TODO:
-        case "MOVE":
+        case "MOVE": onMove(msg.move, msg.text); break;
         default: console.log("WARNING unknown message: ", msg, "ignored");
       }
     };
