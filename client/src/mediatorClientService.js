@@ -41,10 +41,9 @@ export default class MediatorClient {
         case "PLAYERS_ADD": onPlayersAdd(msg.players); break;
         case "PLAYERS_REMOVE": onPlayersRemove(msg.players); break;
         case "GAME_START": onGameStart(msg.from, msg.white); break;
-        case "ASK_SURRENDER": onAskGameEnd("SURRENDER", "Accept surrender ?", "You win" ); break;
-        case "ASK_DEUCE": onAskGameEnd("DEUCE", "Accept deuce ?", "Deuce" ); break;
-        case "SURRENDER": onGameEnd("You lose" ); break;
-        case "DEUCE": onGameEnd("Deuce" ); break;
+        case "ASK_SURRENDER": onAskGameEnd("Accept surrender ?", "You win" ); break;
+        case "ASK_DEUCE": onAskGameEnd("Accept deuce ?", "Deuce" ); break;
+        case "GAME_END": onGameEnd( msg.text ); break;
         case "MOVE": onMove(msg.move, msg.text); break;
         default: console.log("WARNING unknown message: ", msg, "ignored");
       }
@@ -64,10 +63,13 @@ export default class MediatorClient {
     sendContent({what: "GAME_START", from: player, to: other, white: white});
   }
 
-  sendGameMessage(player, other, what, move ) {
+  sendGameMessage(player, other, what, message, move ) {
     let v = {what: what, from: player, to: other};
     if( move ) {
       v.move = move;
+    }
+    if( message ) {
+      v.text = message;
     }
     sendContent(v);
   }

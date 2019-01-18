@@ -52,14 +52,14 @@ export default class App extends Component {
 
   moveOther(move,message) {
     this.setState({myMove:true});
-    console.log("move other", move);
+    this.mediatorClient.sendGameMessage(this.state.player, this.state.otherPlayer, "MOVE", message, move);
   }
 
-  askGameEnd(what, ask, message) {
+  askGameEnd(ask, message) {
     this.setState({myMove:true});
     if( window.confirm(ask) ) {
       alert(message);
-      this.mediatorClient.sendGameMessage(this.state.player, this.state.otherPlayer, what);
+      this.mediatorClient.sendGameMessage(this.state.player, this.state.otherPlayer, "GAME_END", message);
       this.setState({
         whiteMe: undefined,
         otherPlayer: undefined

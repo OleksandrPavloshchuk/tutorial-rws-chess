@@ -28,9 +28,10 @@ type Message struct {
 var passwords map[string]string
 
 type playerSession struct {
-	name       string
-	connection *websocket.Conn
-	mode       int
+	name        string
+	otherPlayer string
+	connection  *websocket.Conn
+	mode        int
 }
 
 var activePlayers map[string]playerSession
@@ -48,6 +49,14 @@ func RemovePlayer(addr net.Addr) {
 	for name, session := range activePlayers {
 		if session.connection.RemoteAddr() == addr {
 			log.Printf("Connection to player %v is lost\n", name)
+			if session.mode==playing {
+				// Send message to opponent that he wins:
+				msg := Message{What: "GAME_END", Text: "You win, beacause your opponent is gone"}
+				content, _ := json.Marshal(msg)
+				if otherSession, found := activePlayers[session.otherPlayer]; found {
+					otherSession.connection.WriteMessage(websocket.TextMessage, content)
+				}
+			}
 			removePlayer(name)
 			return
 		}
@@ -61,7 +70,7 @@ func DispatchMessage(msg *Message, unparsedMsg *[]byte, connection *websocket.Co
 		res := Message{What: "LOGIN_OK"}
 		if err != nil {
 			res.What = "LOGIN_ERROR"
-			res.ErrorText = err.Error()
+			res.Text = err.Error()
 		}
 		return &res, false
 	case "LOGOUT":
@@ -77,7 +86,7 @@ func DispatchMessage(msg *Message, unparsedMsg *[]byte, connection *websocket.Co
 	case "MOVE", "ASK_SURRENDER", "ASK_DEUCE":
 		passMessageToReceiver(msg.Receiver, unparsedMsg)
 		return nil, false
-	case "SURRENDER", "DEUCE":
+	case "GAME_END":
 		changePlayersMode(msg, "PLAYERS_ADD", waiting)
 		return nil, false
 	default:
@@ -88,8 +97,8 @@ func DispatchMessage(msg *Message, unparsedMsg *[]byte, connection *websocket.Co
 }
 
 func changePlayersMode(msg *Message, what string, mode int) {
-	changePlayerMode(msg.Sender, mode)
-	changePlayerMode(msg.Receiver, mode)
+	changePlayerMode(msg.Sender, msg.Receiver, mode)
+	changePlayerMode(msg.Receiver, msg.Sender, mode)
 	updatePlayers(what, []string{msg.Sender, msg.Receiver})
 	content, _ := json.Marshal(msg)
 	if session, found := activePlayers[msg.Receiver]; found {
@@ -97,9 +106,14 @@ func changePlayersMode(msg *Message, what string, mode int) {
 	}
 }
 
-func changePlayerMode(player string, mode int) {
+func changePlayerMode(player string, otherPlayer string, mode int) {
 	s, _ := activePlayers[player]
 	s.mode = mode
+	if mode==playing {
+		s.otherPlayer = otherPlayer
+	} else {
+		s.otherPlayer = ""
+	}
 	activePlayers[player] = s
 }
 
