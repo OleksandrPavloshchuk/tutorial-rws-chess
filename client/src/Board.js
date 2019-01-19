@@ -13,12 +13,12 @@ export default class Board extends Component {
         labels = labels.reverse();
     }
 
-    squares.push(<LRow key="top" labels={labels}/>);
+    squares.push(<LRow aKey="top" key="top" labels={labels}/>);
     for( var i=1; i<=8; i++ ) {
         const l = this.props.app.state.whiteMe ? 9 - i : i;
-        squares.push(<Row label={l} key={i} type={i % 2} />);
+        squares.push(<Row label={l} key={i} type={i % 2} app={this.props.app} />);
     }
-    squares.push(<LRow key="bottom" labels={labels}/>);
+    squares.push(<LRow aKey="bottom" key="bottom" labels={labels}/>);
 
     return (
         <div className="card board ">
@@ -47,7 +47,7 @@ class Player extends Component {
 class LRow extends Component {
   render() {
     return (
-      <tr key={this.props.key}>
+      <tr key={this.props.aKey}>
         {this.props.labels.map( l => <LCell text={l} key={l}/>)}
       </tr>
     );
@@ -57,15 +57,20 @@ class LRow extends Component {
 class Row extends Component {
   render() {
     let cs = [];
-    for( var i=1; i<=8; i++ ) {
-      cs.push(<Cell key={'c' + this.props.label + i} white={(i % 2) !== this.props.type} />);
+
+    for(var i=1; i<=8; i++ ) {
+      const lc = this.props.app.state.whiteMe ? i  : 9 - i;
+      const key = 'c' + this.props.label + lc;
+      cs.push(
+        <Cell key={key} aKey={key} white={(i % 2) !== this.props.type} app={this.props.app} />
+      );
     }
 
     return (
       <tr key={this.props.key}>
-        <LCell text={this.props.label} />
+        <LCell text={this.props.label} aKey={this.props.label} />
         {cs}
-        <LCell text={this.props.label} />
+        <LCell text={this.props.label} aKey={this.props.label} />
       </tr>
     );
   }
@@ -74,15 +79,31 @@ class Row extends Component {
 class LCell extends Component {
   render() {
     return (
-      <td className="cell-label" key={this.props.key}>{this.props.text}</td>
+      <td className="cell-label" key={this.props.aKey}>{this.props.text}</td>
     );
   }
 }
 
 class Cell extends Component {
+
   render() {
+    const piece = this.props.app.state.board[this.props.aKey];
     return (
-      <td className={this.props.white ? 'cell-white' : 'cell-black'} key={this.props.key}></td>
+      <td className={this.props.white ? 'cell-white' : 'cell-black'} key={this.props.aKey}>
+      {piece &&
+        <Piece white={piece.white} type={piece.type} />
+      }
+      </td>
+    );
+  }
+}
+
+class Piece extends Component {
+  render() {
+    const color = this.props.white ? "-white" : "-black";
+
+    return (
+      <div className={this.props.type + color} ></div>
     );
   }
 }

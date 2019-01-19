@@ -53,7 +53,7 @@ export default class BoardPage extends Component {
             >Surrender</button>
           </div>
         </nav>
-        <div class="row">
+        <div className="row">
           <Board app={this.props.parent} />
           <MoveList app={this.props.parent} />
         </div>
