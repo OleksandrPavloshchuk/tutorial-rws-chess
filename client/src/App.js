@@ -89,6 +89,11 @@ export default class App extends Component {
   moveComplete(src,dest) {
     // TODO:
     console.log('move complete', src, dest);
+    let pos = src.piece;
+    let board = this.state.board;
+    board[dest] = board[pos];
+    delete board[pos];
+    this.setState({board:board});
   }
 
   moveOther(move,message) {
