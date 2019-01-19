@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Draggable, Droppable } from 'react-drag-and-drop';
 
 import './assets/css/board.css';
 
@@ -8,7 +9,7 @@ export default class Board extends Component {
 
     let squares = [];
 
-    let labels = ['', 'a','b','c','d','e','f','g','h', ' '];
+    let labels = ['a','b','c','d','e','f','g','h'];
     if( !this.props.app.state.whiteMe ) {
         labels = labels.reverse();
     }
@@ -48,7 +49,9 @@ class LRow extends Component {
   render() {
     return (
       <tr key={this.props.aKey}>
+         <td></td>
         {this.props.labels.map( l => <LCell text={l} key={l}/>)}
+        <td></td>
       </tr>
     );
   }
@@ -86,24 +89,44 @@ class LCell extends Component {
 
 class Cell extends Component {
 
+  // TODO (2019/01/19) set allowed drop types in accordance with valid moves
+
   render() {
     const piece = this.props.app.state.board[this.props.aKey];
     return (
       <td className={this.props.white ? 'cell-white' : 'cell-black'} key={this.props.aKey}>
+      <Droppable types={['piece']} onDrop={key => this.props.app.moveComplete(key, this.props.aKey)} >
       {piece &&
-        <Piece white={piece.white} type={piece.type} />
+        <Piece white={piece.white} type={piece.type} position={this.props.aKey}
+          app={this.props.app} />
       }
+      {!piece &&
+        <div className="cell-empty">&nbsp;</div>
+      }
+      </Droppable>
       </td>
     );
   }
 }
 
 class Piece extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      position: this.props.position
+    };
+  }
+
   render() {
     const color = this.props.white ? "-white" : "-black";
 
     return (
-      <div className={this.props.type + color} ></div>
+      <Draggable
+        type="piece" data={this.state.position}
+        className={this.props.type + color}
+        onDragStart={val => this.props.app.moveStart(this.state.position)}
+        >
+      </Draggable>
     );
   }
 }

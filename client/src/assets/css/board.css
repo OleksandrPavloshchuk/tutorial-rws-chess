@@ -21,6 +21,17 @@
   vertical-align: middle;
 }
 
+.Dropable {
+  width: 100%;
+  height: 100%;
+}
+
+.cell-empty {
+  width: 3em;
+  height: 3em;
+}
+
+
 .cell-white {
   background-color: beige;
   border: 1px seagreen solid;

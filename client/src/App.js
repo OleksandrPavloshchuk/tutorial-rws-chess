@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-// import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -29,6 +28,8 @@ export default class App extends Component {
     this.playersRemove = this.playersRemove.bind(this);
     this.startGame = this.startGame.bind(this);
     this.startGameMe = this.startGameMe.bind(this);
+    this.moveStart = this.moveStart.bind(this);
+    this.moveComplete = this.moveComplete.bind(this);
     this.moveOther = this.moveOther.bind(this);
     this.askGameEnd = this.askGameEnd.bind(this);
     this.gameEnd = this.gameEnd.bind(this);
@@ -46,6 +47,7 @@ export default class App extends Component {
   startGame(other, white) {
     // Init board:
     let b = {};
+
     b["c11"] = {type: "rook", white: true};
     b["c12"] = {type: "knight", white: true};
     b["c13"] = {type: "bishop", white: true};
@@ -76,6 +78,17 @@ export default class App extends Component {
       board: b
     });
 
+  }
+
+  moveStart(src) {
+    // TODO: calculate available drop targets
+    console.log('move start', src);
+  }
+
+
+  moveComplete(src,dest) {
+    // TODO:
+    console.log('move complete', src, dest);
   }
 
   moveOther(move,message) {
