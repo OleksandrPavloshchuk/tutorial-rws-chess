@@ -1,20 +1,16 @@
 import React, { Component } from 'react';
 
-import MediatorClient from './mediatorClientService'
-
 // TODO (2019/01/15) how to invoke invalid style of control?
 
 export default class LoginPage extends Component {
 
   constructor(props) {
     super(props);
-    this.mediatorClient = new MediatorClient();
 
     this.state = {login: "", password: "", errorMessage: null };
 
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
-
   }
 
   onChange(event) {
@@ -23,16 +19,19 @@ export default class LoginPage extends Component {
 
   onSubmit(event) {
     event.preventDefault();
-    this.mediatorClient.login(
+    this.props.parent.mediatorClient.startSession(
       this.state.login,
       this.state.password,
       player => {this.props.parent.setPlayer(player);},
       players => {this.props.parent.playersAdd(players);},
       players => {this.props.parent.playersRemove(players);},
       (other, white) => {this.props.parent.startGame(other, white);},
+      (move,message) => {this.props.parent.moveOther(move, message);},
+      (ask,message) => {this.props.parent.askGameEnd(ask,message);},
+      message => {this.props.parent.gameEnd(message);},
       errorMessage => {
         this.setState({errorMessage : errorMessage});
-        console.log("LOGIN", errorMessage);
+        console.log("LOGIN ERROR", errorMessage);
       }
     );
   }

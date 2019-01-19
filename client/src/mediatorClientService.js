@@ -3,17 +3,24 @@ const socketErrorText = "Can't connect to server";
 
 var socket;
 
-function sendMessage(what, player, password) {
-  let v = {what: what, from: player};
+function sendContent(v) {
+  socket.send(JSON.stringify(v));
+}
+
+function sendMessage(what, sender, password) {
+  let v = {what: what};
+  if( sender ) {
+    v.from = sender;
+  }
   if( password ) {
     v.password = password;
   }
-  socket.send(JSON.stringify(v));
+  sendContent(v);
 }
 
 export default class MediatorClient {
 
-  login(player, password, onLoginOK, onPlayersAdd, onPlayersRemove, onGameStart, onError) {
+  startSession(player, password, onLoginOK, onPlayersAdd, onPlayersRemove, onGameStart, onMove, onAskGameEnd, onGameEnd, onError) {
 
     socket = new WebSocket("ws://localhost:3016/ws");
 
@@ -30,31 +37,41 @@ export default class MediatorClient {
       var msg = JSON.parse(event.data);
       switch( msg.what ) {
         case "LOGIN_OK": onLoginOK(player); break;
-        case "LOGIN_ERROR": onError(msg.errorText); socket = null; break;
+        case "LOGIN_ERROR": onError(msg.text); socket = null; break;
         case "PLAYERS_ADD": onPlayersAdd(msg.players); break;
         case "PLAYERS_REMOVE": onPlayersRemove(msg.players); break;
         case "GAME_START": onGameStart(msg.from, msg.white); break;
-        // TODO:
-        case "SURRENDER":
-        case "DEUCE":
-        case "MOVE":
+        case "ASK_SURRENDER": onAskGameEnd("Accept surrender ?", "You win" ); break;
+        case "ASK_DEUCE": onAskGameEnd("Accept deuce ?", "Deuce" ); break;
+        case "GAME_END": onGameEnd( msg.text ); break;
+        case "MOVE": onMove(msg.move, msg.text); break;
         default: console.log("WARNING unknown message: ", msg, "ignored");
       }
     };
   }
 
   logout(player) {
-    sendMessage( "ASK_LOGOUT", player );
+    sendMessage( "LOGOUT", player );
     socket = undefined;
   }
 
-  retrieveWaitingPlayers(player) {
-    sendMessage( "ASK_PLAYERS", player );
+  retrieveWaitingPlayers() {
+    sendMessage( "ASK_PLAYERS" );
   }
 
   startGame(player, other, white) {
-    let v = {what: "GAME_START", from: player, to: other, white: white};
-    socket.send(JSON.stringify(v));
+    sendContent({what: "GAME_START", from: player, to: other, white: white});
+  }
+
+  sendGameMessage(player, other, what, message, move ) {
+    let v = {what: what, from: player, to: other};
+    if( move ) {
+      v.move = move;
+    }
+    if( message ) {
+      v.text = message;
+    }
+    sendContent(v);
   }
 
 }
