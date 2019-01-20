@@ -1,12 +1,11 @@
-.board {
-  margin: 1em;
-  padding: 1em;
+.waiting-opponent {
+  background-image: url("../images/loading.gif");
+  width: 128px;
+  height: 15px;
 }
 
-.retired-pieces {
+.board {
   margin: 1em;
-  width: 16em;
-  min-width: 16em;
   padding: 1em;
 }
 
@@ -59,50 +58,50 @@
   z-index: 100;
 }
 .pawn-white {
-  background-image: url("../svg/Chess_Pieces_Sprite.svg");
+  background-image: url("../images/Chess_Pieces_Sprite.svg");
   background-position: 45px 0px;
 }
 .bishop-white {
-  background-image: url("../svg/Chess_Pieces_Sprite.svg");
+  background-image: url("../images/Chess_Pieces_Sprite.svg");
   background-position: 180px 0px;
 }
 .knight-white {
-  background-image: url("../svg/Chess_Pieces_Sprite.svg");
+  background-image: url("../images/Chess_Pieces_Sprite.svg");
   background-position: 135px 0px;
 }
 .rook-white {
-  background-image: url("../svg/Chess_Pieces_Sprite.svg");
+  background-image: url("../images/Chess_Pieces_Sprite.svg");
   background-position: 90px 0px;
 }
 .queen-white {
-  background-image: url("../svg/Chess_Pieces_Sprite.svg");
+  background-image: url("../images/Chess_Pieces_Sprite.svg");
   background-position: 225px 0px;
 }
 .king-white {
-  background-image: url("../svg/Chess_Pieces_Sprite.svg");
+  background-image: url("../images/Chess_Pieces_Sprite.svg");
   background-position: 270px 0px;
 }
 .pawn-black {
-  background-image: url("../svg/Chess_Pieces_Sprite.svg");
+  background-image: url("../images/Chess_Pieces_Sprite.svg");
   background-position: 45px 45px;
 }
 .bishop-black {
-  background-image: url("../svg/Chess_Pieces_Sprite.svg");
+  background-image: url("../images/Chess_Pieces_Sprite.svg");
   background-position: 180px 45px;
 }
 .knight-black {
-  background-image: url("../svg/Chess_Pieces_Sprite.svg");
+  background-image: url("../images/Chess_Pieces_Sprite.svg");
   background-position: 135px 45px;
 }
 .rook-black {
-  background-image: url("../svg/Chess_Pieces_Sprite.svg");
+  background-image: url("../images/Chess_Pieces_Sprite.svg");
   background-position: 90px 45px;
 }
 .queen-black {
-  background-image: url("../svg/Chess_Pieces_Sprite.svg");
+  background-image: url("../images/Chess_Pieces_Sprite.svg");
   background-position: 225px 45px;
 }
 .king-black {
-  background-image: url("../svg/Chess_Pieces_Sprite.svg");
+  background-image: url("../images/Chess_Pieces_Sprite.svg");
   background-position: 270px 45px;
 }

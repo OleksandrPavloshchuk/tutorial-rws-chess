@@ -44,14 +44,17 @@ export default class BoardPage extends Component {
       <div className="container">
         <nav className="navbar navbar-light bg-light navbar-small">
           <span className="navbar-brand">Tutorial RWS Chess</span>
+          {!this.props.parent.state.myMove &&
+          <div className="waiting-opponent navbar-small float-right"></div>
+          }
+          {this.props.parent.state.myMove &&
           <div className="btn-group float-right" role="group">
-            <button className="btn btn-outline-warning" disabled={!this.props.parent.state.myMove}
-              onClick={this.askDeuce}
+            <button className="btn btn-outline-secondary" onClick={this.askDeuce}
             >Deuce</button>
-            <button className="btn btn-outline-danger" disabled={!this.props.parent.state.myMove}
-              onClick={this.askSurrender}
+            <button className="btn btn-outline-secondary" onClick={this.askSurrender}
             >Surrender</button>
           </div>
+          }
         </nav>
         <div className="row">
           <Board app={this.props.parent} />
