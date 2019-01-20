@@ -93,11 +93,14 @@ class Cell extends Component {
 
   render() {
     const piece = this.props.app.state.board.get(this.props.aKey);
+    const draggable = piece && ((this.props.app.state.whiteMe && piece.white)
+      || (!this.props.app.state.whiteMe && !piece.white));
+
     return (
       <td className={this.props.white ? 'cell-white' : 'cell-black'} key={this.props.aKey}>
       <Droppable types={['piece']} onDrop={key => this.props.app.moveComplete(key, this.props.aKey)} >
       {piece &&
-        <Piece white={piece.white} type={piece.type} position={this.props.aKey}
+        <Piece white={piece.white} type={piece.type} position={this.props.aKey} draggable={draggable}
           app={this.props.app} />
       }
       {!piece &&
@@ -121,12 +124,12 @@ class Piece extends Component {
     const color = this.props.white ? "-white" : "-black";
 
     return (
-      <Draggable
-        type="piece" data={this.state.position}
-        className={this.props.type + color + " piece" }
-        onDragStart={val => this.props.app.moveStart(this.state.position)}
-        >
-      </Draggable>
+      this.props.draggable
+      ? <Draggable type="piece" data={this.state.position}
+          className={this.props.type + color + " piece" }
+          onDragStart={val => this.props.app.moveStart(this.state.position)}
+        ></Draggable>
+      : <div className={this.props.type + color + " piece" }></div>
     );
   }
 }
