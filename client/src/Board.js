@@ -123,7 +123,7 @@ class Piece extends Component {
     return (
       <Draggable
         type="piece" data={this.state.position}
-        className={this.props.type + color}
+        className={this.props.type + color + " piece" }
         onDragStart={val => this.props.app.moveStart(this.state.position)}
         >
       </Draggable>
