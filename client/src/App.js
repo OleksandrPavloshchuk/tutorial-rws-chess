@@ -157,7 +157,7 @@ class Board {
   }
 
   move(moveFrom, moveTo) {
-    if( moveFrom==moveTo ) {
+    if( moveFrom===moveTo ) {
       return false;
     }
     this.data[moveTo] = this.data[moveFrom];
@@ -194,5 +194,10 @@ class Board {
     return b;
   }
 
+}
 
+// TODO show them in move list
+const pieceLabels = {
+  "pawn": "", "rook": "R", "knight": "N",
+  "bishop": "B", "queen": "Q", "king": "K"
 }
