@@ -26,7 +26,7 @@ export default class LoginPage extends Component {
       players => {this.props.parent.playersAdd(players);},
       players => {this.props.parent.playersRemove(players);},
       (other, white) => {this.props.parent.startGame(other, white);},
-      (move,message) => {this.props.parent.moveOther(move, message);},
+      (moveFrom, moveTo, message) => {this.props.parent.moveOther(moveFrom, moveTo, message);},
       (ask,message) => {this.props.parent.askGameEnd(ask,message);},
       message => {this.props.parent.gameEnd(message);},
       errorMessage => {

@@ -19,7 +19,7 @@ export default class App extends Component {
       whiteMe: undefined,
       myMove: undefined,
       message: undefined,
-      board: {}
+      board: undefined
     };
 
     this.setPlayer = this.setPlayer.bind(this);
@@ -45,37 +45,12 @@ export default class App extends Component {
   }
 
   startGame(other, white) {
-    // Init board:
-    let b = {};
-
-    b["c11"] = {type: "rook", white: true};
-    b["c12"] = {type: "knight", white: true};
-    b["c13"] = {type: "bishop", white: true};
-    b["c14"] = {type: "queen", white: true};
-    b["c15"] = {type: "king", white: true};
-    b["c16"] = {type: "bishop", white: true};
-    b["c17"] = {type: "knight", white: true};
-    b["c18"] = {type: "rook", white: true};
-    for( var i=1; i<=8; i++ ) {
-      b["c2" + i] = {type: "pawn", white: true};
-    }
-    b["c81"] = {type: "rook", white: false};
-    b["c82"] = {type: "knight", white: false};
-    b["c83"] = {type: "bishop", white: false};
-    b["c84"] = {type: "queen", white: false};
-    b["c85"] = {type: "king", white: false};
-    b["c86"] = {type: "bishop", white: false};
-    b["c87"] = {type: "knight", white: false};
-    b["c88"] = {type: "rook", white: false};
-    for( i=1; i<=8; i++ ) {
-      b["c7" + i] = {type: "pawn", white: false};
-    }
 
     this.setState({
       whiteMe: white,
       otherPlayer: other,
       myMove: white,
-      board: b
+      board: new Board()
     });
 
   }
@@ -83,22 +58,27 @@ export default class App extends Component {
   moveStart(src) {
     // TODO: calculate available drop targets
     console.log('move start', src);
+
   }
 
 
-  moveComplete(src,dest) {
+  moveComplete(src, moveTo) {
     // TODO:
-    console.log('move complete', src, dest);
-    let pos = src.piece;
-    let board = this.state.board;
-    board[dest] = board[pos];
-    delete board[pos];
-    this.setState({board:board});
+    console.log('move complete', src, moveTo);
+    let moveFrom = src.piece;
+    this.state.board.move(moveFrom, moveTo);
+    this.setState({myMove:false, board: this.state.board});
+
+    this.mediatorClient.sendGameMessage(
+      this.state.player, this.state.otherPlayer,
+      "MOVE", undefined, moveFrom, moveTo);
   }
 
-  moveOther(move,message) {
-    this.setState({myMove:true});
-    this.mediatorClient.sendGameMessage(this.state.player, this.state.otherPlayer, "MOVE", message, move);
+  moveOther(moveFrom, moveTo, message) {
+    // TODO show message, if presents
+
+    this.state.board.move(moveFrom, moveTo);
+    this.setState({myMove:true, board: this.state.board});
   }
 
   askGameEnd(ask, message) {
@@ -166,4 +146,54 @@ export default class App extends Component {
       </div>
     );
   }
+}
+
+class Board {
+  constructor() {
+    this.init = this.init.bind(this);
+    this.get = this.get.bind(this);
+    this.move = this.move.bind(this);
+
+    this.data = this.init();
+  }
+
+  get(pos) {
+    return this.data[pos];
+  }
+
+  move(moveFrom, moveTo) {
+    this.data[moveFrom] = this.data[moveTo];
+    delete this.data[moveFrom];
+  }
+
+  init() {
+    // Init board:
+    var b = {};
+
+    b["c11"] = {type: "rook", white: true};
+    b["c12"] = {type: "knight", white: true};
+    b["c13"] = {type: "bishop", white: true};
+    b["c14"] = {type: "queen", white: true};
+    b["c15"] = {type: "king", white: true};
+    b["c16"] = {type: "bishop", white: true};
+    b["c17"] = {type: "knight", white: true};
+    b["c18"] = {type: "rook", white: true};
+    for( var i=1; i<=8; i++ ) {
+      b["c2" + i] = {type: "pawn", white: true};
+    }
+    b["c81"] = {type: "rook", white: false};
+    b["c82"] = {type: "knight", white: false};
+    b["c83"] = {type: "bishop", white: false};
+    b["c84"] = {type: "queen", white: false};
+    b["c85"] = {type: "king", white: false};
+    b["c86"] = {type: "bishop", white: false};
+    b["c87"] = {type: "knight", white: false};
+    b["c88"] = {type: "rook", white: false};
+    for( i=1; i<=8; i++ ) {
+      b["c7" + i] = {type: "pawn", white: false};
+    }
+    return b;
+  }
+
+
 }

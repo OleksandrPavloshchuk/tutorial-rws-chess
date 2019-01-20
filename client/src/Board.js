@@ -92,7 +92,7 @@ class Cell extends Component {
   // TODO (2019/01/19) set allowed drop types in accordance with valid moves
 
   render() {
-    const piece = this.props.app.state.board[this.props.aKey];
+    const piece = this.props.app.state.board.get(this.props.aKey);
     return (
       <td className={this.props.white ? 'cell-white' : 'cell-black'} key={this.props.aKey}>
       <Droppable types={['piece']} onDrop={key => this.props.app.moveComplete(key, this.props.aKey)} >

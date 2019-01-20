@@ -20,7 +20,8 @@ type Message struct {
 	Players   []string `json:"players"`
 	Password  string   `json:"password"`
 	Text      string   `json:"text"`
-	Move      string   `json:"move"`
+	MoveFrom  string   `json:"moveFrom"`
+	MoveTo    string   `json:"moveTo"`
 	White     bool     `json:"white"`
 }
 
