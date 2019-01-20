@@ -52,26 +52,21 @@ export default class App extends Component {
       myMove: white,
       board: new Board()
     });
-
   }
 
   moveStart(src) {
     // TODO: calculate available drop targets
-    console.log('move start', src);
-
   }
 
-
   moveComplete(src, moveTo) {
-    // TODO:
-    console.log('move complete', src, moveTo);
     let moveFrom = src.piece;
-    this.state.board.move(moveFrom, moveTo);
-    this.setState({myMove:false, board: this.state.board});
+    if( this.state.board.move(moveFrom, moveTo) ) {
+      this.setState({myMove:false, board: this.state.board});
 
-    this.mediatorClient.sendGameMessage(
-      this.state.player, this.state.otherPlayer,
-      "MOVE", undefined, moveFrom, moveTo);
+      this.mediatorClient.sendGameMessage(
+        this.state.player, this.state.otherPlayer,
+        "MOVE", undefined, moveFrom, moveTo);
+    }
   }
 
   moveOther(moveFrom, moveTo, message) {
@@ -162,8 +157,12 @@ class Board {
   }
 
   move(moveFrom, moveTo) {
-    this.data[moveFrom] = this.data[moveTo];
+    if( moveFrom==moveTo ) {
+      return false;
+    }
+    this.data[moveTo] = this.data[moveFrom];
     delete this.data[moveFrom];
+    return true;
   }
 
   init() {
