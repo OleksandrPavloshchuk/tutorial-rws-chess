@@ -28,8 +28,8 @@ export default class LoginPage extends Component {
       (other, white) => {this.props.app.startGame(other, white);},
       (moveFrom, moveTo, message) => {this.props.app.moveOther(moveFrom, moveTo, message);},
       () => {this.props.app.win()},
-      () => {this.props.app.askDeuce();},
-      message => {this.props.app.gameEnd(message);},
+      () => {this.props.app.onAskDeuce();},
+      () => {this.props.app.deuce();},
       errorMessage => {
         this.setState({errorMessage : errorMessage});
         console.log("LOGIN ERROR", errorMessage);

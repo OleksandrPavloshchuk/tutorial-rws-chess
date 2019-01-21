@@ -32,9 +32,9 @@ export default class App extends Component {
     this.moveStart = this.moveStart.bind(this);
     this.moveComplete = this.moveComplete.bind(this);
     this.moveOther = this.moveOther.bind(this);
-    this.askDeuce = this.askDeuce.bind(this);
+    this.onAskDeuce = this.onAskDeuce.bind(this);
     this.win = this.win.bind(this);
-    this.gameEnd = this.gameEnd.bind(this);
+    this.deuce = this.deuce.bind(this);
   }
 
   setPlayer(player) {
@@ -86,20 +86,16 @@ export default class App extends Component {
     this.setState({myMove:true, message: "You win", endGame:true});
   }
 
-  askDeuce() {
+  onAskDeuce() {
     this.setState({myMove:true});
     if( window.confirm("Accept deuce?") ) {
-      this.setState({myMove:true, message: "Deuce", endGame:true});
-      this.mediatorClient.sendGameMessage(this.state.player, this.state.otherPlayer, "GAME_END", "Deuce");
+      this.deuce();
+      this.mediatorClient.sendGameMessage(this.state.player, this.state.otherPlayer, "DEUCE");
     }
   }
 
-  gameEnd(message) {
-    this.setState({
-      endGame: false,
-      whiteMe: undefined,
-      otherPlayer: undefined
-    });
+  deuce() {
+    this.setState({myMove:true, message: "Deuce", endGame:true});
   }
 
   logout() {

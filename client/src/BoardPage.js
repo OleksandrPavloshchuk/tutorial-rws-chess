@@ -17,7 +17,7 @@ export default class BoardPage extends Component {
   }
 
   returnToPlayerList() {
-    this.props.app.gameEnd();
+    this.props.app.endGame();
   }
 
   surrender() {
