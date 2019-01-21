@@ -55,7 +55,8 @@ export default class App extends Component {
   }
 
   moveStart(src) {
-    // TODO: calculate available drop targets
+    this.state.board.calculateAvailableCells(src);
+    this.setState({board: this.state.board});
   }
 
   moveComplete(src, moveTo) {
@@ -148,8 +149,11 @@ class Board {
     this.init = this.init.bind(this);
     this.get = this.get.bind(this);
     this.move = this.move.bind(this);
+    this.calculateAvailableCells = this.calculateAvailableCells.bind(this);
+    this.isAvailable = this.isAvailable.bind(this);
 
     this.data = this.init();
+    this.availableCells = [];
   }
 
   get(pos) {
@@ -192,6 +196,20 @@ class Board {
       b["c7" + i] = {type: "pawn", white: false};
     }
     return b;
+  }
+
+  calculateAvailableCells(src) {
+    this.availableCells = [];
+    // TODO: implement this correct
+    for( let x=1; x<=8; x++ ) {
+      for( let y=1; y<=8; y++ ) {
+        this.availableCells.push("c" + y + x);
+      }
+    }
+  }
+
+  isAvailable(c) {
+    return this.availableCells.includes(c);
   }
 
 }

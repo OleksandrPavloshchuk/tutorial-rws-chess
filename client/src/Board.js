@@ -50,7 +50,7 @@ class LRow extends Component {
     return (
       <tr key={this.props.aKey}>
          <td></td>
-        {this.props.labels.map( l => <LCell text={l} key={l}/>)}
+        {this.props.labels.map( l => <LCell text={l} key={l} aKey={l}/>)}
         <td></td>
       </tr>
     );
@@ -71,9 +71,9 @@ class Row extends Component {
 
     return (
       <tr key={this.props.key}>
-        <LCell text={this.props.label} aKey={this.props.label} />
+        <td className="cell-label">{this.props.label}</td>
         {cs}
-        <LCell text={this.props.label} aKey={this.props.label} />
+        <td className="cell-label">{this.props.label}</td>
       </tr>
     );
   }
@@ -97,9 +97,14 @@ class Cell extends Component {
       ((this.props.app.state.whiteMe && piece.white)
       || (!this.props.app.state.whiteMe && !piece.white));
 
+    let availableTypes = []
+    if( this.props.app.state.board.isAvailable(this.props.aKey) ) {
+      availableTypes.push('piece');
+    }
+
     return (
       <td className={'cell-' + (this.props.white ? 'white' : 'black')} key={this.props.aKey}>
-      <Droppable types={['piece']} onDrop={key => this.props.app.moveComplete(key, this.props.aKey)} >
+      <Droppable types={availableTypes} onDrop={key => this.props.app.moveComplete(key, this.props.aKey)} >
       {piece &&
         <Piece white={piece.white} type={piece.type} position={this.props.aKey} draggable={draggable}
           app={this.props.app} />
