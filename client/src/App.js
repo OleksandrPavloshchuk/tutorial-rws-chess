@@ -130,13 +130,13 @@ export default class App extends Component {
     return (
       <div className="container">
         {!this.state.player &&
-          <LoginPage parent={this}/>
+          <LoginPage app={this}/>
         }
         {(this.state.player && !this.state.otherPlayer) &&
-          <PlayerListPage parent={this} />
+          <PlayerListPage app={this} />
         }
         {(this.state.player && this.state.otherPlayer) &&
-          <BoardPage parent={this} />
+          <BoardPage app={this} />
         }
       </div>
     );

@@ -19,16 +19,16 @@ export default class LoginPage extends Component {
 
   onSubmit(event) {
     event.preventDefault();
-    this.props.parent.mediatorClient.startSession(
+    this.props.app.mediatorClient.startSession(
       this.state.login,
       this.state.password,
-      player => {this.props.parent.setPlayer(player);},
-      players => {this.props.parent.playersAdd(players);},
-      players => {this.props.parent.playersRemove(players);},
-      (other, white) => {this.props.parent.startGame(other, white);},
-      (moveFrom, moveTo, message) => {this.props.parent.moveOther(moveFrom, moveTo, message);},
-      (ask,message) => {this.props.parent.askGameEnd(ask,message);},
-      message => {this.props.parent.gameEnd(message);},
+      player => {this.props.app.setPlayer(player);},
+      players => {this.props.app.playersAdd(players);},
+      players => {this.props.app.playersRemove(players);},
+      (other, white) => {this.props.app.startGame(other, white);},
+      (moveFrom, moveTo, message) => {this.props.app.moveOther(moveFrom, moveTo, message);},
+      (ask,message) => {this.props.app.askGameEnd(ask,message);},
+      message => {this.props.app.gameEnd(message);},
       errorMessage => {
         this.setState({errorMessage : errorMessage});
         console.log("LOGIN ERROR", errorMessage);

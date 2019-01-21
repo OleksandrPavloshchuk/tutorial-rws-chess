@@ -98,7 +98,7 @@ class Cell extends Component {
       || (!this.props.app.state.whiteMe && !piece.white));
 
     return (
-      <td className={this.props.white ? 'cell-white' : 'cell-black'} key={this.props.aKey}>
+      <td className={'cell-' + (this.props.white ? 'white' : 'black')} key={this.props.aKey}>
       <Droppable types={['piece']} onDrop={key => this.props.app.moveComplete(key, this.props.aKey)} >
       {piece &&
         <Piece white={piece.white} type={piece.type} position={this.props.aKey} draggable={draggable}

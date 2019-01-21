@@ -17,24 +17,24 @@ export default class BoardPage extends Component {
   }
 
   hideMessage() {
-    this.props.parent.setState({message:undefined});
+    this.props.app.setState({message:undefined});
   }
 
   askSurrender() {
     // TODO 92019/01/17) replace it by React modal
     if (window.confirm("Ask surrender?")) {
-      this.props.parent.setState({myMove:false});
-      this.props.parent.mediatorClient.sendGameMessage(
-        this.props.parent.state.player, this.props.parent.state.otherPlayer, "ASK_SURRENDER");
+      this.props.app.setState({myMove:false});
+      this.props.app.mediatorClient.sendGameMessage(
+        this.props.app.state.player, this.props.app.state.otherPlayer, "ASK_SURRENDER");
     }
   }
 
   askDeuce() {
     // TODO 92019/01/17) replace it by React modal
     if (window.confirm("Ask deuce?")) {
-      this.props.parent.setState({myMove:false});
-      this.props.parent.mediatorClient.sendGameMessage(
-        this.props.parent.state.player, this.props.parent.state.otherPlayer, "ASK_DEUCE");
+      this.props.app.setState({myMove:false});
+      this.props.app.mediatorClient.sendGameMessage(
+        this.props.app.state.player, this.props.app.state.otherPlayer, "ASK_DEUCE");
     }
   }
 
@@ -44,10 +44,10 @@ export default class BoardPage extends Component {
       <div className="container">
         <nav className="navbar navbar-light bg-light navbar-small">
           <span className="navbar-brand">Tutorial RWS Chess</span>
-          {!this.props.parent.state.myMove &&
+          {!this.props.app.state.myMove &&
           <div className="waiting-opponent navbar-small float-right"></div>
           }
-          {this.props.parent.state.myMove &&
+          {this.props.app.state.myMove &&
           <div className="btn-group float-right" role="group">
             <button className="btn btn-outline-secondary" onClick={this.askDeuce}
             >Deuce</button>
@@ -57,12 +57,12 @@ export default class BoardPage extends Component {
           }
         </nav>
         <div className="row">
-          <Board app={this.props.parent} />
-          <MoveList app={this.props.parent} />
+          <Board app={this.props.app} />
+          <MoveList app={this.props.app} />
         </div>
-        {this.props.parent.state.message &&
+        {this.props.app.state.message &&
           <div className="alert alert-warning alert-dismissible fade show" role="alert">
-            {this.props.parent.state.message}
+            {this.props.app.state.message}
             <button type="button" className="close" onClick={this.hideMessage}>
               <span aria-hidden="true">&times;</span>
             </button>
