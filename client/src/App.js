@@ -68,6 +68,8 @@ export default class App extends Component {
         this.state.player, this.state.otherPlayer,
         "MOVE", undefined, moveFrom, moveTo);
     }
+    this.state.board.clearAvailableCells();
+    this.setState({board: this.state.board});
   }
 
   moveOther(moveFrom, moveTo, message) {
@@ -150,6 +152,7 @@ class Board {
     this.get = this.get.bind(this);
     this.move = this.move.bind(this);
     this.calculateAvailableCells = this.calculateAvailableCells.bind(this);
+    this.clearAvailableCells = this.clearAvailableCells.bind(this);
     this.isAvailable = this.isAvailable.bind(this);
 
     this.data = this.init();
@@ -196,6 +199,10 @@ class Board {
       b["c7" + i] = {type: "pawn", white: false};
     }
     return b;
+  }
+
+  clearAvailableCells() {
+    this.availableCells = [];
   }
 
   calculateAvailableCells(src) {
