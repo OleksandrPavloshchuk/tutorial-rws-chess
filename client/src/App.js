@@ -18,6 +18,7 @@ export default class App extends Component {
       otherPlayer: undefined,
       whiteMe: undefined,
       myMove: undefined,
+      endGame: false,
       message: undefined,
       board: undefined
     };
@@ -31,7 +32,8 @@ export default class App extends Component {
     this.moveStart = this.moveStart.bind(this);
     this.moveComplete = this.moveComplete.bind(this);
     this.moveOther = this.moveOther.bind(this);
-    this.askGameEnd = this.askGameEnd.bind(this);
+    this.askDeuce = this.askDeuce.bind(this);
+    this.win = this.win.bind(this);
     this.gameEnd = this.gameEnd.bind(this);
   }
 
@@ -47,6 +49,7 @@ export default class App extends Component {
   startGame(other, white) {
 
     this.setState({
+      endGame: false,
       whiteMe: white,
       otherPlayer: other,
       myMove: white,
@@ -79,21 +82,21 @@ export default class App extends Component {
     this.setState({myMove:true, board: this.state.board});
   }
 
-  askGameEnd(ask, message) {
+  win() {
+    this.setState({myMove:true, message: "You win", endGame:true});
+  }
+
+  askDeuce() {
     this.setState({myMove:true});
-    if( window.confirm(ask) ) {
-      alert(message);
-      this.mediatorClient.sendGameMessage(this.state.player, this.state.otherPlayer, "GAME_END", message);
-      this.setState({
-        whiteMe: undefined,
-        otherPlayer: undefined
-      });
+    if( window.confirm("Accept deuce?") ) {
+      this.setState({myMove:true, message: "Deuce", endGame:true});
+      this.mediatorClient.sendGameMessage(this.state.player, this.state.otherPlayer, "GAME_END", "Deuce");
     }
   }
 
   gameEnd(message) {
-    alert(message);
     this.setState({
+      endGame: false,
       whiteMe: undefined,
       otherPlayer: undefined
     });

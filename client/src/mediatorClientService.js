@@ -20,7 +20,7 @@ function sendMessage(what, sender, password) {
 
 export default class MediatorClient {
 
-  startSession(player, password, onLoginOK, onPlayersAdd, onPlayersRemove, onGameStart, onMove, onAskGameEnd, onGameEnd, onError) {
+  startSession(player, password, onLoginOK, onPlayersAdd, onPlayersRemove, onGameStart, onMove, onWin, onAskDeuce, onGameEnd, onError) {
 
     socket = new WebSocket("ws://localhost:3016/ws");
 
@@ -41,8 +41,8 @@ export default class MediatorClient {
         case "PLAYERS_ADD": onPlayersAdd(msg.players); break;
         case "PLAYERS_REMOVE": onPlayersRemove(msg.players); break;
         case "GAME_START": onGameStart(msg.from, msg.white); break;
-        case "ASK_SURRENDER": onAskGameEnd("Accept surrender ?", "You win" ); break;
-        case "ASK_DEUCE": onAskGameEnd("Accept deuce ?", "Deuce" ); break;
+        case "SURRENDER": onWin(); break;
+        case "ASK_DEUCE": onAskDeuce(); break;
         case "GAME_END": onGameEnd( msg.text ); break;
         case "MOVE": onMove(msg.moveFrom, msg.moveTo, msg.text); break;
         default: console.log("WARNING unknown message: ", msg, "ignored");

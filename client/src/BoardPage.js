@@ -11,21 +11,21 @@ export default class BoardPage extends Component {
   constructor(props) {
     super(props);
 
-    this.askSurrender = this.askSurrender.bind(this);
+    this.surrender = this.surrender.bind(this);
     this.askDeuce = this.askDeuce.bind(this);
-    this.hideMessage = this.hideMessage.bind(this);
+    this.returnToPlayerList = this.returnToPlayerList.bind(this);
   }
 
-  hideMessage() {
-    this.props.app.setState({message:undefined});
+  returnToPlayerList() {
+    this.props.app.gameEnd();
   }
 
-  askSurrender() {
+  surrender() {
     // TODO 92019/01/17) replace it by React modal
-    if (window.confirm("Ask surrender?")) {
-      this.props.app.setState({myMove:false});
+    if (window.confirm("Surrender?")) {
+      this.props.app.setState({myMove:false, endGame:true, message:'You lose'});
       this.props.app.mediatorClient.sendGameMessage(
-        this.props.app.state.player, this.props.app.state.otherPlayer, "ASK_SURRENDER");
+        this.props.app.state.player, this.props.app.state.otherPlayer, "SURRENDER");
     }
   }
 
@@ -44,15 +44,24 @@ export default class BoardPage extends Component {
       <div className="container">
         <nav className="navbar navbar-light bg-light navbar-small">
           <span className="navbar-brand">Tutorial RWS Chess</span>
-          {!this.props.app.state.myMove &&
+          {this.props.app.state.message &&
+          <div className="navbar-small float-right">{this.props.app.state.message}</div>
+          }
+          {(!this.props.app.state.endGame && !this.props.app.state.myMove) &&
           <div className="waiting-opponent navbar-small float-right"></div>
           }
-          {this.props.app.state.myMove &&
+          {(!this.props.app.state.endGame && this.props.app.state.myMove) &&
           <div className="btn-group float-right" role="group">
             <button className="btn btn-outline-secondary" onClick={this.askDeuce}
             >Deuce</button>
-            <button className="btn btn-outline-secondary" onClick={this.askSurrender}
+            <button className="btn btn-outline-secondary" onClick={this.surrender}
             >Surrender</button>
+          </div>
+          }
+          {this.props.app.state.endGame &&
+          <div className="btn-group float-right" role="group">
+            <button className="btn btn-outline-secondary" onClick={this.returnToPlayerList}
+            >Exit</button>
           </div>
           }
         </nav>
@@ -60,14 +69,6 @@ export default class BoardPage extends Component {
           <Board app={this.props.app} />
           <MoveList app={this.props.app} />
         </div>
-        {this.props.app.state.message &&
-          <div className="alert alert-warning alert-dismissible fade show" role="alert">
-            {this.props.app.state.message}
-            <button type="button" className="close" onClick={this.hideMessage}>
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-        }
       </div>
     );
   }

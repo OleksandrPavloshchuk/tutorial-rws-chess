@@ -84,7 +84,7 @@ func DispatchMessage(msg *Message, unparsedMsg *[]byte, connection *websocket.Co
 	case "GAME_START":
 		changePlayersMode(msg, "PLAYERS_REMOVE", playing)
 		return nil, false
-	case "MOVE", "ASK_SURRENDER", "ASK_DEUCE":
+	case "MOVE", "SURRENDER", "ASK_DEUCE":
 		passMessageToReceiver(msg.Receiver, unparsedMsg)
 		return nil, false
 	case "GAME_END":
