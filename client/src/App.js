@@ -35,6 +35,7 @@ export default class App extends Component {
     this.onAskDeuce = this.onAskDeuce.bind(this);
     this.win = this.win.bind(this);
     this.deuce = this.deuce.bind(this);
+    this.endGame = this.endGame.bind(this);
   }
 
   setPlayer(player) {
@@ -47,13 +48,23 @@ export default class App extends Component {
   }
 
   startGame(other, white) {
-
     this.setState({
       endGame: false,
       whiteMe: white,
       otherPlayer: other,
       myMove: white,
       board: new Board()
+    });
+  }
+
+  endGame() {
+    this.setState({
+      otherPlayer: undefined,
+      whiteMe: undefined,
+      myMove: undefined,
+      endGame: false,
+      message: undefined,
+      board: undefined
     });
   }
 
