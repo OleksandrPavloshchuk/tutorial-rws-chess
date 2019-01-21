@@ -24,14 +24,23 @@ export default class LoginPage extends Component {
     this.props.app.mediatorClient.startSession(
       this.state.login,
       this.state.password,
+      // - login is accepted by server
       player => {this.props.app.setPlayer(player);},
+      // - retrieve other players list
       players => {this.props.app.playersAdd(players);},
+      // - remove players from list
       players => {this.props.app.playersRemove(players);},
+      // - start game
       (other, white) => {this.props.app.startGame(other, white);},
+      // - accept move by othe player
       (moveFrom, moveTo, message) => {this.props.app.moveOther(moveFrom, moveTo, message);},
-      () => {this.props.app.win()},
+      // - accept surrender by other player
+      () => {this.props.app.win("Your opponent've just surrendered. You win.")},
+      // - accept query for deuce by other player
       () => {this.props.app.onAskDeuce();},
+      // - deuce is accepted by other player
       () => {this.props.app.deuce();},
+      // - handle error
       errorMessage => {
         this.setState({errorMessage : errorMessage});
         console.log("LOGIN ERROR", errorMessage);
@@ -42,7 +51,7 @@ export default class LoginPage extends Component {
   render() {
     return (
       <div className="container col-md-6">
-        <nav className="navbar navbar-light bg-light navbar-small"></Logo/></nav>
+        <nav className="navbar navbar-light bg-light navbar-small"><Logo/></nav>
           <form onSubmit={this.onSubmit}>
           {this.state.errorMessage &&
             <div className="alert alert-danger">{this.state.errorMessage}</div>

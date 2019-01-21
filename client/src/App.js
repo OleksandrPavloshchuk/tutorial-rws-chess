@@ -93,8 +93,8 @@ export default class App extends Component {
     this.setState({myMove:true, board: this.state.board});
   }
 
-  win() {
-    this.setState({myMove:true, message: "You win", endGame:true});
+  win(message) {
+    this.setState({myMove:true, message:message, endGame:true});
   }
 
   onAskDeuce() {
