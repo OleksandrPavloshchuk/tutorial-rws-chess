@@ -92,7 +92,7 @@ export default class App extends Component {
   moveOther(moveFrom, moveTo, message) {
     // TODO show message, if presents
 
-    this.state.board.move(moveFrom, moveTo);
+    this.state.board.moveOther(moveFrom, moveTo);
     this.setState({myMove:true, board: this.state.board});
   }
 

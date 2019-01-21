@@ -6,6 +6,7 @@ export default class BoardData {
     this.init = this.init.bind(this);
     this.get = this.get.bind(this);
     this.move = this.move.bind(this);
+    this.moveOther = this.moveOther.bind(this);
     this.calculateAvailableCells = this.calculateAvailableCells.bind(this);
     this.clearAvailableCells = this.clearAvailableCells.bind(this);
     this.isAvailable = this.isAvailable.bind(this);
@@ -19,13 +20,20 @@ export default class BoardData {
   }
 
   move(moveFrom, moveTo) {
-    if( moveFrom===moveTo ) {
+    if( moveFrom===moveTo || !this.availableCells.includes(moveTo)) {
       return false;
     }
     this.data[moveTo] = this.data[moveFrom];
     delete this.data[moveFrom];
     return true;
   }
+
+  moveOther(moveFrom, moveTo) {
+    this.data[moveTo] = this.data[moveFrom];
+    delete this.data[moveFrom];
+    return true;
+  }
+
 
   init() {
     // Init board:

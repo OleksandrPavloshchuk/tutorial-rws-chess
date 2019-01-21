@@ -98,14 +98,10 @@ class Cell extends Component {
       || (!this.props.app.state.whiteMe && !piece.white));
 
     let cellIsAvailable = this.props.app.state.board.isAvailable(this.props.aKey);
-    let availableTypes = []
-    if( cellIsAvailable ) {
-      availableTypes.push('piece');
-    }
 
     return (
       <td className={'cell-' + (this.props.white ? 'white' : 'black') + (cellIsAvailable ? ' cell-available' : '') } key={this.props.aKey}>
-      <Droppable types={availableTypes} onDrop={key => this.props.app.moveComplete(key, this.props.aKey)} >
+      <Droppable types={['piece']} onDrop={key => this.props.app.moveComplete(key, this.props.aKey)} >
       {piece &&
         <Piece white={piece.white} type={piece.type} position={this.props.aKey} draggable={draggable}
           app={this.props.app} />
