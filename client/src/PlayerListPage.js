@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import Logo from './Logo';
+
 export default class PlayerListPage extends Component {
 
   componentDidMount() {
@@ -13,12 +15,10 @@ export default class PlayerListPage extends Component {
         {name}
         <div className="btn-group float-right" role="group">
           <button className="btn btn-outline-success"
-            onClick={ e =>
-              this.props.app.startGameMe(name, true) }
+            onClick={ e => this.props.app.startGameMe(name, true) }
           >Play White</button>
           <button className="btn btn-outline-success"
-            onClick={ e =>
-              this.props.app.startGameMe(name, false) }
+            onClick={ e => this.props.app.startGameMe(name, false) }
           >Play Black</button>
         </div>
       </li>
@@ -26,8 +26,7 @@ export default class PlayerListPage extends Component {
 
     return (
       <div className="container">
-        <nav className="navbar navbar-light bg-light navbar-small">
-          <span className="navbar-brand">Tutorial RWS Chess</span>
+        <nav className="navbar navbar-light bg-light navbar-small"><Logo/>
           <span className="navbar-text">{this.props.app.state.player}</span>
           <button className="btn btn-outline-secondary" onClick={this.props.app.logout}>Logout</button>
         </nav>

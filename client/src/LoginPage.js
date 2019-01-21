@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import Logo from './Logo';
+
 // TODO (2019/01/15) how to invoke invalid style of control?
 
 export default class LoginPage extends Component {
@@ -40,9 +42,7 @@ export default class LoginPage extends Component {
   render() {
     return (
       <div className="container col-md-6">
-        <nav className="navbar navbar-light bg-light navbar-small">
-          <span className="navbar-brand">Tutorial RWS Chess</span>
-          </nav>
+        <nav className="navbar navbar-light bg-light navbar-small"></Logo/></nav>
           <form onSubmit={this.onSubmit}>
           {this.state.errorMessage &&
             <div className="alert alert-danger">{this.state.errorMessage}</div>

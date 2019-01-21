@@ -4,6 +4,7 @@ import './assets/css/board.css';
 
 import Board from './Board';
 import MoveList from './MoveList';
+import Logo from './Logo';
 
 
 // TODO (2019/01/17) link Reactstrap here
@@ -42,8 +43,7 @@ export default class BoardPage extends Component {
 
     return (
       <div className="container">
-        <nav className="navbar navbar-light bg-light navbar-small">
-          <span className="navbar-brand">Tutorial RWS Chess</span>
+        <nav className="navbar navbar-light bg-light navbar-small"><Logo/>
           {this.props.app.state.message &&
           <div className="navbar-small float-right">{this.props.app.state.message}</div>
           }
