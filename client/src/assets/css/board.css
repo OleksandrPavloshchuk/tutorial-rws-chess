@@ -32,7 +32,7 @@
 
 
 .cell-white {
-  background-color: beige;
+  background-color: wheat;
   border: 1px seagreen solid;
   text-align: center;
   vertical-align: middle;
@@ -54,7 +54,7 @@
 }
 
 .cell-available.cell-white {
-  background-color: wheat;
+  background-color: beige;
 }
 
 

@@ -55,7 +55,9 @@ func RemovePlayer(addr net.Addr) {
 				msg := Message{What: "GAME_END", Text: "You win, beacause your opponent is gone"}
 				content, _ := json.Marshal(msg)
 				if otherSession, found := activePlayers[session.otherPlayer]; found {
+					changePlayerMode(session.otherPlayer, "", waiting)
 					otherSession.connection.WriteMessage(websocket.TextMessage, content)
+					updatePlayers("PLAYERS_ADD", []string{session.otherPlayer})
 				}
 			}
 			removePlayer(name)
