@@ -52,7 +52,7 @@ func RemovePlayer(addr net.Addr) {
 			log.Printf("Connection to player %v is lost\n", name)
 			if session.mode==playing {
 				// Send message to opponent that he wins:
-				msg := Message{What: "GAME_END", Text: "You win, beacause your opponent is gone"}
+				msg := Message{What: "SURRENDER", Text: "You win, beacause your opponent is gone"}
 				content, _ := json.Marshal(msg)
 				if otherSession, found := activePlayers[session.otherPlayer]; found {
 					changePlayerMode(session.otherPlayer, "", waiting)

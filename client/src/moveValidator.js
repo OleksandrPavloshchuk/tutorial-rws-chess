@@ -120,7 +120,6 @@ function check(result, board, white, x, y) {
 }
 
 function checkPawn(result, board, white, x, y) {
-  var v = checkCell(board, white, x, y);
   if(checkCell(board, white, x, y)) {
     result.push("c" + y + x);
     return true;

@@ -35,7 +35,7 @@ export default class LoginPage extends Component {
       // - accept move by othe player
       (moveFrom, moveTo, message) => {this.props.app.moveOther(moveFrom, moveTo, message);},
       // - accept surrender by other player
-      () => {this.props.app.win("Your opponent've just surrendered. You win.")},
+      (message) => {this.props.app.win(message)},
       // - accept query for deuce by other player
       () => {this.props.app.onAskDeuce();},
       // - deuce is accepted by other player

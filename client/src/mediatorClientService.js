@@ -41,7 +41,7 @@ export default class MediatorClient {
         case "PLAYERS_ADD": onPlayersAdd(msg.players); break;
         case "PLAYERS_REMOVE": onPlayersRemove(msg.players); break;
         case "GAME_START": onGameStart(msg.from, msg.white); break;
-        case "SURRENDER": onWin(); break;
+        case "SURRENDER": onWin(msg.text); break;
         case "ASK_DEUCE": onAskDeuce(); break;
         case "DEUCE": onDeuce(); break;
         case "MOVE": onMove(msg.moveFrom, msg.moveTo, msg.text); break;

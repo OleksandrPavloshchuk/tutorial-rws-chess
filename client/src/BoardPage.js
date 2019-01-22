@@ -26,7 +26,8 @@ export default class BoardPage extends Component {
     if (window.confirm("Surrender?")) {
       this.props.app.setState({myMove:false, endGame:true, message:'You lose'});
       this.props.app.mediatorClient.sendGameMessage(
-        this.props.app.state.player, this.props.app.state.otherPlayer, "SURRENDER");
+        this.props.app.state.player, this.props.app.state.otherPlayer, "SURRENDER",
+        "Your opponent just have surrender. You win.");
     }
   }
 
