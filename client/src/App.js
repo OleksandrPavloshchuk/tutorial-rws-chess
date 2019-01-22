@@ -85,8 +85,6 @@ export default class App extends Component {
     }
     this.state.board.clearAvailableCells();
     this.setState({board: this.state.board});
-
-    console.log('move complete', this.state.board.availableCells);
   }
 
   moveOther(moveFrom, moveTo, message) {

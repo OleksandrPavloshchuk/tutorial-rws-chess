@@ -23,21 +23,19 @@ export default class MoveValidator {
 }
 
 function valid(v) {
-  return 1<=v || 8>=v;
+  return 1<=v && 8>=v;
 }
 
 const pieceValidators = {
     pawn : (board,x,y,white) => {
       let r = [];
       if(white) {
-        check(r,board,white,x,y+1);
-        if( y===2) {
-          check(r,board,white,x,y+2);
+        if( checkPawn(r,board,white,x,y+1) && y===2) {
+          checkPawn(r,board,white,x,y+2);
         }
       } else {
-        check(r,board,white,x,y-1);
-        if( y===7) {
-          check(r,board,white,x,y-2);
+        if( checkPawn(r,board,white,x,y-1) && y===7) {
+          checkPawn(r,board,white,x,y-2);
         }
       }
       // TODO take
@@ -54,7 +52,7 @@ const pieceValidators = {
       check(r,board,white,x-2,y+1);
       check(r,board,white,x-1,y+2);
       check(r,board,white,x+2,y-1);
-      return [];
+      return r;
     },
     bishop : (board,sx,sy,white) => {
       let r = [];
@@ -95,7 +93,7 @@ const pieceValidators = {
       check(r,board,white,x-1,y-1);
       check(r,board,white,x-1,y+1);
       check(r,board,white,x+1,y-1);
-      return [];
+      return r;
     }
 };
 
@@ -109,9 +107,6 @@ function checkCell(board, white, x, y) {
     return null;
   }
   const p = board.get("c"+y+x);
-
-  console.log('b', board, p);
-
   if(!p) {
     return true;
   }
@@ -119,13 +114,18 @@ function checkCell(board, white, x, y) {
 }
 
 function check(result, board, white, x, y) {
-  var v = checkCell(board, white, x, y);
-  console.log('checkCell(', white, x, y, '=', v);
-
-  // if(null!=checkCell(board, white, x, y)) {
-  if(null!=v) {
+  if(null!=checkCell(board, white, x, y)) {
     result.push("c" + y + x);
   }
+}
+
+function checkPawn(result, board, white, x, y) {
+  var v = checkCell(board, white, x, y);
+  if(checkCell(board, white, x, y)) {
+    result.push("c" + y + x);
+    return true;
+  }
+  return false;
 }
 
 function checkSeries(result, board, white, sx, sy, nextX, nextY) {
