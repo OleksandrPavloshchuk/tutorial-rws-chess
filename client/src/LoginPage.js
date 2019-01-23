@@ -2,21 +2,27 @@ import React, { Component } from 'react';
 
 import Logo from './Logo';
 
-// TODO (2019/01/15) how to invoke invalid style of control?
-
 export default class LoginPage extends Component {
 
   constructor(props) {
     super(props);
 
-    this.state = {login: "", password: "", errorMessage: null };
+    this.state = { login: "", password: "", errorMessage: null};
 
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.onReset = this.onReset.bind(this);
+  }
+  
+  onReset(event) {
+    event.preventDefault();
+    this.setState({ login: "", password: "", errorMessage: null });    
   }
 
   onChange(event) {
-    this.setState({[event.target.name] : event.target.value});
+    this.setState({
+        [event.target.name] : event.target.value
+    });
   }
 
   onSubmit(event) {
@@ -52,22 +58,23 @@ export default class LoginPage extends Component {
     return (
       <div className="container col-md-6">
         <nav className="navbar navbar-light bg-light navbar-small"><Logo/></nav>
-          <form onSubmit={this.onSubmit}>
-          {this.state.errorMessage &&
-            <div className="alert alert-danger">{this.state.errorMessage}</div>
-          }
+        {this.state.errorMessage &&
+        <div className="alert alert-danger">{this.state.errorMessage}</div>
+        }
+        <form onSubmit={this.onSubmit} onReset={this.onReset}>
           <div className="form-group">
             <label htmlFor="login">Login:</label>
-            <input className="form-control" type="text" required={true}
-              name="login" value={this.state.login} onChange={this.onChange} />
-            </div>
-            <div className="form-group">
+            <input className={"form-control " + (this.state.login.length>0 ? "is-valid" : "is-invalid")} type="text" required={true}
+              name="login" value={this.state.login} onChange={this.onChange} placeholder="Enter login here"/>
+          </div>
+          <div className="form-group">
             <label htmlFor="password">Password:</label>
             <input className="form-control" type="password"
               name="password" value={this.state.password} onChange={this.onChange} />
           </div>
-          <div className="form-group">
-            <input type="submit" className="btn btn-primary"/>
+          <div className="form-group row">
+            <div className="col-auto"><input type="submit" className="btn btn-outline-primary col-auto"/></div>
+            <input type="reset" className="btn btn-outline-secondary col-auto" />
           </div>
         </form>
       </div>
