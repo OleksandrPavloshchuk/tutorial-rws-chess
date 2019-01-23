@@ -101,15 +101,13 @@ export default class App extends Component {
     // TODO (2019/01/23) determine type of move: take or move
     let p = this.state.board.get(moveTo);
     let v = { piece: p.type, moveFrom: moveFrom, moveTo: moveTo };
+    let l = this.state.moves;
     if( p.white ) {
-        this.state.moves.push({
-            num: this.state.moves.length+1,
-            white : v
-        });
+        l.push({num:this.state.moves.length+1, white :v});
     } else {
-      this.state.moves[this.state.moves.length-1].black = v;
+      l[this.state.moves.length-1].black = v;
     }
-    this.setState({moves:this.state.moves});
+    this.setState({moves:l});
   }
 
   win(message) {
