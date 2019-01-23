@@ -29,8 +29,8 @@ export default class MoveList extends Component {
         return <tr key={"m" + m.num}>
           <th scope="row">{m.num}</th>
           <td>{this.label(m.white)}</td>
-          <td></td>
           {m.black && <td>{this.label(m.black)}</td> }
+          {!m.black && <td></td>}
         </tr>
       }
   }
@@ -40,7 +40,7 @@ export default class MoveList extends Component {
         <div className="card move-list">
           <h5 className="card-header">Moves</h5>
           <div className="card-body">
-            <table className="table">
+            <table className="table small">
               <tbody>
               {this.props.app.state.moves.map( m => this.renderRow(m))}
               </tbody>
