@@ -29,13 +29,11 @@ export default class BoardData {
   }
 
   moveOther(moveFrom, moveTo, type) {
-    console.log("1", this.data[moveFrom], type );
     this.data[moveFrom].type = type;
-    console.log("2", this.data[moveFrom], type );
     this.data[moveTo] = this.data[moveFrom];
     delete this.data[moveFrom];
   }
-  
+
   copyData(src) {
     let b = {};
     Object.keys( src.data ).forEach( key => {
@@ -47,7 +45,7 @@ export default class BoardData {
 
   init() {
     let b = {};
-    
+
     let addFigures = white => {
       const y = white ? 1 : 8;
       b["c" + y + "1"] = {type: "rook", white: white};
@@ -57,7 +55,7 @@ export default class BoardData {
       b["c" + y + "5"] = {type: "king", white: white};
       b["c" + y + "6"] = {type: "bishop", white: white};
       b["c" + y + "7"] = {type: "knight", white: white};
-      b["c" + y + "8"] = {type: "rook", white: white};      
+      b["c" + y + "8"] = {type: "rook", white: white};
     };
     addFigures(true);
     for( let i=1; i<=8; i++ ) {
