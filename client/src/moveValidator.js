@@ -5,132 +5,115 @@ export default class MoveValidator {
     this.x = parseInt(src.substring(2,3));
     this.y = parseInt(src.substring(1,2));
     this.board = board;
-
+    this.piece = this.board.get(this.src);
+    
+    this.pieceValidators = {
+      pawn : () => { let r = [];
+        if(this.piece.white) {
+          if( this.checkPawn(r, this.x, this.y+1) && this.y===2) {
+            this.checkPawn(r, this.x, this.y+2);
+          }
+          // TODO take
+          // TODO take on passage
+        } else {
+          if( this.checkPawn(r, this.x, this.y-1) && this.y===7) {
+            this.checkPawn(r, this.x, this.y-2);
+          }
+          // TODO take
+          // TODO take on passage
+        }
+        return r;
+      },
+      knight : () => { let r = [];
+        this.check(r, this.x+1, this.y+2);
+        this.check(r, this.x+2, this.y+1);
+        this.check(r, this.x-1, this.y-2);
+        this.check(r, this.x-2, this.y-1);
+        this.check(r, this.x+1, this.y-2);
+        this.check(r, this.x-2, this.y+1);
+        this.check(r, this.x-1, this.y+2);
+        this.check(r, this.x+2, this.y-1);
+        return r;
+      },
+      bishop : () => { let r = [];
+        this.checkSeries(r, i => this.x+i, i => this.y+i);
+        this.checkSeries(r, i => this.x-i, i => this.y-i);
+        this.checkSeries(r, i => this.x+i, i => this.y-i);
+        this.checkSeries(r, i => this.x-i, i => this.y+i);
+        return r;
+      },
+      rook : () => { let r = [];
+        this.checkSeries(r, i => this.x, i => this.y+i);
+        this.checkSeries(r, i => this.x, i => this.y-i);
+        this.checkSeries(r, i => this.x+i, i => this.y);
+        this.checkSeries(r, i => this.x-i, i => this.y);
+        return r;
+      },
+      queen : () => this.pieceValidators['rook']().concat(this.pieceValidators['bishop']()),
+      king : () => { let r = [];
+        this.check(r, this.x, this.y+1);
+        this.check(r, this.x, this.y-1);
+        this.check(r, this.x+1, this.y);
+        this.check(r, this.x-1, this.y);
+        this.check(r, this.x+1, this.y+1);
+        this.check(r, this.x-1, this.y-1);
+        this.check(r, this.x-1, this.y+1);
+        this.check(r, this.x+1, this.y-1);
+        return r;
+      }
+    };
+    
     this.calculateAvailableCells = this.calculateAvailableCells.bind(this);
+    this.checkCell = this.checkCell.bind(this);
+    this.check = this.check.bind(this);
+    this.checkPawn = this.checkPawn.bind(this);
+    this.checkSeries = this.checkSeries.bind(this);
   }
 
   calculateAvailableCells() {
-    const piece = this.board.get(this.src);
-    if( !piece ) {
+    if( !this.piece ) {
       return [];
     }
-    let r = pieceValidators[piece.type](this.board, this.x, this.y, piece.white);
+    
+    let r = this.pieceValidators[this.piece.type]();
     r.push(this.src);
     // TODO validate for opening the king
     return r;
   }
+  
+  /**
+   * @return null - do not add this key to list of available and exit from loop
+             false - add this key to list of available and exit from loop
+             true - add this key to list of avaiable and continue loop
+   */
+  checkCell(x, y) {
+    if(!valid(x) || !valid(y)) { return null; }
+    const p = this.board.get(key(x,y));
+    if(!p) { return true; }
+    return p.white===this.piece.white ? null : false;
+  }
+  
+  check(result, x, y) {
+    if(null!=this.checkCell(x, y)) { add( result, x, y ); }
+  }
 
-}
+  checkPawn(result, x, y) {
+    if(this.checkCell(x, y)) { add( result, x, y ); return true; } 
+    return false;
+  }
 
-const pieceValidators = {
-    pawn : (board,x,y,white) => {
-      let r = [];
-      if(white) {
-        if( checkPawn(r,board,white,x,y+1) && y===2) {
-          checkPawn(r,board,white,x,y+2);
-        }
-        // TODO take
-        // TODO take on passage
-      } else {
-        if( checkPawn(r,board,white,x,y-1) && y===7) {
-          checkPawn(r,board,white,x,y-2);
-        }
-        // TODO take
-        // TODO take on passage
-      }
-      return r;
-    },
-    knight : (board,x,y,white) => {
-      let r = [];
-      check(r,board,white,x+1,y+2);
-      check(r,board,white,x+2,y+1);
-      check(r,board,white,x-1,y-2);
-      check(r,board,white,x-2,y-1);
-      check(r,board,white,x+1,y-2);
-      check(r,board,white,x-2,y+1);
-      check(r,board,white,x-1,y+2);
-      check(r,board,white,x+2,y-1);
-      return r;
-    },
-    bishop : (board,sx,sy,white) => {
-      let r = [];
-      checkSeries(r, board, white, sx, sy,
-        (x,i) => x+i, (y,i) => y+i);
-      checkSeries(r, board, white, sx, sy,
-        (x,i) => x-i, (y,i) => y-i);
-      checkSeries(r, board, white, sx, sy,
-        (x,i) => x+i, (y,i) => y-i);
-      checkSeries(r, board, white, sx, sy,
-        (x,i) => x-i, (y,i) => y+i);
-      return r;
-    },
-    rook : (board,sx,sy,white) => {
-      let r = [];
-      checkSeries(r, board, white, sx, sy,
-        (x,i) => x, (y,i) => y+i);
-      checkSeries(r, board, white, sx, sy,
-        (x,i) => x, (y,i) => y-i);
-      checkSeries(r, board, white, sx, sy,
-        (x,i) => x+i, (y,i) => y);
-      checkSeries(r, board, white, sx, sy,
-        (x,i) => x-i, (y,i) => y);
-      return r;
-    },
-    queen : (board,sx,sy,white) => {
-      return pieceValidators['rook'](board,sx,sy,white).concat(
-        pieceValidators['bishop'](board,sx,sy,white)
-      );
-    },
-    king : (board,x,y,white) => {
-      let r = [];
-      check(r,board,white,x,y+1);
-      check(r,board,white,x,y-1);
-      check(r,board,white,x+1,y);
-      check(r,board,white,x-1,y);
-      check(r,board,white,x+1,y+1);
-      check(r,board,white,x-1,y-1);
-      check(r,board,white,x-1,y+1);
-      check(r,board,white,x+1,y-1);
-      return r;
+  checkSeries(result, nextX, nextY) {
+    for(let i=1; i<8; i++) {
+      const x = nextX(i);
+      const y = nextY(i);
+      const v = this.checkCell(x, y);
+      if( v==null ) { return; }
+      add( result, x, y );
+      if( !v ) { return; }
     }
-};
+  }
+}
 
 function valid(v) { return 1<=v && 8>=v; }
-function key(x,y) { return "c" + y + x; }
-
-/**
- * @return null - do not add this key to list of available and exit from loop
-           false - add this key to list of available and exit from loop
-           true - add this key to list of avaiable and continue loop
- */
-function checkCell(board, white, x, y) {
-  if(!valid(x) || !valid(y)) { return null; }
-  const p = board.get(key(x,y));
-  if(!p) { return true; }
-  return p.white===white ? null : false;
-}
-
-function check(result, board, white, x, y) {
-  if(null!=checkCell(board, white, x, y)) {
-    result.push(key(x,y));
-  }
-}
-
-function checkPawn(result, board, white, x, y) {
-  if(checkCell(board, white, x, y)) {
-    result.push(key(x,y));
-    return true;
-  }
-  return false;
-}
-
-function checkSeries(result, board, white, sx, sy, nextX, nextY) {
-  for(let i=1; i<8; i++) {
-    const x = nextX(sx, i);
-    const y = nextY(sy, i);
-    const v = checkCell(board, white, x, y);
-    if(v==null) { return; }
-    result.push(key(x,y));
-    if(!v) { return; }
-  }
-}
+function key(x, y) { return "c" + y + x; }
+function add(r, x, y) { r.push( key( x, y ) ); }
