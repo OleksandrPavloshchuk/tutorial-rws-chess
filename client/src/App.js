@@ -21,7 +21,8 @@ export default class App extends Component {
       myMove: undefined,
       endGame: false,
       message: undefined,
-      board: undefined
+      board: undefined,
+      moves: []
     };
 
     this.setPlayer = this.setPlayer.bind(this);
@@ -37,6 +38,7 @@ export default class App extends Component {
     this.win = this.win.bind(this);
     this.deuce = this.deuce.bind(this);
     this.endGame = this.endGame.bind(this);
+    this.addMoveToList = this.addMoveToList.bind(this);
   }
 
   setPlayer(player) {
@@ -54,7 +56,8 @@ export default class App extends Component {
       whiteMe: white,
       otherPlayer: other,
       myMove: white,
-      board: new BoardData()
+      board: new BoardData(),
+      moves: []
     });
   }
 
@@ -77,6 +80,7 @@ export default class App extends Component {
   moveComplete(src, moveTo) {
     let moveFrom = src.piece;
     if( this.state.board.move(moveFrom, moveTo) ) {
+      this.addMoveToList(moveFrom, moveTo);
       this.setState({myMove:false, board: this.state.board});
 
       this.mediatorClient.sendGameMessage(
@@ -89,7 +93,23 @@ export default class App extends Component {
 
   moveOther(moveFrom, moveTo, piece, message) {
     this.state.board.moveOther(moveFrom, moveTo, piece);
+    this.addMoveToList(moveFrom, moveTo);
     this.setState({myMove:true, message:message, board: this.state.board});
+  }
+
+  addMoveToList(moveFrom, moveTo) {
+    // TODO (2019/01/23) determine type of move: take or move
+    let p = this.state.board.get(moveTo);
+    let v = { piece: p.type, moveFrom: moveFrom, moveTo: moveTo };
+    if( p.white ) {
+        this.state.moves.push({
+            num: this.state.moves.length+1,
+            white : v
+        });
+    } else {
+      this.state.moves[this.state.moves.length-1].black = v;
+    }
+    this.setState({moves:this.state.moves});
   }
 
   win(message) {
@@ -153,10 +173,4 @@ export default class App extends Component {
       </div>
     );
   }
-}
-
-// TODO show them in move list
-const pieceLabels = {
-  "pawn": "", "rook": "R", "knight": "N",
-  "bishop": "B", "queen": "Q", "king": "K"
 }
