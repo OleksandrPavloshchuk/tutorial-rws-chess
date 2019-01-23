@@ -22,10 +22,6 @@ export default class MoveValidator {
 
 }
 
-function valid(v) {
-  return 1<=v && 8>=v;
-}
-
 const pieceValidators = {
     pawn : (board,x,y,white) => {
       let r = [];
@@ -33,13 +29,15 @@ const pieceValidators = {
         if( checkPawn(r,board,white,x,y+1) && y===2) {
           checkPawn(r,board,white,x,y+2);
         }
+        // TODO take
+        // TODO take on passage
       } else {
         if( checkPawn(r,board,white,x,y-1) && y===7) {
           checkPawn(r,board,white,x,y-2);
         }
+        // TODO take
+        // TODO take on passage
       }
-      // TODO take
-      // TODO take on passage
       return r;
     },
     knight : (board,x,y,white) => {
@@ -97,31 +95,30 @@ const pieceValidators = {
     }
 };
 
+function valid(v) { return 1<=v && 8>=v; }
+function key(x,y) { return "c" + y + x; }
+
 /**
- * @return null - do not add this key to avaibale and exit from loop
-           false - add this key to available and exit from loop
-           true - add this key to avaiable and continue loop
+ * @return null - do not add this key to list of available and exit from loop
+           false - add this key to list of available and exit from loop
+           true - add this key to list of avaiable and continue loop
  */
 function checkCell(board, white, x, y) {
-  if(!valid(x) || !valid(y)) {
-    return null;
-  }
-  const p = board.get("c"+y+x);
-  if(!p) {
-    return true;
-  }
+  if(!valid(x) || !valid(y)) { return null; }
+  const p = board.get(key(x,y));
+  if(!p) { return true; }
   return p.white===white ? null : false;
 }
 
 function check(result, board, white, x, y) {
   if(null!=checkCell(board, white, x, y)) {
-    result.push("c" + y + x);
+    result.push(key(x,y));
   }
 }
 
 function checkPawn(result, board, white, x, y) {
   if(checkCell(board, white, x, y)) {
-    result.push("c" + y + x);
+    result.push(key(x,y));
     return true;
   }
   return false;
@@ -129,15 +126,11 @@ function checkPawn(result, board, white, x, y) {
 
 function checkSeries(result, board, white, sx, sy, nextX, nextY) {
   for(let i=1; i<8; i++) {
-    let x = nextX(sx, i);
-    let y = nextY(sy, i);
-    let v = checkCell(board, white, x, y);
-    if(v==null) {
-      return;
-    }
-    result.push("c" + y + x);
-    if(!v) {
-      return;
-    }
+    const x = nextX(sx, i);
+    const y = nextY(sy, i);
+    const v = checkCell(board, white, x, y);
+    if(v==null) { return; }
+    result.push(key(x,y));
+    if(!v) { return; }
   }
 }
