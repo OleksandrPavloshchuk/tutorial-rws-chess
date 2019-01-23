@@ -13,12 +13,15 @@ export default class MoveValidator {
           if( this.checkPawn(r, this.x, this.y+1) && this.y===2) {
             this.checkPawn(r, this.x, this.y+2);
           }
-          // TODO take
+          this.checkPawnTake(r, this.x-1, this.y+1);
+          this.checkPawnTake(r, this.x+1, this.y+1);
           // TODO take on passage
         } else {
           if( this.checkPawn(r, this.x, this.y-1) && this.y===7) {
             this.checkPawn(r, this.x, this.y-2);
           }
+          this.checkPawnTake(r, this.x-1, this.y-1);
+          this.checkPawnTake(r, this.x+1, this.y-1);
           // TODO take
           // TODO take on passage
         }
@@ -67,6 +70,7 @@ export default class MoveValidator {
     this.checkCell = this.checkCell.bind(this);
     this.check = this.check.bind(this);
     this.checkPawn = this.checkPawn.bind(this);
+    this.checkPawnTake = this.checkPawnTake.bind(this);
     this.checkSeries = this.checkSeries.bind(this);
   }
 
@@ -101,6 +105,11 @@ export default class MoveValidator {
     if(this.checkCell(x, y)) { add( result, x, y ); return true; } 
     return false;
   }
+  
+  checkPawnTake(result, x, y) {
+    const v = this.checkCell(x, y);
+    if( null!=v && !v ) { add( result, x, y ); } 
+  }  
 
   checkSeries(result, nextX, nextY) {
     for(let i=1; i<8; i++) {
