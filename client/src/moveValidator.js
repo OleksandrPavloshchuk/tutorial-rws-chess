@@ -22,7 +22,6 @@ export default class MoveValidator {
           }
           this.checkPawnTake(r, this.x-1, this.y-1);
           this.checkPawnTake(r, this.x+1, this.y-1);
-          // TODO take
           // TODO take on passage
         }
         return r;

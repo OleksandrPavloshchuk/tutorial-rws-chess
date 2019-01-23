@@ -33,7 +33,7 @@ export default class LoginPage extends Component {
       // - start game
       (other, white) => {this.props.app.startGame(other, white);},
       // - accept move by othe player
-      (moveFrom, moveTo, message) => {this.props.app.moveOther(moveFrom, moveTo, message);},
+      (moveFrom, moveTo, piece, message) => {this.props.app.moveOther(moveFrom, moveTo, piece, message);},
       // - accept surrender by other player
       (message) => {this.props.app.win(message)},
       // - accept query for deuce by other player

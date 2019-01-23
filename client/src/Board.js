@@ -89,8 +89,6 @@ class LCell extends Component {
 
 class Cell extends Component {
 
-  // TODO (2019/01/19) set allowed drop types in accordance with valid moves
-
   render() {
     const piece = this.props.app.state.board.get(this.props.aKey);
     const draggable = piece && this.props.app.state.myMove &&

@@ -23,6 +23,7 @@ type Message struct {
 	MoveFrom  string   `json:"moveFrom"`
 	MoveTo    string   `json:"moveTo"`
 	White     bool     `json:"white"`
+	Piece     string   `json:"piece"`
 }
 
 // TODO (2019/01/14) check credentials from database

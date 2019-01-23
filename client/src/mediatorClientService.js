@@ -32,7 +32,7 @@ export default class MediatorClient {
     socket.onerror = event => { onError(socketErrorText); };
     socket.onmessage = event => {
 
-      //console.log('on message', event.data)
+      // console.log('on message', event.data)
 
       var msg = JSON.parse(event.data);
       switch( msg.what ) {
@@ -44,7 +44,7 @@ export default class MediatorClient {
         case "SURRENDER": onWin(msg.text); break;
         case "ASK_DEUCE": onAskDeuce(); break;
         case "DEUCE": onDeuce(); break;
-        case "MOVE": onMove(msg.moveFrom, msg.moveTo, msg.text); break;
+        case "MOVE": onMove(msg.moveFrom, msg.moveTo, msg.piece, msg.text); break;
         default: console.log("WARNING unknown message: ", msg, "ignored");
       }
     };
@@ -63,7 +63,7 @@ export default class MediatorClient {
     sendContent({what: "GAME_START", from: player, to: other, white: white});
   }
 
-  sendGameMessage(player, other, what, message, moveFrom, moveTo ) {
+  sendGameMessage(player, other, what, message, moveFrom, moveTo, piece ) {
     let v = {what: what, from: player, to: other};
     if( moveFrom ) {
       v.moveFrom = moveFrom;
@@ -73,6 +73,9 @@ export default class MediatorClient {
     }
     if( message ) {
       v.text = message;
+    }
+    if( piece ) {
+      v.piece = piece;
     }
     sendContent(v);
   }

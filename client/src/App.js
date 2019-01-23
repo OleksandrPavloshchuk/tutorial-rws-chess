@@ -81,17 +81,15 @@ export default class App extends Component {
 
       this.mediatorClient.sendGameMessage(
         this.state.player, this.state.otherPlayer,
-        "MOVE", undefined, moveFrom, moveTo);
+        "MOVE", undefined, moveFrom, moveTo, this.state.board.get(moveTo).type );
     }
     this.state.board.clearAvailableCells();
     this.setState({board: this.state.board});
   }
 
-  moveOther(moveFrom, moveTo, message) {
-    // TODO show message, if presents
-
-    this.state.board.moveOther(moveFrom, moveTo);
-    this.setState({myMove:true, board: this.state.board});
+  moveOther(moveFrom, moveTo, piece, message) {
+    this.state.board.moveOther(moveFrom, moveTo, piece);
+    this.setState({myMove:true, message:message, board: this.state.board});
   }
 
   win(message) {

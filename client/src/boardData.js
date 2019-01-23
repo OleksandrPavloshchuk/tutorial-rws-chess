@@ -28,36 +28,34 @@ export default class BoardData {
     return true;
   }
 
-  moveOther(moveFrom, moveTo) {
+  moveOther(moveFrom, moveTo, type) {
+    console.log("1", this.data[moveFrom], type );
+    this.data[moveFrom].type = type;
+    console.log("2", this.data[moveFrom], type );
     this.data[moveTo] = this.data[moveFrom];
     delete this.data[moveFrom];
-    return true;
   }
-
 
   init() {
     // Init board:
     var b = {};
-
-    b["c11"] = {type: "rook", white: true};
-    b["c12"] = {type: "knight", white: true};
-    b["c13"] = {type: "bishop", white: true};
-    b["c14"] = {type: "queen", white: true};
-    b["c15"] = {type: "king", white: true};
-    b["c16"] = {type: "bishop", white: true};
-    b["c17"] = {type: "knight", white: true};
-    b["c18"] = {type: "rook", white: true};
+    
+    var addFigures = white => {
+      const y = white ? 1 : 8;
+      b["c" + y + "1"] = {type: "rook", white: white};
+      b["c" + y + "2"] = {type: "knight", white: white};
+      b["c" + y + "3"] = {type: "bishop", white: white};
+      b["c" + y + "4"] = {type: "queen", white: white};
+      b["c" + y + "5"] = {type: "king", white: white};
+      b["c" + y + "6"] = {type: "bishop", white: white};
+      b["c" + y + "7"] = {type: "knight", white: white};
+      b["c" + y + "8"] = {type: "rook", white: white};      
+    };
+    addFigures(true);
     for( var i=1; i<=8; i++ ) {
       b["c2" + i] = {type: "pawn", white: true};
     }
-    b["c81"] = {type: "rook", white: false};
-    b["c82"] = {type: "knight", white: false};
-    b["c83"] = {type: "bishop", white: false};
-    b["c84"] = {type: "queen", white: false};
-    b["c85"] = {type: "king", white: false};
-    b["c86"] = {type: "bishop", white: false};
-    b["c87"] = {type: "knight", white: false};
-    b["c88"] = {type: "rook", white: false};
+    addFigures(false);
     for( i=1; i<=8; i++ ) {
       b["c7" + i] = {type: "pawn", white: false};
     }
