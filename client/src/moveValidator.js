@@ -86,7 +86,6 @@ export default class MoveValidator {
       && !this.board.get(key(this.x-1,this.y))
       && !this.board.get(key(this.x-2,this.y))
       && !this.board.get(key(this.x-3,this.y));
-    return false;
   }
 
   allowedShortCastling() {

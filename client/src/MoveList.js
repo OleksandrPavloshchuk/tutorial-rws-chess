@@ -18,6 +18,9 @@ export default class MoveList extends Component {
 
   label(m) {
     // TODO (2019/01/23) use take and check / mate tag
+    if( m.castling ) {
+      return m.castling;
+    }
     return pieceLabels[m.piece] +
       this.labelPos(m.moveFrom) + (m.take ? ':' : '-') + this.labelPos(m.moveTo);
   }
