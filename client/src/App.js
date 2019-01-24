@@ -56,7 +56,7 @@ export default class App extends Component {
       whiteMe: white,
       otherPlayer: other,
       myMove: white,
-      board: new BoardData(),
+      board: new BoardData(white),
       moves: []
     });
   }
