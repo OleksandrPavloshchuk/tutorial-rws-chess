@@ -1,3 +1,4 @@
+import Configuration from "./config";
 
 const socketErrorText = "Can't connect to server";
 
@@ -21,8 +22,11 @@ function sendMessage(what, sender, password) {
 export default class MediatorClient {
 
   startSession(player, password, onLoginOK, onPlayersAdd, onPlayersRemove, onGameStart, onMove, onWin, onAskDeuce, onDeuce, onError) {
-
-    socket = new WebSocket("ws://localhost:3016/ws");
+  
+    this.config = new Configuration();
+    
+//    socket = new WebSocket(this.config.webSocketUrl, 'websocket');
+    socket = new WebSocket(this.config.webSocketUrl);
 
     socket.onopen = event => {
       console.log("Connected to", event.currentTarget.url);
@@ -37,7 +41,7 @@ export default class MediatorClient {
       var msg = JSON.parse(event.data);
       switch( msg.what ) {
         case "LOGIN_OK": onLoginOK(player); break;
-        case "LOGIN_ERROR": onError(msg.text); socket = null; break;
+        case "LOGIN_ERROR": onError(msg.text); socket.close(); socket = null; break;
         case "PLAYERS_ADD": onPlayersAdd(msg.players); break;
         case "PLAYERS_REMOVE": onPlayersRemove(msg.players); break;
         case "GAME_START": onGameStart(msg.from, msg.white); break;
