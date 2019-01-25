@@ -17,12 +17,14 @@ export default class MoveList extends Component {
   }
 
   label(m) {
-    // TODO (2019/01/23) use take and check / mate tag
+    // TODO (2019/01/23) use check / mate tag
     if( m.castling ) {
       return m.castling;
     }
-    return pieceLabels[m.piece] +
-      this.labelPos(m.moveFrom) + (m.take ? ':' : '-') + this.labelPos(m.moveTo);
+    var r = m.newType ? "" : pieceLabels[m.piece];
+    r += this.labelPos(m.moveFrom) + (m.take ? ':' : '-') + this.labelPos(m.moveTo);
+    r += m.newType ? pieceLabels[m.piece] : "";
+    return r;
   }
 
   renderRow(m) {

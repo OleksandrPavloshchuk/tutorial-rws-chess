@@ -17,6 +17,7 @@ export default class BoardData {
     this.copyData = this.copyData.bind(this);
     this.init = this.init.bind(this);
     this.doMove = this.doMove.bind(this);
+    this.setNewPieceType = this.setNewPieceType.bind(this);
 
     this.startRook1 = "c" + startRow(whiteMe) + "1";
     this.startRook8 = "c" + startRow(whiteMe) + "8";
@@ -28,6 +29,12 @@ export default class BoardData {
 
   get(pos) {
     return this.data[pos];
+  }
+
+  setNewPieceType(pos, newType) {
+    if( newType ) {
+      this.data[pos].type = newType;
+    }
   }
 
   doMove(moveFrom, moveTo, type) {
@@ -66,7 +73,9 @@ export default class BoardData {
   }
 
   moveOther(moveFrom, moveTo, type) {
-    this.data[moveFrom].type = type;
+    if(type) {
+      this.data[moveFrom].type = type;
+    }
     this.doMove(moveFrom, moveTo);
   }
 

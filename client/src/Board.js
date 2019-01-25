@@ -99,7 +99,7 @@ class Cell extends Component {
 
     return (
       <td className={'cell-' + (this.props.white ? 'white' : 'black') + (cellIsAvailable ? ' cell-available' : '') } key={this.props.aKey}>
-      <Droppable types={['piece']} onDrop={key => this.props.app.moveComplete(key, this.props.aKey)} >
+      <Droppable types={['piece']} onDrop={key => this.props.app.dropPiece(key, this.props.aKey)} >
       {piece &&
         <Piece white={piece.white} type={piece.type} position={this.props.aKey} draggable={draggable}
           app={this.props.app} />

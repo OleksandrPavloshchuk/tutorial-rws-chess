@@ -22,6 +22,8 @@ export default class App extends Component {
       endGame: false,
       message: undefined,
       board: undefined,
+      newPieceType: undefined,
+      showConversion: false,
       moves: []
     };
 
@@ -39,6 +41,12 @@ export default class App extends Component {
     this.deuce = this.deuce.bind(this);
     this.endGame = this.endGame.bind(this);
     this.addMoveToList = this.addMoveToList.bind(this);
+    this.isTake = this.isTake.bind(this);
+    this.dropPiece = this.dropPiece.bind(this);
+  }
+
+  isTake(moveTo) {
+    return !!this.state.board.get(moveTo);
   }
 
   setPlayer(player) {
@@ -57,7 +65,9 @@ export default class App extends Component {
       otherPlayer: other,
       myMove: white,
       board: new BoardData(white),
-      moves: []
+      moves: [],
+      newPieceType: undefined,
+      showConversion: false
     });
   }
 
@@ -77,32 +87,49 @@ export default class App extends Component {
     this.setState({board: this.state.board});
   }
 
-  moveComplete(src, moveTo) {
-    let moveFrom = src.piece;
-    let take = !!this.state.board.get(moveTo);
-    if( this.state.board.move(moveFrom, moveTo) ) {
-      this.addMoveToList(moveFrom, moveTo, take);
-      this.setState({myMove:false, board: this.state.board});
+  moveComplete(moveFrom, moveTo, take, newPieceType) {
+    this.addMoveToList(moveFrom, moveTo, take, newPieceType);
+    this.state.board.setNewPieceType( newPieceType );
+    this.mediatorClient.sendGameMessage(
+      this.state.player, this.state.otherPlayer, "MOVE", undefined, moveFrom, moveTo, newPieceType );
+    this.setState({myMove:false, board: this.state.board});
+  }
 
-      this.mediatorClient.sendGameMessage(
-        this.state.player, this.state.otherPlayer,
-        "MOVE", undefined, moveFrom, moveTo, this.state.board.get(moveTo).type );
+  dropPiece(src, moveTo) {
+    let moveFrom = src.piece;
+    let take = this.isTake(moveTo);
+    if( this.state.board.move(moveFrom, moveTo) ) {
+
+      let p = this.state.board.get(moveTo);
+      let y = moveTo.substring(1,2);
+      if( "pawn"===p.type &&
+        ((this.state.whiteMe && "8"===y) || (!this.state.whiteMe && "1"===y))) {
+          // Check for conversion:
+        } else {
+          this.moveComplete( moveFrom, moveTo, take );
+        }
     }
     this.state.board.clearAvailableCells();
     this.setState({board: this.state.board});
   }
 
   moveOther(moveFrom, moveTo, piece, message) {
-    let take = !!this.state.board.get(moveTo);
+    let take = this.isTake(moveTo);
     this.state.board.moveOther(moveFrom, moveTo, piece);
-    this.addMoveToList(moveFrom, moveTo, take);
+    this.addMoveToList(moveFrom, moveTo, take, piece);
     this.setState({myMove:true, message:message, board: this.state.board});
   }
 
-  addMoveToList(moveFrom, moveTo, take) {
+  addMoveToList(moveFrom, moveTo, take, newPieceType) {
     // TODO (2019/01/23) determine type of move: take or move
     let p = this.state.board.get(moveTo);
-    let v = { piece: p.type, moveFrom: moveFrom, moveTo: moveTo, take:take };
+    let v = {
+      piece: p.type,
+      moveFrom: moveFrom,
+      moveTo: moveTo,
+      take: take,
+      newType: newPieceType
+    };
     let l = this.state.moves;
     if( p.white ) {
         l.push({num:this.state.moves.length+1, white :v});
