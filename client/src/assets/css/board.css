@@ -15,6 +15,13 @@
   min-width: 16em;
 }
 
+.conversion-panel {
+  margin: 1em;
+  margin-left: 0;
+  margin-right: 0;
+  width: 3em;
+}
+
 .cell-label {
   text-align: center;
   vertical-align: middle;

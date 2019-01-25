@@ -5,6 +5,7 @@ import './assets/css/board.css';
 import Board from './Board';
 import MoveList from './MoveList';
 import Logo from './Logo';
+import ConversionPanel from './ConversionPanel';
 
 
 // TODO (2019/01/17) link Reactstrap here
@@ -68,6 +69,9 @@ export default class BoardPage extends Component {
         </nav>
         <div className="row">
           <Board app={this.props.app} />
+          {this.props.app.state.showConversion &&
+            <ConversionPanel app={this.props.app} />
+          }
           <MoveList app={this.props.app} />
         </div>
       </div>

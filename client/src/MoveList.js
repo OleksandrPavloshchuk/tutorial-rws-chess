@@ -23,7 +23,7 @@ export default class MoveList extends Component {
     }
     var r = m.newType ? "" : pieceLabels[m.piece];
     r += this.labelPos(m.moveFrom) + (m.take ? ':' : '-') + this.labelPos(m.moveTo);
-    r += m.newType ? pieceLabels[m.piece] : "";
+    r += m.newType ? pieceLabels[m.newType] : "";
     return r;
   }
 

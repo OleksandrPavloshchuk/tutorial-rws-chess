@@ -89,7 +89,7 @@ export default class App extends Component {
 
   moveComplete(moveFrom, moveTo, take, newPieceType) {
     this.addMoveToList(moveFrom, moveTo, take, newPieceType);
-    this.state.board.setNewPieceType( newPieceType );
+    this.state.board.setNewPieceType( moveTo, newPieceType );
     this.mediatorClient.sendGameMessage(
       this.state.player, this.state.otherPlayer, "MOVE", undefined, moveFrom, moveTo, newPieceType );
     this.setState({myMove:false, board: this.state.board});
@@ -104,7 +104,7 @@ export default class App extends Component {
       let y = moveTo.substring(1,2);
       if( "pawn"===p.type &&
         ((this.state.whiteMe && "8"===y) || (!this.state.whiteMe && "1"===y))) {
-          // Check for conversion:
+          this.setState({take:take, moveFrom:moveFrom, moveTo:moveTo, showConversion:true});
         } else {
           this.moveComplete( moveFrom, moveTo, take );
         }
@@ -121,7 +121,6 @@ export default class App extends Component {
   }
 
   addMoveToList(moveFrom, moveTo, take, newPieceType) {
-    // TODO (2019/01/23) determine type of move: take or move
     let p = this.state.board.get(moveTo);
     let v = {
       piece: p.type,
@@ -130,6 +129,7 @@ export default class App extends Component {
       take: take,
       newType: newPieceType
     };
+
     let l = this.state.moves;
     if( p.white ) {
         l.push({num:this.state.moves.length+1, white :v});
