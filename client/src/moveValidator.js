@@ -6,7 +6,7 @@ export default class MoveValidator {
     this.y = parseInt(src.substring(1,2));
     this.board = board;
     this.piece = this.board.get(this.src);
-    
+
     this.pieceValidators = {
       pawn : () => { let r = [];
         if(this.piece.white) {
@@ -61,29 +61,50 @@ export default class MoveValidator {
         this.check(r, this.x-1, this.y-1);
         this.check(r, this.x-1, this.y+1);
         this.check(r, this.x+1, this.y-1);
+        if(this.allowedShortCastling() ) {
+          add(r, this.x+2, this.y);
+        }
+        if(this.allowedLongCastling() ) {
+          add(r, this.x-2, this.y);
+        }
         return r;
       }
     };
-    
+
     this.calculateAvailableCells = this.calculateAvailableCells.bind(this);
     this.checkCell = this.checkCell.bind(this);
     this.check = this.check.bind(this);
     this.checkPawn = this.checkPawn.bind(this);
     this.checkPawnTake = this.checkPawnTake.bind(this);
     this.checkSeries = this.checkSeries.bind(this);
+    this.allowedShortCastling = this.allowedShortCastling.bind(this);
+    this.allowedLongCastling = this.allowedLongCastling.bind(this);
+  }
+
+  allowedLongCastling() {
+    return !this.board.kingMoved && !this.board.rook1Moved
+      && !this.board.get(key(this.x-1,this.y))
+      && !this.board.get(key(this.x-2,this.y))
+      && !this.board.get(key(this.x-3,this.y));
+  }
+
+  allowedShortCastling() {
+    return !this.board.kingMoved && !this.board.rook8Moved
+      && !this.board.get(key(this.x+1,this.y))
+      && !this.board.get(key(this.x+2,this.y));
   }
 
   calculateAvailableCells() {
     if( !this.piece ) {
       return [];
     }
-    
+
     let r = this.pieceValidators[this.piece.type]();
     r.push(this.src);
     // TODO validate for opening the king
     return r;
   }
-  
+
   /**
    * @return null - do not add this key to list of available and exit from loop
              false - add this key to list of available and exit from loop
@@ -95,20 +116,20 @@ export default class MoveValidator {
     if(!p) { return true; }
     return p.white===this.piece.white ? null : false;
   }
-  
+
   check(result, x, y) {
     if(null!=this.checkCell(x, y)) { add( result, x, y ); }
   }
 
   checkPawn(result, x, y) {
-    if(this.checkCell(x, y)) { add( result, x, y ); return true; } 
+    if(this.checkCell(x, y)) { add( result, x, y ); return true; }
     return false;
   }
-  
+
   checkPawnTake(result, x, y) {
     const v = this.checkCell(x, y);
-    if( null!=v && !v ) { add( result, x, y ); } 
-  }  
+    if( null!=v && !v ) { add( result, x, y ); }
+  }
 
   checkSeries(result, nextX, nextY) {
     for(let i=1; i<8; i++) {

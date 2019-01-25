@@ -56,7 +56,7 @@ export default class App extends Component {
       whiteMe: white,
       otherPlayer: other,
       myMove: white,
-      board: new BoardData(),
+      board: new BoardData(white),
       moves: []
     });
   }
@@ -79,8 +79,9 @@ export default class App extends Component {
 
   moveComplete(src, moveTo) {
     let moveFrom = src.piece;
+    let take = !!this.state.board.get(moveTo);
     if( this.state.board.move(moveFrom, moveTo) ) {
-      this.addMoveToList(moveFrom, moveTo);
+      this.addMoveToList(moveFrom, moveTo, take);
       this.setState({myMove:false, board: this.state.board});
 
       this.mediatorClient.sendGameMessage(
@@ -92,20 +93,35 @@ export default class App extends Component {
   }
 
   moveOther(moveFrom, moveTo, piece, message) {
+    let take = !!this.state.board.get(moveTo);
     this.state.board.moveOther(moveFrom, moveTo, piece);
-    this.addMoveToList(moveFrom, moveTo);
+    this.addMoveToList(moveFrom, moveTo, take);
     this.setState({myMove:true, message:message, board: this.state.board});
   }
 
-  addMoveToList(moveFrom, moveTo) {
+  addMoveToList(moveFrom, moveTo, take) {
     // TODO (2019/01/23) determine type of move: take or move
     let p = this.state.board.get(moveTo);
-    let v = { piece: p.type, moveFrom: moveFrom, moveTo: moveTo };
+    let v = { piece: p.type, moveFrom: moveFrom, moveTo: moveTo, take:take };
     let l = this.state.moves;
     if( p.white ) {
         l.push({num:this.state.moves.length+1, white :v});
+        if( "king"===p.type && moveFrom==="c15") {
+          if( moveTo==="c13") {
+            l[this.state.moves.length-1].white.castling = "0-0-0";
+          } else if (moveTo==="c17") {
+            l[this.state.moves.length-1].white.castling = "0-0";
+          }
+        }
     } else {
       l[this.state.moves.length-1].black = v;
+      if( "king"===p.type && moveFrom==="c85") {
+        if( moveTo==="c83") {
+          l[this.state.moves.length-1].black.castling = "0-0-0";
+        } else if (moveTo==="c87") {
+          l[this.state.moves.length-1].black.castling = "0-0";
+        }
+      }
     }
     this.setState({moves:l});
   }
