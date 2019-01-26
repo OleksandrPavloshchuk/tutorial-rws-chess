@@ -102,9 +102,9 @@ export default class App extends Component {
     if( this.state.board.move(moveFrom, moveTo) ) {
 
       let p = this.state.board.get(moveTo);
-      let y = moveTo.substring(1,2);
+      let moveToY = y(moveTo);
       if( "pawn"===p.type &&
-        ((this.state.whiteMe && "8"===y) || (!this.state.whiteMe && "1"===y))) {
+        ((this.state.whiteMe && 8===moveToY) || (!this.state.whiteMe && 1===moveToY))) {
           this.setState({take:take, moveFrom:moveFrom, moveTo:moveTo, showConversion:true});
         } else {
           this.moveComplete( moveFrom, moveTo, take );
