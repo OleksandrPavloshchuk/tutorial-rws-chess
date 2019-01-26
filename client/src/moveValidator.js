@@ -1,9 +1,11 @@
+import {key, x, y} from './boardData';
+
 export default class MoveValidator {
 
   constructor(src, board) {
     this.src = src;
-    this.x = parseInt(src.substring(2,3));
-    this.y = parseInt(src.substring(1,2));
+    this.x = x(src);
+    this.y = y(src);
     this.board = board;
     this.piece = this.board.get(this.src);
 
@@ -144,5 +146,4 @@ export default class MoveValidator {
 }
 
 function valid(v) { return 1<=v && 8>=v; }
-function key(x, y) { return "c" + y + x; }
 function add(r, x, y) { r.push( key( x, y ) ); }

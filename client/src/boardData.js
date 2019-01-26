@@ -55,10 +55,10 @@ export default class BoardData {
       const xTo = x(moveTo);
       const yFrom = y(moveTo);
       if( xTo-xFrom===2) {
-        this.doMove( "c" + yFrom + "8", "c" + yFrom + "6", "rook");
+        this.doMove( key(8, yFrom), key(6, yFrom), "rook");
       }
       if( xFrom-xTo===2) {
-        this.doMove( "c" + yFrom + "1", "c" + yFrom + "4", "rook");
+        this.doMove( key(1,yFrom), key(4,yFrom), "rook");
       }
     }
   }
@@ -99,22 +99,22 @@ export default class BoardData {
 
     let addFigures = white => {
       const y = white ? 1 : 8;
-      b["c" + y + "1"] = {type: "rook", white: white};
-      b["c" + y + "2"] = {type: "knight", white: white};
-      b["c" + y + "3"] = {type: "bishop", white: white};
-      b["c" + y + "4"] = {type: "queen", white: white};
-      b["c" + y + "5"] = {type: "king", white: white};
-      b["c" + y + "6"] = {type: "bishop", white: white};
-      b["c" + y + "7"] = {type: "knight", white: white};
-      b["c" + y + "8"] = {type: "rook", white: white};
+      b[key(1,y)] = {type: "rook", white: white};
+      b[key(2,y)] = {type: "knight", white: white};
+      b[key(3,y)] = {type: "bishop", white: white};
+      b[key(4,y)] = {type: "queen", white: white};
+      b[key(5,y)] = {type: "king", white: white};
+      b[key(6,y)] = {type: "bishop", white: white};
+      b[key(7,y)] = {type: "knight", white: white};
+      b[key(8,y)] = {type: "rook", white: white};
     };
     addFigures(true);
     for( let i=1; i<=8; i++ ) {
-      b["c2" + i] = {type: "pawn", white: true};
+      b[key(i,2)] = {type: "pawn", white: true};
     }
     addFigures(false);
     for( let i=1; i<=8; i++ ) {
-      b["c7" + i] = {type: "pawn", white: false};
+      b[key(i,7)] = {type: "pawn", white: false};
     }
     this.data = b;
   }
@@ -134,10 +134,14 @@ export default class BoardData {
 
 }
 
-function x(key) {
+export function key(x,y) {
+  return "c" + y + x;
+}
+
+export function x(key) {
     return parseInt(key.substring(2,3));
 }
 
-function y(key) {
+export function y(key) {
     return parseInt(key.substring(1,2));
 }
