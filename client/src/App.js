@@ -6,7 +6,7 @@ import LoginPage from './LoginPage';
 import PlayerListPage from './PlayerListPage';
 import BoardPage from './BoardPage';
 import MediatorClient from './mediatorClientService';
-import BoardData from './boardData';
+import BoardData,{key,x,y} from './boardData';
 
 export default class App extends Component {
   constructor(props) {
@@ -43,6 +43,7 @@ export default class App extends Component {
     this.addMoveToList = this.addMoveToList.bind(this);
     this.isTake = this.isTake.bind(this);
     this.dropPiece = this.dropPiece.bind(this);
+    this.isCastling = this.isCastling.bind(this);
   }
 
   isTake(moveTo) {
@@ -117,6 +118,15 @@ export default class App extends Component {
     let take = this.isTake(moveTo);
     this.state.board.moveOther(moveFrom, moveTo, piece);
     this.addMoveToList(moveFrom, moveTo, take, piece);
+    let p = this.state.board.get(moveTo);
+    let py = p.white ? 1 : 8;
+
+    if(this.isCastling(p, moveFrom, moveTo, 3)) {
+      this.state.board.doMove(key(1,py),key(4,py));
+    } else if(this.isCastling(p, moveFrom, moveTo, 7)) {
+      this.state.board.doMove(key(8,py),key(6,py));
+    }
+
     this.setState({myMove:true, message:message, board: this.state.board});
   }
 
@@ -133,24 +143,24 @@ export default class App extends Component {
     let l = this.state.moves;
     if( p.white ) {
         l.push({num:this.state.moves.length+1, white :v});
-        if( "king"===p.type && moveFrom==="c15") {
-          if( moveTo==="c13") {
-            l[this.state.moves.length-1].white.castling = "0-0-0";
-          } else if (moveTo==="c17") {
-            l[this.state.moves.length-1].white.castling = "0-0";
-          }
-        }
     } else {
       l[this.state.moves.length-1].black = v;
-      if( "king"===p.type && moveFrom==="c85") {
-        if( moveTo==="c83") {
-          l[this.state.moves.length-1].black.castling = "0-0-0";
-        } else if (moveTo==="c87") {
-          l[this.state.moves.length-1].black.castling = "0-0";
-        }
-      }
     }
+    v = p.white ? l[this.state.moves.length-1].white : l[this.state.moves.length-1].black;
+    if(this.isCastling(p, moveFrom, moveTo, 3) ) {
+      v.castling = "0-0-0";
+    } else if(this.isCastling(p, moveFrom, moveTo, 7) ) {
+      v.castling = "0-0";
+    }
+
     this.setState({moves:l});
+  }
+
+  isCastling(p, moveFrom, moveTo, xTo) {
+    if("king"!==p.type) { return false; }
+    const py = p.white ? 1 : 8;
+    if( key(5,py)!==moveFrom) { return false; }
+    return key(xTo,py)===moveTo;
   }
 
   win(message) {
