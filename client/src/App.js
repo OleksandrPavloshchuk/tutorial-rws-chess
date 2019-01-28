@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import LoginPage from './LoginPage'
-import PlayerListPage from './PlayerListPage'
-import BoardPage from './BoardPage'
-import MediatorClient from './mediatorClientService'
+import LoginPage from './LoginPage';
+import PlayerListPage from './PlayerListPage';
+import BoardPage from './BoardPage';
+import MediatorClient from './mediatorClientService';
+import BoardData,{key, startY, y} from './boardData';
 
 export default class App extends Component {
   constructor(props) {
@@ -18,8 +19,15 @@ export default class App extends Component {
       otherPlayer: undefined,
       whiteMe: undefined,
       myMove: undefined,
+      endGame: false,
       message: undefined,
-      board: undefined
+      board: undefined,
+      newPieceType: undefined,
+      showConversion: false,
+      askDeuce: false,
+	  confirmDeuce: false,
+      askSurrender: false,
+      moves: []
     };
 
     this.setPlayer = this.setPlayer.bind(this);
@@ -31,13 +39,20 @@ export default class App extends Component {
     this.moveStart = this.moveStart.bind(this);
     this.moveComplete = this.moveComplete.bind(this);
     this.moveOther = this.moveOther.bind(this);
-    this.askGameEnd = this.askGameEnd.bind(this);
-    this.gameEnd = this.gameEnd.bind(this);
+    this.onAskDeuce = this.onAskDeuce.bind(this);
+    this.win = this.win.bind(this);
+    this.deuce = this.deuce.bind(this);
+    this.endGame = this.endGame.bind(this);
+    this.addMoveToList = this.addMoveToList.bind(this);
+    this.isTake = this.isTake.bind(this);
+    this.dropPiece = this.dropPiece.bind(this);
+    this.isCastling = this.isCastling.bind(this);
+    this.isConversion = this.isConversion.bind(this);
   }
 
-  setPlayer(player) {
-    this.setState({player : player});
-  }
+  isTake = moveTo => !!this.state.board.get(moveTo);
+
+  setPlayer = player => this.setState({player : player});
 
   startGameMe(other, white) {
     this.mediatorClient.startGame(this.state.player, other, !white);
@@ -45,61 +60,99 @@ export default class App extends Component {
   }
 
   startGame(other, white) {
-
     this.setState({
+      endGame: false,
       whiteMe: white,
       otherPlayer: other,
       myMove: white,
-      board: new Board()
+      board: new BoardData(white),
+      moves: [],
+      newPieceType: undefined,
+      showConversion: false
+    });
+  }
+
+  endGame() {
+    this.setState({
+      otherPlayer: undefined,
+      whiteMe: undefined,
+      myMove: undefined,
+      endGame: false,
+      message: undefined,
+      board: undefined
     });
   }
 
   moveStart(src) {
-    // TODO: calculate available drop targets
+    this.state.board.calculateAvailableCells(src);
+    this.setState({board: this.state.board});
   }
 
-  moveComplete(src, moveTo) {
+  moveComplete(moveFrom, moveTo, take, newPieceType) {
+    this.addMoveToList(moveFrom, moveTo, take, newPieceType);
+    this.state.board.setNewPieceType( moveTo, newPieceType );
+    this.mediatorClient.sendGameMessage(
+      this.state.player, this.state.otherPlayer, "MOVE", undefined, moveFrom, moveTo, newPieceType );
+    this.setState({myMove:false, board: this.state.board});
+  }
+  
+  isConversion(moveFrom, moveTo) {
+    let p = this.state.board.get(moveTo);
+    if( "pawn"!==p.type ) { return false; }
+    return (this.state.whiteMe && 8===y(moveTo)) || (!this.state.whiteMe && 1===y(moveTo));
+  }
+
+  dropPiece(src, moveTo) {
     let moveFrom = src.piece;
+    let take = this.isTake(moveTo);
     if( this.state.board.move(moveFrom, moveTo) ) {
-      this.setState({myMove:false, board: this.state.board});
-
-      this.mediatorClient.sendGameMessage(
-        this.state.player, this.state.otherPlayer,
-        "MOVE", undefined, moveFrom, moveTo);
+      if( this.isConversion(moveFrom, moveTo) ) {
+        this.setState({take:take, moveFrom:moveFrom, moveTo:moveTo, showConversion:true});
+      } else {
+        this.moveComplete( moveFrom, moveTo, take );
+      }
     }
+    this.state.board.clearAvailableCells();
+    this.setState({board: this.state.board});
   }
 
-  moveOther(moveFrom, moveTo, message) {
-    // TODO show message, if presents
-
-    this.state.board.move(moveFrom, moveTo);
-    this.setState({myMove:true, board: this.state.board});
+  moveOther(moveFrom, moveTo, piece, message) {
+    let take = this.isTake(moveTo);
+    this.state.board.moveOther(moveFrom, moveTo, piece);
+    this.addMoveToList(moveFrom, moveTo, take, piece);
+    this.setState({myMove:true, message:message, board: this.state.board});
   }
 
-  askGameEnd(ask, message) {
-    this.setState({myMove:true});
-    if( window.confirm(ask) ) {
-      alert(message);
-      this.mediatorClient.sendGameMessage(this.state.player, this.state.otherPlayer, "GAME_END", message);
-      this.setState({
-        whiteMe: undefined,
-        otherPlayer: undefined
-      });
+  addMoveToList(moveFrom, moveTo, take, newPieceType) {
+    let p = this.state.board.get(moveTo);
+    let v = { piece:p.type, moveFrom:moveFrom, moveTo:moveTo, take:take, newType: newPieceType };
+
+    let moves = this.state.moves;
+    if( p.white ) {
+      moves.push({num:this.state.moves.length+1, white :v});
+    } else {
+      moves[this.state.moves.length-1].black = v;
     }
+    if( this.isCastling(p, moveFrom, moveTo, 3) ) { v.castling = "0-0-0"; } 
+    else if( this.isCastling(p, moveFrom, moveTo, 7) ) { v.castling = "0-0"; }
+
+    this.setState({moves:moves});
   }
 
-  gameEnd(message) {
-    alert(message);
-    this.setState({
-      whiteMe: undefined,
-      otherPlayer: undefined
-    });
+  isCastling(p, moveFrom, moveTo, xTo) {
+    if( "king"!==p.type ) { return false; }
+    const py = startY(p.white);
+    if( key(5,py)!==moveFrom ) { return false; }
+    return key(xTo,py)===moveTo;
   }
 
-  logout() {
-    this.mediatorClient.logout(this.state.player);
-    this.setState({player : undefined});
-  }
+  onAskDeuce = () => this.setState({myMove:true, confirmDeuce:true});
+
+  win = message => this.setState({myMove:true, message:message, endGame:true});
+
+  deuce = () => this.setState({myMove:true, message:"Deuce", endGame:true});
+
+  logout = () => { this.mediatorClient.logout(this.state.player); this.setState({player : undefined}); }
 
   playersAdd(players) {
     if( !this.state.player ) {
@@ -108,9 +161,7 @@ export default class App extends Component {
     var p = [];
     this.state.waitingPlayers.forEach(i => p.push(i));
     players.forEach(i => {
-      if ( this.state.player!==i && !p.includes(i) ) {
-        p.push(i);
-      }
+      if ( this.state.player!==i && !p.includes(i) ) { p.push(i); }
     });
     this.setState({waitingPlayers:p});
   }
@@ -118,9 +169,7 @@ export default class App extends Component {
   playersRemove(players) {
     var p = [];
     this.state.waitingPlayers.forEach(i => {
-      if ( this.state.player!==i && !players.includes(i) ) {
-        p.push(i);
-      }
+      if ( this.state.player!==i && !players.includes(i) ) { p.push(i); }
     });
     this.setState({waitingPlayers:p});
   }
@@ -130,74 +179,15 @@ export default class App extends Component {
     return (
       <div className="container">
         {!this.state.player &&
-          <LoginPage parent={this}/>
+          <LoginPage app={this}/>
         }
         {(this.state.player && !this.state.otherPlayer) &&
-          <PlayerListPage parent={this} />
+          <PlayerListPage app={this} />
         }
         {(this.state.player && this.state.otherPlayer) &&
-          <BoardPage parent={this} />
+          <BoardPage app={this} />
         }
       </div>
     );
   }
-}
-
-class Board {
-  constructor() {
-    this.init = this.init.bind(this);
-    this.get = this.get.bind(this);
-    this.move = this.move.bind(this);
-
-    this.data = this.init();
-  }
-
-  get(pos) {
-    return this.data[pos];
-  }
-
-  move(moveFrom, moveTo) {
-    if( moveFrom===moveTo ) {
-      return false;
-    }
-    this.data[moveTo] = this.data[moveFrom];
-    delete this.data[moveFrom];
-    return true;
-  }
-
-  init() {
-    // Init board:
-    var b = {};
-
-    b["c11"] = {type: "rook", white: true};
-    b["c12"] = {type: "knight", white: true};
-    b["c13"] = {type: "bishop", white: true};
-    b["c14"] = {type: "queen", white: true};
-    b["c15"] = {type: "king", white: true};
-    b["c16"] = {type: "bishop", white: true};
-    b["c17"] = {type: "knight", white: true};
-    b["c18"] = {type: "rook", white: true};
-    for( var i=1; i<=8; i++ ) {
-      b["c2" + i] = {type: "pawn", white: true};
-    }
-    b["c81"] = {type: "rook", white: false};
-    b["c82"] = {type: "knight", white: false};
-    b["c83"] = {type: "bishop", white: false};
-    b["c84"] = {type: "queen", white: false};
-    b["c85"] = {type: "king", white: false};
-    b["c86"] = {type: "bishop", white: false};
-    b["c87"] = {type: "knight", white: false};
-    b["c88"] = {type: "rook", white: false};
-    for( i=1; i<=8; i++ ) {
-      b["c7" + i] = {type: "pawn", white: false};
-    }
-    return b;
-  }
-
-}
-
-// TODO show them in move list
-const pieceLabels = {
-  "pawn": "", "rook": "R", "knight": "N",
-  "bishop": "B", "queen": "Q", "king": "K"
 }

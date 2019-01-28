@@ -23,6 +23,7 @@ type Message struct {
 	MoveFrom  string   `json:"moveFrom"`
 	MoveTo    string   `json:"moveTo"`
 	White     bool     `json:"white"`
+	Piece     string   `json:"piece"`
 }
 
 // TODO (2019/01/14) check credentials from database
@@ -52,10 +53,12 @@ func RemovePlayer(addr net.Addr) {
 			log.Printf("Connection to player %v is lost\n", name)
 			if session.mode==playing {
 				// Send message to opponent that he wins:
-				msg := Message{What: "GAME_END", Text: "You win, beacause your opponent is gone"}
+				msg := Message{What: "SURRENDER", Text: "You win, because your opponent is gone"}
 				content, _ := json.Marshal(msg)
 				if otherSession, found := activePlayers[session.otherPlayer]; found {
+					changePlayerMode(session.otherPlayer, "", waiting)
 					otherSession.connection.WriteMessage(websocket.TextMessage, content)
+					updatePlayers("PLAYERS_ADD", []string{session.otherPlayer})
 				}
 			}
 			removePlayer(name)
@@ -84,10 +87,11 @@ func DispatchMessage(msg *Message, unparsedMsg *[]byte, connection *websocket.Co
 	case "GAME_START":
 		changePlayersMode(msg, "PLAYERS_REMOVE", playing)
 		return nil, false
-	case "MOVE", "ASK_SURRENDER", "ASK_DEUCE":
+	case "MOVE", "ASK_DEUCE":
 		passMessageToReceiver(msg.Receiver, unparsedMsg)
 		return nil, false
-	case "GAME_END":
+	case "SURRENDER", "DEUCE":
+		passMessageToReceiver(msg.Receiver, unparsedMsg)
 		changePlayersMode(msg, "PLAYERS_ADD", waiting)
 		return nil, false
 	default:

@@ -4,67 +4,65 @@ import './assets/css/board.css';
 
 import Board from './Board';
 import MoveList from './MoveList';
+import Logo from './Logo';
+import ConversionPanel from './ConversionPanel';
+import QuestionModal from './QuestionModal';
 
-
-// TODO (2019/01/17) link Reactstrap here
 export default class BoardPage extends Component {
   constructor(props) {
     super(props);
 
-    this.askSurrender = this.askSurrender.bind(this);
-    this.askDeuce = this.askDeuce.bind(this);
-    this.hideMessage = this.hideMessage.bind(this);
+    this.surrender = this.surrender.bind(this);
+    this.deuce = this.deuce.bind(this);
+    this.returnToPlayerList = this.returnToPlayerList.bind(this);
   }
 
-  hideMessage() {
-    this.props.parent.setState({message:undefined});
+  returnToPlayerList = () => this.props.app.endGame();
+  
+  surrender() {
+    this.props.app.setState({askSurrender:true, acceptDeuce:false, askDeuce:false});
   }
 
-  askSurrender() {
-    // TODO 92019/01/17) replace it by React modal
-    if (window.confirm("Ask surrender?")) {
-      this.props.parent.setState({myMove:false});
-      this.props.parent.mediatorClient.sendGameMessage(
-        this.props.parent.state.player, this.props.parent.state.otherPlayer, "ASK_SURRENDER");
-    }
-  }
-
-  askDeuce() {
-    // TODO 92019/01/17) replace it by React modal
-    if (window.confirm("Ask deuce?")) {
-      this.props.parent.setState({myMove:false});
-      this.props.parent.mediatorClient.sendGameMessage(
-        this.props.parent.state.player, this.props.parent.state.otherPlayer, "ASK_DEUCE");
-    }
+  deuce() {
+    this.props.app.setState({askDeuce:true, acceptDeuce:false, askSurrender:false});
   }
 
   render() {
 
     return (
       <div className="container">
-        <nav className="navbar navbar-light bg-light navbar-small">
-          <span className="navbar-brand">Tutorial RWS Chess</span>
+        {(this.props.app.state.askSurrender  || this.props.app.state.askDeuce || this.props.app.state.confirmDeuce) &&
+            <QuestionModal app={this.props.app} />
+        }
+        <nav className="navbar navbar-light bg-light navbar-small"><Logo/>
+          {this.props.app.state.message &&
+          <div className="navbar-small float-right">{this.props.app.state.message}</div>
+          }
+          {(!this.props.app.state.endGame && !this.props.app.state.myMove) &&
+          <div className="waiting-opponent navbar-small float-right"></div>
+          }
+          {(!this.props.app.state.endGame && this.props.app.state.myMove) &&
           <div className="btn-group float-right" role="group">
-            <button className="btn btn-outline-warning" disabled={!this.props.parent.state.myMove}
-              onClick={this.askDeuce}
+            <button className="btn btn-outline-secondary" onClick={this.deuce}
             >Deuce</button>
-            <button className="btn btn-outline-danger" disabled={!this.props.parent.state.myMove}
-              onClick={this.askSurrender}
+            <button className="btn btn-outline-secondary" onClick={this.surrender}
             >Surrender</button>
           </div>
+          }
+          {this.props.app.state.endGame &&
+          <div className="btn-group float-right" role="group">
+            <button className="btn btn-outline-secondary" onClick={this.returnToPlayerList}
+            >Exit</button>
+          </div>
+          }
         </nav>
         <div className="row">
-          <Board app={this.props.parent} />
-          <MoveList app={this.props.parent} />
+          <Board app={this.props.app} />
+          {this.props.app.state.showConversion &&
+            <ConversionPanel app={this.props.app} />
+          }
+          <MoveList app={this.props.app} />
         </div>
-        {this.props.parent.state.message &&
-          <div className="alert alert-warning alert-dismissible fade show" role="alert">
-            {this.props.parent.state.message}
-            <button type="button" className="close" onClick={this.hideMessage}>
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-        }
       </div>
     );
   }

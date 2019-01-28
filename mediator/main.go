@@ -41,7 +41,7 @@ func registerWebSocket() {
 				log.Printf("web socket: can't parse message. Ignored: %v\n", err)
 			} else {
 				// TODO remove trace
-				log.Printf("TRACE: msg=%v\n", msgSrc)
+				//log.Printf("TRACE: msg=%v\n", msgSrc)
 
 				if msgRes, doExit := players.DispatchMessage(&msgSrc, &msgData, conn); doExit {
 					return

@@ -50,7 +50,7 @@ class LRow extends Component {
     return (
       <tr key={this.props.aKey}>
          <td></td>
-        {this.props.labels.map( l => <LCell text={l} key={l}/>)}
+        {this.props.labels.map( l => <LCell text={l} key={l} aKey={l}/>)}
         <td></td>
       </tr>
     );
@@ -71,9 +71,9 @@ class Row extends Component {
 
     return (
       <tr key={this.props.key}>
-        <LCell text={this.props.label} aKey={this.props.label} />
+        <td className="cell-label">{this.props.label}</td>
         {cs}
-        <LCell text={this.props.label} aKey={this.props.label} />
+        <td className="cell-label">{this.props.label}</td>
       </tr>
     );
   }
@@ -89,15 +89,19 @@ class LCell extends Component {
 
 class Cell extends Component {
 
-  // TODO (2019/01/19) set allowed drop types in accordance with valid moves
-
   render() {
     const piece = this.props.app.state.board.get(this.props.aKey);
+    const draggable = piece && this.props.app.state.myMove && !this.props.app.state.showConversion &&
+      ((this.props.app.state.whiteMe && piece.white)
+      || (!this.props.app.state.whiteMe && !piece.white));
+
+    let cellIsAvailable = this.props.app.state.board.isAvailable(this.props.aKey);
+
     return (
-      <td className={this.props.white ? 'cell-white' : 'cell-black'} key={this.props.aKey}>
-      <Droppable types={['piece']} onDrop={key => this.props.app.moveComplete(key, this.props.aKey)} >
+      <td className={'cell-' + (this.props.white ? 'white' : 'black') + (cellIsAvailable ? ' cell-available' : '') } key={this.props.aKey}>
+      <Droppable types={['piece']} onDrop={key => this.props.app.dropPiece(key, this.props.aKey)} >
       {piece &&
-        <Piece white={piece.white} type={piece.type} position={this.props.aKey}
+        <Piece white={piece.white} type={piece.type} position={this.props.aKey} draggable={draggable}
           app={this.props.app} />
       }
       {!piece &&
@@ -121,12 +125,12 @@ class Piece extends Component {
     const color = this.props.white ? "-white" : "-black";
 
     return (
-      <Draggable
-        type="piece" data={this.state.position}
-        className={this.props.type + color + " piece" }
-        onDragStart={val => this.props.app.moveStart(this.state.position)}
-        >
-      </Draggable>
+      this.props.draggable
+      ? <Draggable type="piece" data={this.state.position}
+          className={this.props.type + color + " piece" }
+          onDragStart={val => this.props.app.moveStart(this.state.position)}
+        ></Draggable>
+      : <div className={this.props.type + color + " piece" }></div>
     );
   }
 }

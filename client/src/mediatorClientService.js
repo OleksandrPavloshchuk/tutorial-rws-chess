@@ -1,3 +1,4 @@
+import Configuration from "./config";
 
 const socketErrorText = "Can't connect to server";
 
@@ -20,9 +21,11 @@ function sendMessage(what, sender, password) {
 
 export default class MediatorClient {
 
-  startSession(player, password, onLoginOK, onPlayersAdd, onPlayersRemove, onGameStart, onMove, onAskGameEnd, onGameEnd, onError) {
-
-    socket = new WebSocket("ws://localhost:3016/ws");
+  startSession(player, password, onLoginOK, onPlayersAdd, onPlayersRemove, onGameStart, onMove, onWin, onAskDeuce, onDeuce, onError) {
+  
+    this.config = new Configuration();
+    
+    socket = new WebSocket(this.config.webSocketUrl);
 
     socket.onopen = event => {
       console.log("Connected to", event.currentTarget.url);
@@ -32,19 +35,19 @@ export default class MediatorClient {
     socket.onerror = event => { onError(socketErrorText); };
     socket.onmessage = event => {
 
-      console.log('on message', event.data)
+     // console.log('on message', event.data)
 
       var msg = JSON.parse(event.data);
       switch( msg.what ) {
         case "LOGIN_OK": onLoginOK(player); break;
-        case "LOGIN_ERROR": onError(msg.text); socket = null; break;
+        case "LOGIN_ERROR": onError(msg.text); socket.close(); socket = null; break;
         case "PLAYERS_ADD": onPlayersAdd(msg.players); break;
         case "PLAYERS_REMOVE": onPlayersRemove(msg.players); break;
         case "GAME_START": onGameStart(msg.from, msg.white); break;
-        case "ASK_SURRENDER": onAskGameEnd("Accept surrender ?", "You win" ); break;
-        case "ASK_DEUCE": onAskGameEnd("Accept deuce ?", "Deuce" ); break;
-        case "GAME_END": onGameEnd( msg.text ); break;
-        case "MOVE": onMove(msg.moveFrom, msg.moveTo, msg.text); break;
+        case "SURRENDER": onWin(msg.text); break;
+        case "ASK_DEUCE": onAskDeuce(); break;
+        case "DEUCE": onDeuce(); break;
+        case "MOVE": onMove(msg.moveFrom, msg.moveTo, msg.piece, msg.text); break;
         default: console.log("WARNING unknown message: ", msg, "ignored");
       }
     };
@@ -63,7 +66,7 @@ export default class MediatorClient {
     sendContent({what: "GAME_START", from: player, to: other, white: white});
   }
 
-  sendGameMessage(player, other, what, message, moveFrom, moveTo ) {
+  sendGameMessage(player, other, what, message, moveFrom, moveTo, piece ) {
     let v = {what: what, from: player, to: other};
     if( moveFrom ) {
       v.moveFrom = moveFrom;
@@ -73,6 +76,9 @@ export default class MediatorClient {
     }
     if( message ) {
       v.text = message;
+    }
+    if( piece ) {
+      v.piece = piece;
     }
     sendContent(v);
   }
