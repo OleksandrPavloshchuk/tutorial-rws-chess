@@ -24,8 +24,8 @@ export default class App extends Component {
       board: undefined,
       newPieceType: undefined,
       showConversion: false,
-      questionText: undefined,
       askDeuce: false,
+	  acceptDeuce: false,
       askSurrender: false,
       moves: []
     };
@@ -146,13 +146,10 @@ export default class App extends Component {
     return key(xTo,py)===moveTo;
   }
 
-  onAskDeuce() {
-    this.setState({myMove:true});
-    if( window.confirm("Accept deuce?") ) {
-      this.deuce();
-      this.mediatorClient.sendGameMessage(this.state.player, this.state.otherPlayer, "DEUCE");
-    }
-  }
+  onAskDeuce = () => {
+     this.setState({myMove:true, acceptDeuce:true});
+     console.log('on ask deuce: ', this.state.acceptDeuce);
+   }
 
   win = message => this.setState({myMove:true, message:message, endGame:true});
 

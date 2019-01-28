@@ -35,7 +35,7 @@ export default class MediatorClient {
     socket.onerror = event => { onError(socketErrorText); };
     socket.onmessage = event => {
 
-      console.log('on message', event.data)
+     // console.log('on message', event.data)
 
       var msg = JSON.parse(event.data);
       switch( msg.what ) {

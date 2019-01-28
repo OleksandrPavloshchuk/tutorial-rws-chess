@@ -1,18 +1,14 @@
 import React from 'react';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Button, Modal, ModalFooter } from 'reactstrap';
 
 export default class QuestionModal extends React.Component {
   constructor(props) {
     super(props);
 
-    this.toggle = this.toggle.bind(this);
     this.surrender = this.surrender.bind(this);
-    this.deuce = this.deuce.bind(this);
-  }
-
-  toggle() {
-//	let t = this.props.app.state.question;
-//    this.props.app.setState({question:false; questionText:undefined});
+    this.askDeuce = this.askDeuce.bind(this);
+    this.acceptDeuce = this.acceptDeuce.bind(this);
+    this.isModalOpen = this.isModalOpen.bind(this);
   }
 
   surrender() {
@@ -21,26 +17,36 @@ export default class QuestionModal extends React.Component {
          this.props.app.state.player, this.props.app.state.otherPlayer, "SURRENDER",  "Your opponent just have surrendered. You win.");
   }
 
-  deuce() {
+  askDeuce() {
       this.props.app.setState({myMove:false, askDeuce:false});
       this.props.app.mediatorClient.sendGameMessage(
         this.props.app.state.player, this.props.app.state.otherPlayer, "ASK_DEUCE");
   }
 
+  acceptDeuce() {
+      this.props.app.deuce();
+      this.props.app.mediatorClient.sendGameMessage(this.state.player, this.state.otherPlayer, "DEUCE");
+  }
+
+  isModalOpen() {
+	return this.props.app.state.askSurrender || this.props.app.state.askDeuce || this.props.app.state.acceptDeuce;
+  }
+
   render() {
     return (
       <div>
-        <Modal isOpen={this.props.app.state.askSurrender || this.props.app.state.askDeuce} toggle={this.toggle} >
-          <ModalHeader toggle={this.toggle}>Confirmation</ModalHeader>
-          <ModalBody>{this.props.app.state.questionText}</ModalBody>
+        <Modal isOpen={this.isModalOpen()}>
           <ModalFooter>
             {this.props.app.state.askDeuce &&
-               <Button color="primary" onClick={this.deuce}>OK</Button>
+               <Button color="primary" onClick={this.askDeuce}>Ask deuce</Button>
+            }
+            {this.props.app.state.acceptDeuce &&
+               <Button color="primary" onClick={this.acceptDeuce}>Accept deuce</Button>
             }
             {this.props.app.state.askSurrender &&
-               <Button color="primary" onClick={this.surrender}>OK</Button>
+               <Button color="primary" onClick={this.surrender}>Surrender</Button>
             }
-            <Button color="secondary" onClick={()=>    this.props.app.setState({askSurrender:false, askDeuce:false}) }>Cancel</Button>
+            <Button color="secondary" onClick={()=> this.props.app.setState({askSurrender:false, askDeuce:false, acceptDeuce:false}) }>Cancel</Button>
           </ModalFooter>
         </Modal>
       </div>

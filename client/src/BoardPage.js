@@ -20,11 +20,11 @@ export default class BoardPage extends Component {
   returnToPlayerList = () => this.props.app.endGame();
   
   surrender() {
-    this.props.app.setState({askSurrender:true, askDeuce:false, questionText:"Surrender?"});
+    this.props.app.setState({askSurrender:true, acceptDeuce:false, askDeuce:false});
   }
 
   deuce() {
-    this.props.app.setState({askDeuce:true, askSurrender:false, questionText:"Deuce?"});
+    this.props.app.setState({askDeuce:true, acceptDeuce:false, askSurrender:false});
   }
 
   render() {
