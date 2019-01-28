@@ -146,10 +146,7 @@ export default class App extends Component {
     return key(xTo,py)===moveTo;
   }
 
-  onAskDeuce = () => {
-     this.setState({myMove:true, confirmDeuce:true});
-     console.log('on ask deuce: ', this.state.confirmDeuce);
-   };
+  onAskDeuce = () => this.setState({myMove:true, confirmDeuce:true});
 
   win = message => this.setState({myMove:true, message:message, endGame:true});
 
