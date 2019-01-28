@@ -8,56 +8,31 @@ import Logo from './Logo';
 import ConversionPanel from './ConversionPanel';
 import QuestionModal from './QuestionModal';
 
-
-// TODO (2019/01/17) link Reactstrap here
 export default class BoardPage extends Component {
   constructor(props) {
     super(props);
-    this.state = {askDeuce:false, askSurrender:false};
 
-    this.askSurrender = this.surrender.bind(this);
-    this.askDeuce = this.askDeuce.bind(this);
-    this.returnToPlayerList = this.returnToPlayerList.bind(this);
-    this.deuce = this.deuce.bind(this);
     this.surrender = this.surrender.bind(this);
+    this.deuce = this.deuce.bind(this);
+    this.returnToPlayerList = this.returnToPlayerList.bind(this);
   }
 
   returnToPlayerList = () => this.props.app.endGame();
   
-  deuce() {
-    console.log("TODO deuce");
-  }
-  
   surrender() {
-    console.log("TODO surrender");
-  }
-  
-
-  askSurrender() {
-    // TODO 92019/01/17) replace it by React modal
-    if (window.confirm("Surrender?")) {
-      this.props.app.setState({myMove:false, endGame:true, message:'You lose'});
-      this.props.app.mediatorClient.sendGameMessage(
-        this.props.app.state.player, this.props.app.state.otherPlayer, "SURRENDER",
-        "Your opponent just have surrendered. You win.");
-    }
+    this.props.app.setState({askSurrender:true, askDeuce:false, questionText:"Surrender?"});
   }
 
-  askDeuce() {
-    // TODO 92019/01/17) replace it by React modal
-    if (window.confirm("Ask deuce?")) {
-      this.props.app.setState({myMove:false});
-      this.props.app.mediatorClient.sendGameMessage(
-        this.props.app.state.player, this.props.app.state.otherPlayer, "ASK_DEUCE");
-    }
+  deuce() {
+    this.props.app.setState({askDeuce:true, askSurrender:false, questionText:"Deuce?"});
   }
 
   render() {
 
     return (
       <div className="container">
-        {this.state.askDeuce &&
-            <QuestionModal text="Deuce?"/>
+        {(this.props.app.state.askSurrender  || this.props.app.state.askDeuce ) &&
+            <QuestionModal app={this.props.app} />
         }
         <nav className="navbar navbar-light bg-light navbar-small"><Logo/>
           {this.props.app.state.message &&
@@ -68,9 +43,9 @@ export default class BoardPage extends Component {
           }
           {(!this.props.app.state.endGame && this.props.app.state.myMove) &&
           <div className="btn-group float-right" role="group">
-            <button className="btn btn-outline-secondary" onClick={this.askDeuce}
+            <button className="btn btn-outline-secondary" onClick={this.deuce}
             >Deuce</button>
-            <button className="btn btn-outline-secondary" onClick={this.askSurrender}
+            <button className="btn btn-outline-secondary" onClick={this.surrender}
             >Surrender</button>
           </div>
           }

@@ -24,6 +24,9 @@ export default class App extends Component {
       board: undefined,
       newPieceType: undefined,
       showConversion: false,
+      questionText: undefined,
+      askDeuce: false,
+      askSurrender: false,
       moves: []
     };
 
