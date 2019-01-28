@@ -1,9 +1,5 @@
 import MoveValidator from './moveValidator';
 
-function startRow(white) {
-  return white ? "1" : "8";
-}
-
 export default class BoardData {
 
   constructor(whiteMe, src) {
@@ -18,18 +14,23 @@ export default class BoardData {
     this.init = this.init.bind(this);
     this.doMove = this.doMove.bind(this);
     this.setNewPieceType = this.setNewPieceType.bind(this);
+    
+    const y = startY(whiteMe);
 
-    this.startRook1 = "c" + startRow(whiteMe) + "1";
-    this.startRook8 = "c" + startRow(whiteMe) + "8";
-    this.startKing = "c" + startRow(whiteMe) + "5";
+    this.startRook1 = key(1, y);
+    this.startRook8 = key(8, y);
+    this.startKing = key(5, y);
 
     if(src) { this.copyData(src); } else { this.init(); }
     this.availableCells = [];
   }
 
+  get = pos => this.data[pos];
+  /*
   get(pos) {
     return this.data[pos];
   }
+  */
 
   setNewPieceType(pos, newType) {
     if( newType ) {
@@ -58,7 +59,7 @@ export default class BoardData {
         this.doMove( key(8, yFrom), key(6, yFrom), "rook");
       }
       if( xFrom-xTo===2) {
-        this.doMove( key(1,yFrom), key(4,yFrom), "rook");
+        this.doMove( key(1,yFrom), key(4, yFrom), "rook");
       }
     }
   }
@@ -76,7 +77,7 @@ export default class BoardData {
     if(type) {
       this.data[moveFrom].type = type;
     }
-    this.doMove(moveFrom, moveTo);
+    this.doMove(moveFrom, moveTo, this.get(moveFrom).type );
   }
 
   copyData(src) {
@@ -98,7 +99,7 @@ export default class BoardData {
     let b = {};
 
     let addFigures = white => {
-      const y = white ? 1 : 8;
+      const y = startY(white);
       b[key(1,y)] = {type: "rook", white: white};
       b[key(2,y)] = {type: "knight", white: white};
       b[key(3,y)] = {type: "bishop", white: white};
@@ -139,9 +140,13 @@ export function key(x,y) {
 }
 
 export function x(key) {
-    return parseInt(key.substring(2,3));
+  return parseInt(key.substring(2,3));
 }
 
 export function y(key) {
-    return parseInt(key.substring(1,2));
+  return parseInt(key.substring(1,2));
+}
+
+export function startY(white) {
+  return white ? 1 : 8;
 }

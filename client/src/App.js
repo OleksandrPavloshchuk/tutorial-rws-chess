@@ -6,7 +6,7 @@ import LoginPage from './LoginPage';
 import PlayerListPage from './PlayerListPage';
 import BoardPage from './BoardPage';
 import MediatorClient from './mediatorClientService';
-import BoardData,{key,x,y} from './boardData';
+import BoardData,{key, startY, y} from './boardData';
 
 export default class App extends Component {
   constructor(props) {
@@ -118,15 +118,6 @@ export default class App extends Component {
     let take = this.isTake(moveTo);
     this.state.board.moveOther(moveFrom, moveTo, piece);
     this.addMoveToList(moveFrom, moveTo, take, piece);
-    let p = this.state.board.get(moveTo);
-    let py = p.white ? 1 : 8;
-
-    if(this.isCastling(p, moveFrom, moveTo, 3)) {
-      this.state.board.doMove(key(1,py),key(4,py));
-    } else if(this.isCastling(p, moveFrom, moveTo, 7)) {
-      this.state.board.doMove(key(8,py),key(6,py));
-    }
-
     this.setState({myMove:true, message:message, board: this.state.board});
   }
 
@@ -147,9 +138,9 @@ export default class App extends Component {
       l[this.state.moves.length-1].black = v;
     }
     v = p.white ? l[this.state.moves.length-1].white : l[this.state.moves.length-1].black;
-    if(this.isCastling(p, moveFrom, moveTo, 3) ) {
+    if( this.isCastling(p, moveFrom, moveTo, 3) ) {
       v.castling = "0-0-0";
-    } else if(this.isCastling(p, moveFrom, moveTo, 7) ) {
+    } else if( this.isCastling(p, moveFrom, moveTo, 7) ) {
       v.castling = "0-0";
     }
 
@@ -157,9 +148,9 @@ export default class App extends Component {
   }
 
   isCastling(p, moveFrom, moveTo, xTo) {
-    if("king"!==p.type) { return false; }
-    const py = p.white ? 1 : 8;
-    if( key(5,py)!==moveFrom) { return false; }
+    if( "king"!==p.type ) { return false; }
+    const py = startY(p.white);
+    if( key(5,py)!==moveFrom ) { return false; }
     return key(xTo,py)===moveTo;
   }
 
