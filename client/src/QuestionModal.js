@@ -24,32 +24,31 @@ export default class QuestionModal extends React.Component {
   }
 
   acceptDeuce() {
+      this.props.app.setState({myMove:false, confirmDeuce:false});
       this.props.app.deuce();
-      this.props.app.mediatorClient.sendGameMessage(this.state.player, this.state.otherPlayer, "DEUCE");
+      this.props.app.mediatorClient.sendGameMessage(this.props.app.state.player, this.props.app.state.otherPlayer, "DEUCE");
   }
 
   isModalOpen() {
-	return this.props.app.state.askSurrender || this.props.app.state.askDeuce || this.props.app.state.acceptDeuce;
+	return this.props.app.state.askSurrender || this.props.app.state.confirmDeuce || this.props.app.state.askDeuce;
   }
 
   render() {
     return (
-      <div>
         <Modal isOpen={this.isModalOpen()}>
           <ModalFooter>
             {this.props.app.state.askDeuce &&
                <Button color="primary" onClick={this.askDeuce}>Ask deuce</Button>
             }
-            {this.props.app.state.acceptDeuce &&
+            {this.props.app.state.confirmDeuce &&
                <Button color="primary" onClick={this.acceptDeuce}>Accept deuce</Button>
             }
             {this.props.app.state.askSurrender &&
                <Button color="primary" onClick={this.surrender}>Surrender</Button>
             }
-            <Button color="secondary" onClick={()=> this.props.app.setState({askSurrender:false, askDeuce:false, acceptDeuce:false}) }>Cancel</Button>
+            <Button color="secondary" onClick={()=> this.props.app.setState({askSurrender:false, askDeuce:false, confirmDeuce:false}) }>Cancel</Button>
           </ModalFooter>
         </Modal>
-      </div>
     );
   }
 }

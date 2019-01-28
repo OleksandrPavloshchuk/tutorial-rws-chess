@@ -31,7 +31,7 @@ export default class BoardPage extends Component {
 
     return (
       <div className="container">
-        {(this.props.app.state.askSurrender  || this.props.app.state.askDeuce ) &&
+        {(this.props.app.state.askSurrender  || this.props.app.state.askDeuce || this.props.app.state.confirmDeuce) &&
             <QuestionModal app={this.props.app} />
         }
         <nav className="navbar navbar-light bg-light navbar-small"><Logo/>

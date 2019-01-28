@@ -91,7 +91,7 @@ class Cell extends Component {
 
   render() {
     const piece = this.props.app.state.board.get(this.props.aKey);
-    const draggable = piece && this.props.app.state.myMove &&
+    const draggable = piece && this.props.app.state.myMove && !this.props.app.state.showConversion &&
       ((this.props.app.state.whiteMe && piece.white)
       || (!this.props.app.state.whiteMe && !piece.white));
 

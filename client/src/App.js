@@ -25,7 +25,7 @@ export default class App extends Component {
       newPieceType: undefined,
       showConversion: false,
       askDeuce: false,
-	  acceptDeuce: false,
+	  confirmDeuce: false,
       askSurrender: false,
       moves: []
     };
@@ -147,9 +147,9 @@ export default class App extends Component {
   }
 
   onAskDeuce = () => {
-     this.setState({myMove:true, acceptDeuce:true});
-     console.log('on ask deuce: ', this.state.acceptDeuce);
-   }
+     this.setState({myMove:true, confirmDeuce:true});
+     console.log('on ask deuce: ', this.state.confirmDeuce);
+   };
 
   win = message => this.setState({myMove:true, message:message, endGame:true});
 
