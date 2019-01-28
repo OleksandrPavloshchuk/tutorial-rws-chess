@@ -122,13 +122,7 @@ export default class App extends Component {
 
   addMoveToList(moveFrom, moveTo, take, newPieceType) {
     let p = this.state.board.get(moveTo);
-    let v = {
-      piece: p.type,
-      moveFrom: moveFrom,
-      moveTo: moveTo,
-      take: take,
-      newType: newPieceType
-    };
+    let v = { piece:p.type, moveFrom:moveFrom, moveTo:moveTo, take:take, newType: newPieceType };
 
     let moves = this.state.moves;
     if( p.white ) {

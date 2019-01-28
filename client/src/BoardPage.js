@@ -18,9 +18,7 @@ export default class BoardPage extends Component {
     this.returnToPlayerList = this.returnToPlayerList.bind(this);
   }
 
-  returnToPlayerList() {
-    this.props.app.endGame();
-  }
+  returnToPlayerList = () => this.props.app.endGame();
 
   surrender() {
     // TODO 92019/01/17) replace it by React modal
@@ -28,7 +26,7 @@ export default class BoardPage extends Component {
       this.props.app.setState({myMove:false, endGame:true, message:'You lose'});
       this.props.app.mediatorClient.sendGameMessage(
         this.props.app.state.player, this.props.app.state.otherPlayer, "SURRENDER",
-        "Your opponent just have surrender. You win.");
+        "Your opponent just have surrendered. You win.");
     }
   }
 
