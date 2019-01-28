@@ -44,15 +44,12 @@ export default class App extends Component {
     this.isTake = this.isTake.bind(this);
     this.dropPiece = this.dropPiece.bind(this);
     this.isCastling = this.isCastling.bind(this);
+    this.isConversion = this.isConversion.bind(this);
   }
 
-  isTake(moveTo) {
-    return !!this.state.board.get(moveTo);
-  }
+  isTake = moveTo => !!this.state.board.get(moveTo);
 
-  setPlayer(player) {
-    this.setState({player : player});
-  }
+  setPlayer = player => this.setState({player : player});
 
   startGameMe(other, white) {
     this.mediatorClient.startGame(this.state.player, other, !white);
@@ -95,20 +92,22 @@ export default class App extends Component {
       this.state.player, this.state.otherPlayer, "MOVE", undefined, moveFrom, moveTo, newPieceType );
     this.setState({myMove:false, board: this.state.board});
   }
+  
+  isConversion(moveFrom, moveTo) {
+    let p = this.state.board.get(moveTo);
+    if( "pawn"!==p.type ) { return false; }
+    return (this.state.whiteMe && 8===y(moveTo)) || (!this.state.whiteMe && 1===y(moveTo));
+  }
 
   dropPiece(src, moveTo) {
     let moveFrom = src.piece;
     let take = this.isTake(moveTo);
     if( this.state.board.move(moveFrom, moveTo) ) {
-
-      let p = this.state.board.get(moveTo);
-      let moveToY = y(moveTo);
-      if( "pawn"===p.type &&
-        ((this.state.whiteMe && 8===moveToY) || (!this.state.whiteMe && 1===moveToY))) {
-          this.setState({take:take, moveFrom:moveFrom, moveTo:moveTo, showConversion:true});
-        } else {
-          this.moveComplete( moveFrom, moveTo, take );
-        }
+      if( this.isConversion(moveFrom, moveTo) ) {
+        this.setState({take:take, moveFrom:moveFrom, moveTo:moveTo, showConversion:true});
+      } else {
+        this.moveComplete( moveFrom, moveTo, take );
+      }
     }
     this.state.board.clearAvailableCells();
     this.setState({board: this.state.board});
@@ -131,20 +130,16 @@ export default class App extends Component {
       newType: newPieceType
     };
 
-    let l = this.state.moves;
+    let moves = this.state.moves;
     if( p.white ) {
-        l.push({num:this.state.moves.length+1, white :v});
+      moves.push({num:this.state.moves.length+1, white :v});
     } else {
-      l[this.state.moves.length-1].black = v;
+      moves[this.state.moves.length-1].black = v;
     }
-    v = p.white ? l[this.state.moves.length-1].white : l[this.state.moves.length-1].black;
-    if( this.isCastling(p, moveFrom, moveTo, 3) ) {
-      v.castling = "0-0-0";
-    } else if( this.isCastling(p, moveFrom, moveTo, 7) ) {
-      v.castling = "0-0";
-    }
+    if( this.isCastling(p, moveFrom, moveTo, 3) ) { v.castling = "0-0-0"; } 
+    else if( this.isCastling(p, moveFrom, moveTo, 7) ) { v.castling = "0-0"; }
 
-    this.setState({moves:l});
+    this.setState({moves:moves});
   }
 
   isCastling(p, moveFrom, moveTo, xTo) {
@@ -152,10 +147,6 @@ export default class App extends Component {
     const py = startY(p.white);
     if( key(5,py)!==moveFrom ) { return false; }
     return key(xTo,py)===moveTo;
-  }
-
-  win(message) {
-    this.setState({myMove:true, message:message, endGame:true});
   }
 
   onAskDeuce() {
@@ -166,14 +157,11 @@ export default class App extends Component {
     }
   }
 
-  deuce() {
-    this.setState({myMove:true, message: "Deuce", endGame:true});
-  }
+  win = message => this.setState({myMove:true, message:message, endGame:true});
 
-  logout() {
-    this.mediatorClient.logout(this.state.player);
-    this.setState({player : undefined});
-  }
+  deuce = () => this.setState({myMove:true, message:"Deuce", endGame:true});
+
+  logout = () => { this.mediatorClient.logout(this.state.player); this.setState({player : undefined}); }
 
   playersAdd(players) {
     if( !this.state.player ) {
@@ -182,9 +170,7 @@ export default class App extends Component {
     var p = [];
     this.state.waitingPlayers.forEach(i => p.push(i));
     players.forEach(i => {
-      if ( this.state.player!==i && !p.includes(i) ) {
-        p.push(i);
-      }
+      if ( this.state.player!==i && !p.includes(i) ) { p.push(i); }
     });
     this.setState({waitingPlayers:p});
   }
@@ -192,9 +178,7 @@ export default class App extends Component {
   playersRemove(players) {
     var p = [];
     this.state.waitingPlayers.forEach(i => {
-      if ( this.state.player!==i && !players.includes(i) ) {
-        p.push(i);
-      }
+      if ( this.state.player!==i && !players.includes(i) ) { p.push(i); }
     });
     this.setState({waitingPlayers:p});
   }

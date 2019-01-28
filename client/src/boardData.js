@@ -26,17 +26,8 @@ export default class BoardData {
   }
 
   get = pos => this.data[pos];
-  /*
-  get(pos) {
-    return this.data[pos];
-  }
-  */
-
-  setNewPieceType(pos, newType) {
-    if( newType ) {
-      this.data[pos].type = newType;
-    }
-  }
+  
+  setNewPieceType = (pos, newType) => { if( newType ) { this.get(pos).type = newType; } };
 
   doMove(moveFrom, moveTo, type) {
     this.data[moveTo] = this.data[moveFrom];
@@ -52,24 +43,15 @@ export default class BoardData {
     }
     // Check for castling:
     if( "king"===type) {
-      const xFrom = x(moveFrom);
-      const xTo = x(moveTo);
-      const yFrom = y(moveTo);
-      if( xTo-xFrom===2) {
-        this.doMove( key(8, yFrom), key(6, yFrom), "rook");
-      }
-      if( xFrom-xTo===2) {
-        this.doMove( key(1,yFrom), key(4, yFrom), "rook");
-      }
+      const xFrom = x(moveFrom); const xTo = x(moveTo); const yFrom = y(moveTo);
+      if( xTo-xFrom===2) { this.doMove( key(8, yFrom), key(6, yFrom), "rook");
+      } else if( xFrom-xTo===2) { this.doMove( key(1,yFrom), key(4, yFrom), "rook"); }
     }
   }
 
   move(moveFrom, moveTo) {
-    if( moveFrom===moveTo || !this.availableCells.includes(moveTo)) {
-      return false;
-    }
-    let type = this.get(moveFrom).type;
-    this.doMove(moveFrom, moveTo, type);
+    if( moveFrom===moveTo || !this.isAvailable(moveTo)) { return false; }
+    this.doMove(moveFrom, moveTo, this.get(moveFrom).type);
     return true;
   }
 
@@ -82,10 +64,7 @@ export default class BoardData {
 
   copyData(src) {
     let b = {};
-    Object.keys( src.data ).forEach( key => {
-      const v = src.data[key];
-      b[key] = {type: v.type, white: v.white };
-    });
+    Object.keys( src.data ).forEach( key => { const v = src.data[key]; b[key] = {type: v.type, white: v.white }; });
     this.rook1Moved = src.rook1Moved;
     this.rook8Moved = src.rook8Moved;
     this.kingMoved = src.kingMoved;
@@ -110,43 +89,19 @@ export default class BoardData {
       b[key(8,y)] = {type: "rook", white: white};
     };
     addFigures(true);
-    for( let i=1; i<=8; i++ ) {
-      b[key(i,2)] = {type: "pawn", white: true};
-    }
+    for( let i=1; i<=8; i++ ) { b[key(i,2)] = {type: "pawn", white: true}; }
     addFigures(false);
-    for( let i=1; i<=8; i++ ) {
-      b[key(i,7)] = {type: "pawn", white: false};
-    }
+    for( let i=1; i<=8; i++ ) { b[key(i,7)] = {type: "pawn", white: false}; }
     this.data = b;
   }
 
-  clearAvailableCells() {
-    this.availableCells = [];
-  }
-
-  calculateAvailableCells(src) {
-    this.availableCells = new MoveValidator(src, this)
-      .calculateAvailableCells();
-  }
-
-  isAvailable(c) {
-    return this.availableCells.includes(c);
-  }
+  clearAvailableCells = () => { this.availableCells = []; };
+  calculateAvailableCells = src => { this.availableCells = new MoveValidator(src, this).calculateAvailableCells(); };
+  isAvailable = c => this.availableCells.includes(c);
 
 }
 
-export function key(x,y) {
-  return "c" + y + x;
-}
-
-export function x(key) {
-  return parseInt(key.substring(2,3));
-}
-
-export function y(key) {
-  return parseInt(key.substring(1,2));
-}
-
-export function startY(white) {
-  return white ? 1 : 8;
-}
+export function key(x,y) { return "c" + y + x; }
+export function x(key) { return parseInt(key.substring(2,3)); }
+export function y(key) { return parseInt(key.substring(1,2)); }
+export function startY(white) { return white ? 1 : 8; }
