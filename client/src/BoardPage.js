@@ -6,21 +6,34 @@ import Board from './Board';
 import MoveList from './MoveList';
 import Logo from './Logo';
 import ConversionPanel from './ConversionPanel';
+import QuestionModal from './QuestionModal';
 
 
 // TODO (2019/01/17) link Reactstrap here
 export default class BoardPage extends Component {
   constructor(props) {
     super(props);
+    this.state = {askDeuce:false, askSurrender:false};
 
-    this.surrender = this.surrender.bind(this);
+    this.askSurrender = this.surrender.bind(this);
     this.askDeuce = this.askDeuce.bind(this);
     this.returnToPlayerList = this.returnToPlayerList.bind(this);
+    this.deuce = this.deuce.bind(this);
+    this.surrender = this.surrender.bind(this);
   }
 
   returnToPlayerList = () => this.props.app.endGame();
-
+  
+  deuce() {
+    console.log("TODO deuce");
+  }
+  
   surrender() {
+    console.log("TODO surrender");
+  }
+  
+
+  askSurrender() {
     // TODO 92019/01/17) replace it by React modal
     if (window.confirm("Surrender?")) {
       this.props.app.setState({myMove:false, endGame:true, message:'You lose'});
@@ -43,6 +56,9 @@ export default class BoardPage extends Component {
 
     return (
       <div className="container">
+        {this.state.askDeuce &&
+            <QuestionModal text="Deuce?"/>
+        }
         <nav className="navbar navbar-light bg-light navbar-small"><Logo/>
           {this.props.app.state.message &&
           <div className="navbar-small float-right">{this.props.app.state.message}</div>
@@ -54,7 +70,7 @@ export default class BoardPage extends Component {
           <div className="btn-group float-right" role="group">
             <button className="btn btn-outline-secondary" onClick={this.askDeuce}
             >Deuce</button>
-            <button className="btn btn-outline-secondary" onClick={this.surrender}
+            <button className="btn btn-outline-secondary" onClick={this.askSurrender}
             >Surrender</button>
           </div>
           }
