@@ -17,21 +17,15 @@ export default class BoardPage extends Component {
     this.returnToPlayerList = this.returnToPlayerList.bind(this);
   }
 
-  returnToPlayerList = () => this.props.app.endGame();
-  
-  surrender() {
-    this.props.app.setState({askSurrender:true, acceptDeuce:false, askDeuce:false});
-  }
-
-  deuce() {
-    this.props.app.setState({askDeuce:true, acceptDeuce:false, askSurrender:false});
-  }
+  returnToPlayerList = () => this.props.app.endGame();  
+  surrender = () => this.props.app.setState({askSurrender:true, acceptDeuce:false, askDeuce:false, confirmDeuce:false});
+  deuce = () => this.props.app.setState({askDeuce:true, acceptDeuce:false, askSurrender:false, confirmDeuce:false});
 
   render() {
 
     return (
       <div className="container">
-        {(this.props.app.state.askSurrender  || this.props.app.state.askDeuce || this.props.app.state.confirmDeuce) &&
+        {this.props.app.isConfirm() &&
             <QuestionModal app={this.props.app} />
         }
         <nav className="navbar navbar-light bg-light navbar-small"><Logo/>

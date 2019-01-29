@@ -8,7 +8,7 @@ export default class QuestionModal extends React.Component {
     this.surrender = this.surrender.bind(this);
     this.askDeuce = this.askDeuce.bind(this);
     this.acceptDeuce = this.acceptDeuce.bind(this);
-    this.isModalOpen = this.isModalOpen.bind(this);
+    this.cancel = this.cancel.bind(this);
   }
 
   surrender() {
@@ -29,13 +29,11 @@ export default class QuestionModal extends React.Component {
       this.props.app.mediatorClient.sendGameMessage(this.props.app.state.player, this.props.app.state.otherPlayer, "DEUCE");
   }
 
-  isModalOpen() {
-	return this.props.app.state.askSurrender || this.props.app.state.confirmDeuce || this.props.app.state.askDeuce;
-  }
+  cancel = () => this.props.app.setState({askSurrender:false, askDeuce:false, confirmDeuce:false});
 
   render() {
     return (
-        <Modal isOpen={this.isModalOpen()}>
+        <Modal isOpen={this.props.app.isConfirm()}>
           <ModalFooter>
             {this.props.app.state.askDeuce &&
                <Button color="primary" onClick={this.askDeuce}>Ask deuce</Button>
@@ -46,7 +44,7 @@ export default class QuestionModal extends React.Component {
             {this.props.app.state.askSurrender &&
                <Button color="primary" onClick={this.surrender}>Surrender</Button>
             }
-            <Button color="secondary" onClick={()=> this.props.app.setState({askSurrender:false, askDeuce:false, confirmDeuce:false}) }>Cancel</Button>
+            <Button color="secondary" onClick={this.cancel}>Cancel</Button>
           </ModalFooter>
         </Modal>
     );

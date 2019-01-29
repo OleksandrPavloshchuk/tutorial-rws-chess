@@ -48,11 +48,16 @@ export default class App extends Component {
     this.dropPiece = this.dropPiece.bind(this);
     this.isCastling = this.isCastling.bind(this);
     this.isConversion = this.isConversion.bind(this);
+    this.isConfirm = this.isConfirm.bind(this);
   }
 
   isTake = moveTo => !!this.state.board.get(moveTo);
-
   setPlayer = player => this.setState({player : player});
+  isConfirm = () => this.state.askSurrender || this.state.confirmDeuce || this.state.askDeuce;
+  onAskDeuce = () => this.setState({myMove:true, confirmDeuce:true});
+  win = message => this.setState({myMove:true, message:message, endGame:true});
+  deuce = () => this.setState({myMove:true, message:"Deuce", endGame:true});
+  logout = () => { this.mediatorClient.logout(this.state.player); this.setState({player : undefined}); }
 
   startGameMe(other, white) {
     this.mediatorClient.startGame(this.state.player, other, !white);
@@ -145,14 +150,6 @@ export default class App extends Component {
     if( key(5,py)!==moveFrom ) { return false; }
     return key(xTo,py)===moveTo;
   }
-
-  onAskDeuce = () => this.setState({myMove:true, confirmDeuce:true});
-
-  win = message => this.setState({myMove:true, message:message, endGame:true});
-
-  deuce = () => this.setState({myMove:true, message:"Deuce", endGame:true});
-
-  logout = () => { this.mediatorClient.logout(this.state.player); this.setState({player : undefined}); }
 
   playersAdd(players) {
     if( !this.state.player ) {
