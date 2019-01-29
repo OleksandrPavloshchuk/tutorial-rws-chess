@@ -91,11 +91,14 @@ class Cell extends Component {
 
   render() {
     const piece = this.props.app.state.board.get(this.props.aKey);
-    const draggable = piece && this.props.app.state.myMove && !this.props.app.state.showConversion &&
-      ((this.props.app.state.whiteMe && piece.white)
+    const draggable = piece 
+      && this.props.app.state.myMove 
+      && !this.props.app.state.showConversion 
+      && !this.props.app.state.endGame
+      && ((this.props.app.state.whiteMe && piece.white)
       || (!this.props.app.state.whiteMe && !piece.white));
 
-    let cellIsAvailable = this.props.app.state.board.isAvailable(this.props.aKey);
+    const cellIsAvailable = this.props.app.state.board.isAvailable(this.props.aKey);
 
     return (
       <td className={'cell-' + (this.props.white ? 'white' : 'black') + (cellIsAvailable ? ' cell-available' : '') } key={this.props.aKey}>
@@ -114,21 +117,15 @@ class Cell extends Component {
 }
 
 class Piece extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      position: this.props.position
-    };
-  }
 
   render() {
     const color = this.props.white ? "-white" : "-black";
 
     return (
       this.props.draggable
-      ? <Draggable type="piece" data={this.state.position}
+      ? <Draggable type="piece" data={this.props.position}
           className={this.props.type + color + " piece" }
-          onDragStart={val => this.props.app.moveStart(this.state.position)}
+          onDragStart={val => this.props.app.moveStart(this.props.position)}
         ></Draggable>
       : <div className={this.props.type + color + " piece" }></div>
     );
