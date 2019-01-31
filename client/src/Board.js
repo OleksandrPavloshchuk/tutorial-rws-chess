@@ -121,18 +121,22 @@ class Piece extends Component {
 
   render() {
     const color = this.props.white ? "-white" : "-black";
-    const moveThis = this.props.postion===this.props.app.state.otherMoveTo;
+
+    const current = this.props.position===this.props.app.state.moveOtherTo;
+  
+    if(current) console.log('pos', this.props.position)
 
     return (
       this.props.draggable
       ?
        <Draggable type="piece" data={this.props.position} className={this.props.type + color + " piece" }
-          onDragStart={val => this.props.app.moveStart(this.props.position)}>     
-          <Motion defaultStyle={{opacity:1}} style={{opacity: spring(moveThis ? 1 : 0)}}>{
-          style => <div style={{opacity:style.opacity}} className="piece"></div>
-          }</Motion>
+          onDragStart={val => this.props.app.moveStart(this.props.position)}>               
           </Draggable>
-      : <div className={this.props.type + color + " piece" }></div>
+      : <div className={this.props.type + color + " piece" }>
+          <Motion defaultStyle={{opacity:1}} style={{opacity: spring(current ? 1 : 0)}}>{
+            style => <div style={{opacity:style.opacity}} className="haze"></div>
+          }</Motion>
+        </div>
     );
   }
 }

@@ -123,11 +123,11 @@ export default class App extends Component {
   }
 
   moveOther(moveFrom, moveTo, piece, message) {
-    this.setState({ otherMoveTo:moveTo });
+    this.setState({ moveOtherTo:moveTo });
     let take = this.isTake(moveTo);
     this.state.board.moveOther(moveFrom, moveTo, piece);
     this.addMoveToList(moveFrom, moveTo, take, piece);
-    this.setState({myMove:true, message:message, board: this.state.board, otherMoveTo:undefined});
+    this.setState({myMove:true, message:message, board: this.state.board, moveOtherTo:undefined});
   }
 
   addMoveToList(moveFrom, moveTo, take, newPieceType) {
