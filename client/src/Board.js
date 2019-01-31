@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Draggable, Droppable } from 'react-drag-and-drop';
+import {Motion, spring} from 'react-motion';
 
 import './assets/css/board.css';
 
@@ -120,13 +121,17 @@ class Piece extends Component {
 
   render() {
     const color = this.props.white ? "-white" : "-black";
+    const moveThis = this.props.postion===this.props.app.state.otherMoveTo;
 
     return (
       this.props.draggable
-      ? <Draggable type="piece" data={this.props.position}
-          className={this.props.type + color + " piece" }
-          onDragStart={val => this.props.app.moveStart(this.props.position)}
-        ></Draggable>
+      ?
+       <Draggable type="piece" data={this.props.position} className={this.props.type + color + " piece" }
+          onDragStart={val => this.props.app.moveStart(this.props.position)}>     
+          <Motion defaultStyle={{opacity:1}} style={{opacity: spring(moveThis ? 1 : 0)}}>{
+          style => <div style={{opacity:style.opacity}} className="piece"></div>
+          }</Motion>
+          </Draggable>
       : <div className={this.props.type + color + " piece" }></div>
     );
   }
