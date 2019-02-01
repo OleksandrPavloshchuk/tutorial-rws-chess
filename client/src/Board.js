@@ -119,22 +119,31 @@ class Cell extends Component {
 
 class Piece extends Component {
 
+   constructor(props) {
+      super(props);
+      this.isCurrent = this.isCurrent.bind(this);
+   }
+
+   isCurrent() {
+     if( !this.props.app.state.moveOtherTo) {
+       return false;
+     }
+    return this.props.position===this.props.app.state.moveOtherTo;
+   }
+
   render() {
     const color = this.props.white ? "-white" : "-black";
-
-    const current = this.props.position===this.props.app.state.moveOtherTo;
   
-    if(current) console.log('pos', this.props.position)
-
     return (
+     
       this.props.draggable
       ?
        <Draggable type="piece" data={this.props.position} className={this.props.type + color + " piece" }
           onDragStart={val => this.props.app.moveStart(this.props.position)}>               
           </Draggable>
       : <div className={this.props.type + color + " piece" }>
-          <Motion defaultStyle={{opacity:1}} style={{opacity: spring(current ? 1 : 0)}}>{
-            style => <div style={{opacity:style.opacity}} className="haze"></div>
+          <Motion defaultStyle={{opacity:1}} style={{opacity: spring(this.isCurrent() ? 1 : 0)}}>{
+            style => <div style={{opacity: !this.props.app.state.myMove ? 0 : style.opacity}} className="haze"></div>
           }</Motion>
         </div>
     );

@@ -1,6 +1,8 @@
 import React from 'react';
 import { Button, Modal, ModalFooter } from 'reactstrap';
 
+import './assets/css/QuestionModal.css';
+
 export default class QuestionModal extends React.Component {
   constructor(props) {
     super(props);
@@ -33,18 +35,18 @@ export default class QuestionModal extends React.Component {
 
   render() {
     return (
-        <Modal isOpen={this.props.app.isConfirm()}>
-          <ModalFooter>
+        <Modal isOpen={this.props.app.isConfirm()} className="modal-narrow" >
+          <ModalFooter className="modal-footer-center">
             {this.props.app.state.askDeuce &&
-               <Button color="primary" onClick={this.askDeuce}>Ask deuce</Button>
+               <Button color="outline-danger" onClick={this.askDeuce}>Ask deuce</Button>
             }
             {this.props.app.state.confirmDeuce &&
-               <Button color="primary" onClick={this.acceptDeuce}>Accept deuce</Button>
+               <Button color="outline-primary" onClick={this.acceptDeuce}>Accept deuce</Button>
             }
             {this.props.app.state.askSurrender &&
-               <Button color="primary" onClick={this.surrender}>Surrender</Button>
+               <Button color="outline-danger" onClick={this.surrender}>Surrender</Button>
             }
-            <Button color="secondary" onClick={this.cancel}>Cancel</Button>
+            <Button color="outline-secondary" onClick={this.cancel}>Cancel</Button>
           </ModalFooter>
         </Modal>
     );
