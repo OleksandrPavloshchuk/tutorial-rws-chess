@@ -73,6 +73,16 @@
   display: block;
   z-index: 100;
 }
+
+.haze {
+  background-color: lime;
+  position: relative;
+  width: 50px;
+  height: 50px;
+  display: block;
+  z-index: 99;
+}
+
 .pawn-white {
   background-image: url("../images/Chess_Pieces_Sprite.svg");
   background-position: 46px 0px;
