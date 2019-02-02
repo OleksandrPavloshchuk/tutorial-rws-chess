@@ -7,6 +7,7 @@ import PlayerListPage from './PlayerListPage';
 import BoardPage from './BoardPage';
 import MediatorClient from './mediatorClientService';
 import BoardData,{key, startY, y} from './boardData';
+import {isCheck} from './moveValidator.js';
 
 export default class App extends Component {
   constructor(props) {
@@ -126,6 +127,9 @@ export default class App extends Component {
     this.setState({ moveOtherTo:moveTo });
     let take = this.isTake(moveTo);
     this.state.board.moveOther(moveFrom, moveTo, piece);
+    if( isCheck( this.state.board, this.state.whiteMe ) ) {
+       message = "Check";
+    }
     this.addMoveToList(moveFrom, moveTo, take, piece);
     this.setState({myMove:true, message:message, board: this.state.board, moveOtherTo:undefined});
   }
