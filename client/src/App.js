@@ -127,25 +127,30 @@ export default class App extends Component {
     this.setState({ moveOtherTo:moveTo });
     let take = this.isTake(moveTo);
     this.state.board.moveOther(moveFrom, moveTo, piece);
+    let check = false;
     if( isCheck( this.state.board, this.state.whiteMe ) ) {
        const kingPos = this.state.board.getMyKingPos(this.state.whiteMe);
        const kingMoves = new MoveValidator(kingPos, this.state.board).calculateAvailableCells();
        if( kingMoves.length===1) {
+           this.addMoveToList(moveFrom, moveTo, take, piece, false, true);
            this.setState({myMove:false, endGame:true, message:'Mate. You lose.', askSurrender:false});
            this.mediatorClient.sendGameMessage( 
               this.state.player, this.state.otherPlayer, "SURRENDER",  "Your opponent just got mate. You win.");           
            return;
        } else {       
 	       message = "Check";
+           check = true;
        }
     }
-    this.addMoveToList(moveFrom, moveTo, take, piece);
+    this.addMoveToList(moveFrom, moveTo, take, piece, check, false);
     this.setState({myMove:true, message:message, board: this.state.board, moveOtherTo:undefined});
   }
 
-  addMoveToList(moveFrom, moveTo, take, newPieceType) {
+  addMoveToList(moveFrom, moveTo, take, newPieceType, check, mate) {
     let p = this.state.board.get(moveTo);
-    let v = { piece:p.type, moveFrom:moveFrom, moveTo:moveTo, take:take, newType: newPieceType };
+    let v = { piece:p.type, moveFrom:moveFrom, moveTo:moveTo, take:take, newType: newPieceType, check:check, mate:mate };
+
+    // TODO (2019/02/02) show check or mate for this player
 
     let moves = this.state.moves;
     if( p.white ) {
