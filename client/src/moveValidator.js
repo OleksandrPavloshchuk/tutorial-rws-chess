@@ -1,4 +1,5 @@
-import {key, x, y} from './boardData';
+import BoardData, {key, x, y} from './boardData';
+import CheckDetector from './checkDetector';
 
 export default class MoveValidator {
 
@@ -101,9 +102,32 @@ export default class MoveValidator {
       return [];
     }
 
-    let r = this.pieceValidators[this.piece.type]();
+    let tmp = this.pieceValidators[this.piece.type]();
+
+    
+    let r = [];
+    tmp.forEach( k => {
+      const probeBoard = new BoardData(this.piece.white, this.board);
+      probeBoard.doMove(this.src, k, this.piece.type);
+      const opponentPieces = probeBoard.getPieces(false, this.piece.white);
+
+      function check() {
+        for( var i=0; i<opponentPieces.length; i++ ) {
+           const ok = opponentPieces[i];
+           if( new CheckDetector(ok, probeBoard).isCheck() ) {
+             console.log('CHECK: my=', k, 'other=', ok);
+             return true;
+           }
+        }
+        return false;
+      }
+
+      if (!check() ) {
+        r.push(k);     
+      }
+    });    
+
     r.push(this.src);
-    // TODO validate for opening the king
     return r;
   }
 

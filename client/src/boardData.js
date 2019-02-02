@@ -14,6 +14,7 @@ export default class BoardData {
     this.init = this.init.bind(this);
     this.doMove = this.doMove.bind(this);
     this.setNewPieceType = this.setNewPieceType.bind(this);
+    this.getPieces = this.getPieces.bind(this);
     
     const y = startY(whiteMe);
 
@@ -98,6 +99,23 @@ export default class BoardData {
   clearAvailableCells = () => { this.availableCells = []; };
   calculateAvailableCells = src => { this.availableCells = new MoveValidator(src, this).calculateAvailableCells(); };
   isAvailable = c => this.availableCells.includes(c);
+
+  getPieces(my, whiteMe) {
+    let r = [];
+    Object.keys(this.data).forEach( k => {
+       const p = this.data[k];
+       if( my ) {          
+         if ( p.white===whiteMe) {
+           r.push(k);
+         }
+       } else {
+         if ( p.white!==whiteMe) {
+           r.push(k);
+         }
+       }
+    });
+    return r;
+  }
 
 }
 

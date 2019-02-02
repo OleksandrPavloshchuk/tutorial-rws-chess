@@ -9,7 +9,7 @@ export default class CheckDetector {
     this.board = board;
     this.piece = this.board.get(this.src);
 
-    this.checkDetectors = {
+    this.checkDetector = {
       pawn : () => {
         if(this.piece.white) {                    
           return this.checkCell(this.x-1, this.y+1) || this.checkCell(this.x+1, this.y+1);
@@ -30,10 +30,10 @@ export default class CheckDetector {
           || this.checkSeries(i => this.x+i, i => this.y-i)
           || this.checkSeries(i => this.x-i, i => this.y+i),
       rook : () => this.checkSeries(i => this.x, i => this.y+i)
-        || this.checkSeries(r, i => this.x, i => this.y-i)
-        || this.checkSeries(r, i => this.x+i, i => this.y)
-        || this.checkSeries(r, i => this.x-i, i => this.y),
-      queen : () => this.checkDetectors['rook']() || this.checkDetectors['bishop'](),
+        || this.checkSeries(i => this.x, i => this.y-i)
+        || this.checkSeries(i => this.x+i, i => this.y)
+        || this.checkSeries(i => this.x-i, i => this.y),
+      queen : () => this.checkDetector['rook']() || this.checkDetector['bishop'](),
       king : () => false
     };
 
@@ -56,7 +56,10 @@ export default class CheckDetector {
     if(!valid(x) || !valid(y)) { return null; }
     const p = this.board.get(key(x,y));
     if(!p) { return false; }
-    return (p.white!==this.piece.white  && "king"===p.type) ? null : true;
+    if( p.white===this.piece.white ) {
+      return null;
+    }
+    return ("king"===p.type) ? true : null;
   }
 
   checkSeries(nextX, nextY) {
