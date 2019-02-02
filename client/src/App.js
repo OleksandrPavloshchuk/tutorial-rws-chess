@@ -7,7 +7,7 @@ import PlayerListPage from './PlayerListPage';
 import BoardPage from './BoardPage';
 import MediatorClient from './mediatorClientService';
 import BoardData,{key, startY, y} from './boardData';
-import {isCheck} from './moveValidator.js';
+import MoveValidator, {isCheck} from './moveValidator.js';
 
 export default class App extends Component {
   constructor(props) {
@@ -128,7 +128,16 @@ export default class App extends Component {
     let take = this.isTake(moveTo);
     this.state.board.moveOther(moveFrom, moveTo, piece);
     if( isCheck( this.state.board, this.state.whiteMe ) ) {
-       message = "Check";
+       const kingPos = this.state.board.getMyKingPos(this.state.whiteMe);
+       const kingMoves = new MoveValidator(kingPos, this.state.board).calculateAvailableCells();
+       if( kingMoves.length===1) {
+           this.setState({myMove:false, endGame:true, message:'Mate. You lose.', askSurrender:false});
+           this.mediatorClient.sendGameMessage( 
+              this.state.player, this.state.otherPlayer, "SURRENDER",  "Your opponent just got mate. You win.");           
+           return;
+       } else {       
+	       message = "Check";
+       }
     }
     this.addMoveToList(moveFrom, moveTo, take, piece);
     this.setState({myMove:true, message:message, board: this.state.board, moveOtherTo:undefined});
