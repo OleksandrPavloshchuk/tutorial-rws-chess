@@ -19,11 +19,13 @@ type Message struct {
 	Receiver  string   `json:"to"`
 	Players   []string `json:"players"`
 	Password  string   `json:"password"`
+	White     bool     `json:"white"`
 	Text      string   `json:"text"`
+/*
 	MoveFrom  string   `json:"moveFrom"`
 	MoveTo    string   `json:"moveTo"`
-	White     bool     `json:"white"`
 	Piece     string   `json:"piece"`
+    Suffix     string `json:"suffix"`  */
 }
 
 // TODO (2019/01/14) check credentials from database
@@ -87,7 +89,7 @@ func DispatchMessage(msg *Message, unparsedMsg *[]byte, connection *websocket.Co
 	case "GAME_START":
 		changePlayersMode(msg, "PLAYERS_REMOVE", playing)
 		return nil, false
-	case "MOVE", "ASK_DEUCE":
+	case "MOVE", "ASK_DEUCE","AMEND_LAST_MOVE":
 		passMessageToReceiver(msg.Receiver, unparsedMsg)
 		return nil, false
 	case "SURRENDER", "DEUCE":
