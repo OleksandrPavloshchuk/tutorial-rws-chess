@@ -66,6 +66,11 @@ export default class MediatorClient {
     sendContent({what: "GAME_START", from: player, to: other, white: white});
   }
 
+  sendGameMessage(v) {
+    sendContent(v);
+  }
+
+  /*
   sendGameMessage(player, other, what, message, moveFrom, moveTo, piece ) {
     let v = {what: what, from: player, to: other};
     if( moveFrom ) {
@@ -82,5 +87,6 @@ export default class MediatorClient {
     }
     sendContent(v);
   }
+  */
 
 }

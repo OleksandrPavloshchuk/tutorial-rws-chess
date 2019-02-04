@@ -51,7 +51,14 @@ export default class App extends Component {
     this.isCastling = this.isCastling.bind(this);
     this.isConversion = this.isConversion.bind(this);
     this.isConfirm = this.isConfirm.bind(this);
+    this.sendGameMessage = this.sendGameMessage.bind(this);
   }
+
+ sendGameMessage(v) {
+   v.from = this.state.player;
+   v.to = this.state.otherPlayer;
+   this.mediatorClient.sendGameMessage(v);
+ }
 
   isTake = moveTo => !!this.state.board.get(moveTo);
   setPlayer = player => this.setState({player : player});
@@ -98,8 +105,7 @@ export default class App extends Component {
   moveComplete(moveFrom, moveTo, take, newPieceType) {
     this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:newPieceType});
     this.state.board.setNewPieceType( moveTo, newPieceType );
-    this.mediatorClient.sendGameMessage(
-      this.state.player, this.state.otherPlayer, "MOVE", undefined, moveFrom, moveTo, newPieceType );
+    this.sendGameMessage({what:"MOVE", moveFrom:moveFrom, moveTo:moveTo, piece:newPieceType} );
     this.setState({myMove:false, board: this.state.board});
   }
   
@@ -134,8 +140,7 @@ export default class App extends Component {
        if( kingMoves.length===1) {
            this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:piece, suffix:'X'});
            this.setState({myMove:false, endGame:true, message:'Mate. You lose.', askSurrender:false});
-           this.mediatorClient.sendGameMessage( 
-              this.state.player, this.state.otherPlayer, "SURRENDER",  "Your opponent just got mate. You win.");           
+           this.mediatorClient.sendGameMessage({what: "SURRENDER",  message:"Your opponent just got mate. You win."}); 
            return;
        } else {       
 	       message = "Check";
