@@ -70,23 +70,4 @@ export default class MediatorClient {
     sendContent(v);
   }
 
-  /*
-  sendGameMessage(player, other, what, message, moveFrom, moveTo, piece ) {
-    let v = {what: what, from: player, to: other};
-    if( moveFrom ) {
-      v.moveFrom = moveFrom;
-    }
-    if( moveTo ) {
-      v.moveTo = moveTo;
-    }
-    if( message ) {
-      v.text = message;
-    }
-    if( piece ) {
-      v.piece = piece;
-    }
-    sendContent(v);
-  }
-  */
-
 }

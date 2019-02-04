@@ -140,7 +140,7 @@ export default class App extends Component {
        if( kingMoves.length===1) {
            this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:piece, suffix:'X'});
            this.setState({myMove:false, endGame:true, message:'Mate. You lose.', askSurrender:false});
-           this.mediatorClient.sendGameMessage({what: "SURRENDER",  message:"Your opponent just got mate. You win."}); 
+           this.sendGameMessage({what: "SURRENDER",  text:"Your opponent just got mate. You win."}); 
            return;
        } else {       
 	       message = "Check";

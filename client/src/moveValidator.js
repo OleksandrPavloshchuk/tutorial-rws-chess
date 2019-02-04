@@ -12,21 +12,16 @@ export default class MoveValidator {
 
     this.pieceValidators = {
       pawn : () => { let r = [];
-        if(this.piece.white) {
-          if( this.checkPawn(r, this.x, this.y+1) && this.y===2) {
-            this.checkPawn(r, this.x, this.y+2);
+        const step = this.piece.white ? 1 : -1;
+        const startLine = this.piece.white ? 2 : 7;
+
+          if( this.checkPawn(r, this.x, this.y+step) && this.y===startLine) {
+            this.checkPawn(r, this.x, this.y+2*step);
           }
-          this.checkPawnTake(r, this.x-1, this.y+1);
-          this.checkPawnTake(r, this.x+1, this.y+1);
+          this.checkPawnTake(r, this.x-1, this.y+step);
+          this.checkPawnTake(r, this.x+1, this.y+step);
           // TODO take on passage
-        } else {
-          if( this.checkPawn(r, this.x, this.y-1) && this.y===7) {
-            this.checkPawn(r, this.x, this.y-2);
-          }
-          this.checkPawnTake(r, this.x-1, this.y-1);
-          this.checkPawnTake(r, this.x+1, this.y-1);
-          // TODO take on passage
-        }
+
         return r;
       },
       knight : () => { let r = [];
