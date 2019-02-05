@@ -52,6 +52,7 @@ export default class App extends Component {
     this.isConversion = this.isConversion.bind(this);
     this.isConfirm = this.isConfirm.bind(this);
     this.sendGameMessage = this.sendGameMessage.bind(this);
+    this.amendLastMove = this.amendLastMove.bind(this);
   }
 
  sendGameMessage(v) {
@@ -133,29 +134,45 @@ export default class App extends Component {
     this.setState({ moveOtherTo:moveTo });
     let take = this.isTake(moveTo);
     this.state.board.moveOther(moveFrom, moveTo, piece);
-    let check = false;
+    let check = isCheck( this.state.board, this.state.whiteMe );        
     if( isCheck( this.state.board, this.state.whiteMe ) ) {
        const kingPos = this.state.board.getMyKingPos(this.state.whiteMe);
        const kingMoves = new MoveValidator(kingPos, this.state.board).calculateAvailableCells();
        if( kingMoves.length===1) {
-           this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:piece, suffix:'X'});
-           this.setState({myMove:false, endGame:true, message:'Mate. You lose.', askSurrender:false});
-           this.sendGameMessage({what: "SURRENDER",  text:"Your opponent just got mate. You win."}); 
+           if( check ) {
+             const suffix = 'X';
+             this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:piece, suffix:suffix});
+             this.setState({myMove:false, endGame:true, message:'Mate. You lose.', askSurrender:false});
+             this.sendGameMessage({what: "AMEND_LAST_MOVE",  text:suffix}); 
+             this.sendGameMessage({what: "SURRENDER",  text:"Your opponent just got mate. You win."}); 
+           } else {
+             const suffix = ' deuce';
+             this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:piece, suffix:suffix});
+             this.setState({myMove:false, endGame:true, message:'Deuce', askSurrender:false});
+             this.sendGameMessage({what: "AMEND_LAST_MOVE",  text:suffix}); 
+             this.sendGameMessage({what: "DEUCE"});              
+           }
            return;
-       } else {       
-	       message = "Check";
-           check = true;
-       }
+       } else if( check ) { message = "Check"; }
     }
     const suffix = check ? '+' : undefined;
+    this.sendGameMessage({what: "AMEND_LAST_MOVE",  text:suffix}); 
     this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:piece, suffix:suffix});
     this.setState({myMove:true, message:message, board: this.state.board, moveOtherTo:undefined});
+  }
+  
+  amendLastMove(suffix) {
+    if( this.state.moves.length > 0 ) {
+      const lastMove = this.state.moves[this.state.moves.length-1];
+      const v = this.state.whiteMe ? lastMove.black : lastMove.white;
+      v.suffix = suffix;
+      this.setState({moves:this.state.moves});
+    }
   }
 
   addMoveToList(v) {
     let p = this.state.board.get(v.moveTo);
     v.piece = p.type;
-//    let v = { piece:p.type, moveFrom:moveFrom, moveTo:moveTo, take:take, newType: newPieceType, check:check, mate:mate };
 
     // TODO (2019/02/02) show check or mate for this player
 

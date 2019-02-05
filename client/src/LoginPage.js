@@ -23,15 +23,16 @@ export default class LoginPage extends Component {
       this.state.login,
       this.state.password,      
       {
-        "LOGIN_ERROR":    (msg) => { this.setState({errorMessage:msg.text}); console.log("ERROR", msg.text); },
-        "PLAYERS_ADD":    (msg) => this.props.app.playersAdd(msg.players),
-        "PLAYERS_REMOVE": (msg) => this.props.app.playersRemove(msg.players),
-        "GAME_START":     (msg) => this.props.app.startGame(msg.from, msg.white),
-        "MOVE":           (msg) => this.props.app.moveOther(msg.moveFrom, msg.moveTo, msg.piece, msg.text),
-        "SURRENDER":      (msg) => this.props.app.win(msg.text),
-        "ASK_DEUCE":      ()    => this.props.app.onAskDeuce(),
-        "DEUCE":          ()    => this.props.app.deuce(),
-        "LOGIN_OK":       ()    => this.props.app.setPlayer(this.state.login)
+        "LOGIN_ERROR":     msg => { this.setState({errorMessage:msg.text}); console.log("ERROR", msg.text); },
+        "PLAYERS_ADD":     msg => this.props.app.playersAdd(msg.players),
+        "PLAYERS_REMOVE":  msg => this.props.app.playersRemove(msg.players),
+        "GAME_START":      msg => this.props.app.startGame(msg.from, msg.white),
+        "MOVE":            msg => this.props.app.moveOther(msg.moveFrom, msg.moveTo, msg.piece, msg.text),
+        "SURRENDER":       msg => this.props.app.win(msg.text),
+        "AMEND_LAST_MOVE": msg => this.props.app.amendLastMove(msg.text),
+        "ASK_DEUCE":       ()  => this.props.app.onAskDeuce(),
+        "DEUCE":           ()  => this.props.app.deuce(),
+        "LOGIN_OK":        ()  => this.props.app.setPlayer(this.state.login)
       }
     );
   };

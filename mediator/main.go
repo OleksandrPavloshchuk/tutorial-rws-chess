@@ -2,6 +2,7 @@ package main
 
 import (
 	"./dispatcher"
+	"./service"	
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"io"
@@ -66,7 +67,8 @@ func exitIfError(err error, conn *websocket.Conn) bool {
 }
 
 func main() {
-	dispatcher.Init()
+    service.Init()
+	dispatcher.Init()	
 
 	registerAbout()
 	registerWebSocket()

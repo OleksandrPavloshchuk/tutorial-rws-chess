@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"net"
+	"../service"
 )
 
 const (
@@ -23,9 +24,6 @@ type Message struct {
 	Text      string   `json:"text"`
 }
 
-// TODO (2019/01/14) check credentials from database
-var passwords map[string]string
-
 type playerSession struct {
 	name        string
 	otherPlayer string
@@ -37,11 +35,6 @@ var activePlayers map[string]playerSession
 
 func Init() {
 	activePlayers = make(map[string]playerSession, 0)
-	passwords = make(map[string]string, 4)
-	passwords["player-1"] = "123456"
-	passwords["player-2"] = "654321"
-	passwords["me"] = "1"
-	passwords["player-3"] = "1"
 }
 
 func RemovePlayer(addr net.Addr) {
@@ -83,12 +76,11 @@ func DispatchMessage(msg *Message, unparsedMsg *[]byte, connection *websocket.Co
 	case "GAME_START":
 		changePlayersMode(msg, "PLAYERS_REMOVE", playing)
 		return nil, false
-	case "MOVE", "ASK_DEUCE", "AMEND_LAST_MOVE":
+	case "MOVE", "ASK_DEUCE", "AMEND_LAST_MOVE", "SURRENDER", "DEUCE":
 		passMessageToReceiver(msg.To, unparsedMsg)
-		return nil, false
-	case "SURRENDER", "DEUCE":
-		passMessageToReceiver(msg.To, unparsedMsg)
-		changePlayersMode(msg, "PLAYERS_ADD", waiting)
+		if msg.What=="SURRENDER" || msg.What=="DEUCE" {
+		    changePlayersMode(msg, "PLAYERS_ADD", waiting)
+		}
 		return nil, false
 	default:
 		log.Println("DISPATCH: unexpected message: %v\n", msg)
@@ -144,8 +136,7 @@ func login(name string, password string, connection *websocket.Conn) error {
 	if _, found := activePlayers[name]; found {
 		return errors.New("This player is already logged in")
 	}
-
-	if foundPassword, found := passwords[name]; found && foundPassword == password {
+	if service.CheckPassword(name, password) {
 		activePlayers[name] = playerSession{name: name, connection: connection, mode: waiting}
 		updatePlayers("PLAYERS_ADD", []string{name})
 		log.Printf("login: %v\n", name)
