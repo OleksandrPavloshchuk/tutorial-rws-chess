@@ -65,8 +65,14 @@ export default class App extends Component {
   setPlayer = player => this.setState({player : player});
   isConfirm = () => this.state.askSurrender || this.state.confirmDeuce || this.state.askDeuce;
   onAskDeuce = () => this.setState({myMove:true, confirmDeuce:true});
-  win = message => this.setState({myMove:true, message:message, endGame:true});
-  deuce = () => this.setState({myMove:true, message:"Deuce", endGame:true});
+  win = message => {
+    this.setState({myMove:true, message:message, endGame:true});
+    this.amendLastMove('X');
+  }
+  deuce = () => { 
+    this.setState({myMove:true, message:"Deuce", endGame:true});
+    this.amendLastMove(' deuce');
+  }
   logout = () => { this.mediatorClient.logout(this.state.player); this.setState({player : undefined}); }
 
   startGameMe(other, white) {
@@ -135,26 +141,22 @@ export default class App extends Component {
     let take = this.isTake(moveTo);
     this.state.board.moveOther(moveFrom, moveTo, piece);
     let check = isCheck( this.state.board, this.state.whiteMe );        
-    if( isCheck( this.state.board, this.state.whiteMe ) ) {
-       const kingPos = this.state.board.getMyKingPos(this.state.whiteMe);
-       const kingMoves = new MoveValidator(kingPos, this.state.board).calculateAvailableCells();
-       if( kingMoves.length===1) {
-           if( check ) {
-             const suffix = 'X';
-             this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:piece, suffix:suffix});
-             this.setState({myMove:false, endGame:true, message:'Mate. You lose.', askSurrender:false});
-             this.sendGameMessage({what: "AMEND_LAST_MOVE",  text:suffix}); 
-             this.sendGameMessage({what: "SURRENDER",  text:"Your opponent just got mate. You win."}); 
-           } else {
-             const suffix = ' deuce';
-             this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:piece, suffix:suffix});
-             this.setState({myMove:false, endGame:true, message:'Deuce', askSurrender:false});
-             this.sendGameMessage({what: "AMEND_LAST_MOVE",  text:suffix}); 
-             this.sendGameMessage({what: "DEUCE"});              
-           }
-           return;
-       } else if( check ) { message = "Check"; }
-    }
+    
+    const kingPos = this.state.board.getMyKingPos(this.state.whiteMe);
+    const kingMoves = new MoveValidator(kingPos, this.state.board).calculateAvailableCells();
+    if( kingMoves.length===1) {
+        const msgMy = check ? "Mate. You loose." : "Stalemate. Deuce."; 
+        const msgOther = check ? "Your opponent just got mate. You win." : "Stalemate. Deuce.";
+        const what = check ? "SURRENDER" : "DEUCE";
+        const suffix = check ? 'X' : ' deuce';
+        
+        this.addMoveToList({ moveFrom:moveFrom, moveTo:moveTo, take:take, newType:piece, suffix:suffix });
+        this.setState({ myMove:false, endGame:true, message:msgMy, askSurrender:false });
+        this.sendGameMessage({ what:"AMEND_LAST_MOVE", text:suffix }); 
+        this.sendGameMessage({ what:what, text:msgOther }); 
+
+        return;
+    } else if( check ) { message = "Check"; }
     const suffix = check ? '+' : undefined;
     this.sendGameMessage({what: "AMEND_LAST_MOVE",  text:suffix}); 
     this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:piece, suffix:suffix});
