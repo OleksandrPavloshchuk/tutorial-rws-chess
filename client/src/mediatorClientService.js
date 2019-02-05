@@ -21,7 +21,7 @@ export default class MediatorClient {
         socket.onerror = event => dispatcher["LOGIN_ERROR"]({text:socketErrorText});
         socket.onmessage = event => {
 
-            // console.log('on message', event.data)
+            console.log('RECEIVED', event.data)
 
             var msg = JSON.parse(event.data);
             if( "LOGIN_ERROR"===msg.what) { closeSocket(); }

@@ -59,6 +59,8 @@ export default class App extends Component {
    v.from = this.state.player;
    v.to = this.state.otherPlayer;
    this.mediatorClient.sendGameMessage(v);
+   // TODO remove trace
+   console.log('SENT', v)   
  }
 
   isTake = moveTo => !!this.state.board.get(moveTo);
@@ -142,9 +144,15 @@ export default class App extends Component {
     this.state.board.moveOther(moveFrom, moveTo, piece);
     let check = isCheck( this.state.board, this.state.whiteMe );        
     
-    const kingPos = this.state.board.getMyKingPos(this.state.whiteMe);
-    const kingMoves = new MoveValidator(kingPos, this.state.board).calculateAvailableCells();
-    if( kingMoves.length===1) {
+    // Calculate all moves (TODO refactor):
+    const myFigures = this.state.board.getPieces(true, this.state.whiteMe);
+    var counter = 0;
+    for( var i=0; i<myFigures.length; i++ ) {
+      const moves = new MoveValidator(myFigures[i], this.state.board).calculateAvailableCells();
+      counter += moves.length-1;
+    }
+    
+    if( 0===counter) {
         const msgMy = check ? "Mate. You loose." : "Stalemate. Deuce."; 
         const msgOther = check ? "Your opponent just got mate. You win." : "Stalemate. Deuce.";
         const what = check ? "SURRENDER" : "DEUCE";
@@ -166,7 +174,7 @@ export default class App extends Component {
   amendLastMove(suffix) {
     if( this.state.moves.length > 0 ) {
       const lastMove = this.state.moves[this.state.moves.length-1];
-      const v = this.state.whiteMe ? lastMove.black : lastMove.white;
+      const v = this.state.whiteMe ? lastMove.white : lastMove.black;
       v.suffix = suffix;
       this.setState({moves:this.state.moves});
     }
