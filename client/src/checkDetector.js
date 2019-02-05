@@ -11,11 +11,8 @@ export default class CheckDetector {
 
     this.checkDetector = {
       pawn : () => {
-        if(this.piece.white) {                    
-          return this.checkCell(this.x-1, this.y+1) || this.checkCell(this.x+1, this.y+1);
-        } else {
-          return this.checkCell(this.x-1, this.y-1) || this.checkCell(this.x+1, this.y-1);
-        }
+        const step = this.piece.white ? 1 : -1;
+        return this.checkCell(this.x-1, this.y+step) || this.checkCell(this.x+1, this.y+step);
       },
       knight : () => this.checkCell(this.x+1, this.y+2)
           || this.checkCell(this.x+2, this.y+1)
