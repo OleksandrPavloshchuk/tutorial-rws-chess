@@ -51,7 +51,14 @@ export default class App extends Component {
     this.isCastling = this.isCastling.bind(this);
     this.isConversion = this.isConversion.bind(this);
     this.isConfirm = this.isConfirm.bind(this);
+    this.sendGameMessage = this.sendGameMessage.bind(this);
   }
+
+ sendGameMessage(v) {
+   v.from = this.state.player;
+   v.to = this.state.otherPlayer;
+   this.mediatorClient.sendGameMessage(v);
+ }
 
   isTake = moveTo => !!this.state.board.get(moveTo);
   setPlayer = player => this.setState({player : player});
@@ -96,10 +103,9 @@ export default class App extends Component {
   }
 
   moveComplete(moveFrom, moveTo, take, newPieceType) {
-    this.addMoveToList(moveFrom, moveTo, take, newPieceType);
+    this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:newPieceType});
     this.state.board.setNewPieceType( moveTo, newPieceType );
-    this.mediatorClient.sendGameMessage(
-      this.state.player, this.state.otherPlayer, "MOVE", undefined, moveFrom, moveTo, newPieceType );
+    this.sendGameMessage({what:"MOVE", moveFrom:moveFrom, moveTo:moveTo, piece:newPieceType} );
     this.setState({myMove:false, board: this.state.board});
   }
   
@@ -132,23 +138,24 @@ export default class App extends Component {
        const kingPos = this.state.board.getMyKingPos(this.state.whiteMe);
        const kingMoves = new MoveValidator(kingPos, this.state.board).calculateAvailableCells();
        if( kingMoves.length===1) {
-           this.addMoveToList(moveFrom, moveTo, take, piece, false, true);
+           this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:piece, suffix:'X'});
            this.setState({myMove:false, endGame:true, message:'Mate. You lose.', askSurrender:false});
-           this.mediatorClient.sendGameMessage( 
-              this.state.player, this.state.otherPlayer, "SURRENDER",  "Your opponent just got mate. You win.");           
+           this.sendGameMessage({what: "SURRENDER",  text:"Your opponent just got mate. You win."}); 
            return;
        } else {       
 	       message = "Check";
            check = true;
        }
     }
-    this.addMoveToList(moveFrom, moveTo, take, piece, check, false);
+    const suffix = check ? '+' : undefined;
+    this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:piece, suffix:suffix});
     this.setState({myMove:true, message:message, board: this.state.board, moveOtherTo:undefined});
   }
 
-  addMoveToList(moveFrom, moveTo, take, newPieceType, check, mate) {
-    let p = this.state.board.get(moveTo);
-    let v = { piece:p.type, moveFrom:moveFrom, moveTo:moveTo, take:take, newType: newPieceType, check:check, mate:mate };
+  addMoveToList(v) {
+    let p = this.state.board.get(v.moveTo);
+    v.piece = p.type;
+//    let v = { piece:p.type, moveFrom:moveFrom, moveTo:moveTo, take:take, newType: newPieceType, check:check, mate:mate };
 
     // TODO (2019/02/02) show check or mate for this player
 
@@ -158,8 +165,8 @@ export default class App extends Component {
     } else {
       moves[this.state.moves.length-1].black = v;
     }
-    if( this.isCastling(p, moveFrom, moveTo, 3) ) { v.castling = "0-0-0"; } 
-    else if( this.isCastling(p, moveFrom, moveTo, 7) ) { v.castling = "0-0"; }
+    if( this.isCastling(p, v.moveFrom, v.moveTo, 3) ) { v.castling = "0-0-0"; } 
+    else if( this.isCastling(p, v.moveFrom, v.moveTo, 7) ) { v.castling = "0-0"; }
 
     this.setState({moves:moves});
   }
