@@ -1,4 +1,5 @@
-import {key, x, y} from './boardData';
+import BoardData, {key, x, y} from './boardData';
+import CheckDetector from './checkDetector';
 
 export default class MoveValidator {
 
@@ -11,21 +12,16 @@ export default class MoveValidator {
 
     this.pieceValidators = {
       pawn : () => { let r = [];
-        if(this.piece.white) {
-          if( this.checkPawn(r, this.x, this.y+1) && this.y===2) {
-            this.checkPawn(r, this.x, this.y+2);
+        const step = this.piece.white ? 1 : -1;
+        const startLine = this.piece.white ? 2 : 7;
+
+          if( this.checkPawn(r, this.x, this.y+step) && this.y===startLine) {
+            this.checkPawn(r, this.x, this.y+2*step);
           }
-          this.checkPawnTake(r, this.x-1, this.y+1);
-          this.checkPawnTake(r, this.x+1, this.y+1);
+          this.checkPawnTake(r, this.x-1, this.y+step);
+          this.checkPawnTake(r, this.x+1, this.y+step);
           // TODO take on passage
-        } else {
-          if( this.checkPawn(r, this.x, this.y-1) && this.y===7) {
-            this.checkPawn(r, this.x, this.y-2);
-          }
-          this.checkPawnTake(r, this.x-1, this.y-1);
-          this.checkPawnTake(r, this.x+1, this.y-1);
-          // TODO take on passage
-        }
+
         return r;
       },
       knight : () => { let r = [];
@@ -101,9 +97,17 @@ export default class MoveValidator {
       return [];
     }
 
-    let r = this.pieceValidators[this.piece.type]();
+    let tmp = this.pieceValidators[this.piece.type]();
+
+    let r = [];
+    tmp.forEach( k => {
+      const probeBoard = new BoardData(this.piece.white, this.board);
+      probeBoard.doMove(this.src, k, this.piece.type);
+      const check = isCheck(probeBoard, this.piece.white);
+      if (!check ) { r.push(k);  }
+    });    
+
     r.push(this.src);
-    // TODO validate for opening the king
     return r;
   }
 
@@ -147,3 +151,17 @@ export default class MoveValidator {
 
 function valid(v) { return 1<=v && 8>=v; }
 function add(r, x, y) { r.push( key( x, y ) ); }
+
+export function isCheck(board, white) {
+     const opponentPieces = board.getPieces(false, white);
+
+     for( var i=0; i<opponentPieces.length; i++ ) {
+        const ok = opponentPieces[i];
+        if( new CheckDetector(ok, board).isCheck() ) {
+          return true;
+        }
+     }
+     return false;   
+  }
+
+

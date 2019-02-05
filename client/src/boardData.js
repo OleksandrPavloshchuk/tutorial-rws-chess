@@ -14,6 +14,8 @@ export default class BoardData {
     this.init = this.init.bind(this);
     this.doMove = this.doMove.bind(this);
     this.setNewPieceType = this.setNewPieceType.bind(this);
+    this.getPieces = this.getPieces.bind(this);
+    this.getMyKingPos = this.getMyKingPos.bind(this);
     
     const y = startY(whiteMe);
 
@@ -47,6 +49,17 @@ export default class BoardData {
       if( xTo-xFrom===2) { this.doMove( key(8, yFrom), key(6, yFrom), "rook");
       } else if( xFrom-xTo===2) { this.doMove( key(1,yFrom), key(4, yFrom), "rook"); }
     }
+  }
+
+  getMyKingPos(white) {
+     const pos = Object.keys(this.data);
+     for( var i=0; i<pos.length; i++ ) {
+       const p = this.get(pos[i]);
+       if( p.white===white && "king"===p.type) {
+          return pos[i];
+       }
+     }
+     return undefined;
   }
 
   move(moveFrom, moveTo) {
@@ -98,6 +111,23 @@ export default class BoardData {
   clearAvailableCells = () => { this.availableCells = []; };
   calculateAvailableCells = src => { this.availableCells = new MoveValidator(src, this).calculateAvailableCells(); };
   isAvailable = c => this.availableCells.includes(c);
+
+  getPieces(my, whiteMe) {
+    let r = [];
+    Object.keys(this.data).forEach( k => {
+       const p = this.data[k];
+       if( my ) {          
+         if ( p.white===whiteMe) {
+           r.push(k);
+         }
+       } else {
+         if ( p.white!==whiteMe) {
+           r.push(k);
+         }
+       }
+    });
+    return r;
+  }
 
 }
 

@@ -1,0 +1,8 @@
+.modal-narrow {
+	width: 260px;
+    max-width: 260px;
+}
+
+.modal-footer-center {
+   justify-content: center;
+}
