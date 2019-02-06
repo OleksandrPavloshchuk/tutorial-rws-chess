@@ -66,7 +66,7 @@ export default class App extends Component {
   isTake = moveTo => !!this.state.board.get(moveTo);
   setPlayer = player => this.setState({player : player});
   isConfirm = () => this.state.askSurrender || this.state.confirmDeuce || this.state.askDeuce;
-  onAskDeuce = () => this.setState({myMove:true, confirmDeuce:true});
+  onAskDeuce = () => this.setState({myMove:false, confirmDeuce:true});
   win = message => {
     this.setState({myMove:true, message:message, endGame:true});
     this.amendLastMove('X');

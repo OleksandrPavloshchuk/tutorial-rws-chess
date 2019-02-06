@@ -19,7 +19,7 @@ export default class QuestionModal extends React.Component {
   }
 
   askDeuce() {
-      this.props.app.setState({myMove:false, askDeuce:false});
+      this.props.app.setState({askDeuce:false});
       this.props.app.sendGameMessage({what:"ASK_DEUCE"});
   }
 
