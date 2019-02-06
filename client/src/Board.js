@@ -13,7 +13,7 @@ export default function Board(props) {
     squares.push(<LRow aKey="top" key="top" labels={labels}/>);
     for( var i=1; i<=8; i++ ) {
         const l = props.app.state.whiteMe ? 9 - i : i;
-        const key = "c" + i;
+        const key = "r" + i;
         squares.push(<Row label={l} key={key} aKey={key} type={i % 2} app={props.app} />);
     }
     squares.push(<LRow aKey="bottom" key="bottom" labels={labels}/>);
@@ -31,7 +31,7 @@ function Player(props) {
 
 function LRow(props) {
     return <tr key={props.aKey}><td></td>
-        {this.props.labels.map( l => <LCell text={l} key={l} aKey={l}/>)}
+        {props.labels.map( l => <LCell text={l} key={l} aKey={l}/>)}
     <td></td></tr>;
 }
 
@@ -40,11 +40,11 @@ function Row(props) {
 
     for(var i=1; i<=8; i++ ) {
         const lc = props.app.state.whiteMe ? i  : 9 - i;
-        const key = props.label + lc;
+        const key = 'c' + props.label + lc;
         cs.push(<Cell key={key} aKey={key} white={(i % 2) !== props.type} app={props.app} />);
     }
 
-    return <tr key={this.props.key}>
+    return <tr key={props.key}>
         <td className="cell-label">{props.label}</td>
         {cs}
         <td className="cell-label">{props.label}</td>
