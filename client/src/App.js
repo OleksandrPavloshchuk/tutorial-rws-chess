@@ -183,9 +183,6 @@ export default class App extends Component {
   addMoveToList(v) {
     let p = this.state.board.get(v.moveTo);
     v.piece = p.type;
-
-    // TODO (2019/02/02) show check or mate for this player
-
     let moves = this.state.moves;
     if( p.white ) {
       moves.push({num:this.state.moves.length+1, white :v});
@@ -229,15 +226,9 @@ export default class App extends Component {
 
     return (
       <div className="container">
-        {!this.state.player &&
-          <LoginPage app={this}/>
-        }
-        {(this.state.player && !this.state.otherPlayer) &&
-          <PlayerListPage app={this} />
-        }
-        {(this.state.player && this.state.otherPlayer) &&
-          <BoardPage app={this} />
-        }
+        {this.state.player
+			? this.state.otherPlayer  ? 	<BoardPage app={this} /> :  <PlayerListPage app={this} />
+            : <LoginPage app={this}/> }
       </div>
     );
   }

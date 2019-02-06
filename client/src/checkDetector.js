@@ -39,10 +39,7 @@ export default class CheckDetector {
     this.checkSeries = this.checkSeries.bind(this);
   }
 
-  isCheck() {
-    if( !this.piece ) {  return false;  }
-    return this.checkDetector[this.piece.type]();
-  }
+  isCheck = () => this.piece ? this.checkDetector[this.piece.type]() : false;
 
   /**
    * @return null - no check and exit from loop
