@@ -1,4 +1,4 @@
-package service
+package authentication
 
 // TODO (2019/01/14) check credentials from database
 var passwords map[string]string

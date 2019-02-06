@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"net"
-	"../service"
+	"../service/authentication"
 )
 
 const (
@@ -136,7 +136,7 @@ func login(name string, password string, connection *websocket.Conn) error {
 	if _, found := activePlayers[name]; found {
 		return errors.New("This player is already logged in")
 	}
-	if service.CheckPassword(name, password) {
+	if authentication.CheckPassword(name, password) {
 		activePlayers[name] = playerSession{name: name, connection: connection, mode: waiting}
 		updatePlayers("PLAYERS_ADD", []string{name})
 		log.Printf("login: %v\n", name)
