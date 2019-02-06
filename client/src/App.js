@@ -60,7 +60,7 @@ export default class App extends Component {
    v.to = this.state.otherPlayer;
    this.mediatorClient.sendGameMessage(v);
    // TODO remove trace
-   console.log('SENT', v)   
+   // console.log('SENT', v)   
  }
 
   isTake = moveTo => !!this.state.board.get(moveTo);

@@ -44,7 +44,7 @@ function Row(props) {
         cs.push(<Cell key={key} aKey={key} white={(i % 2) !== props.type} app={props.app} />);
     }
 
-    return <tr key={props.key}>
+    return <tr key={props.aKey} >
         <td className="cell-label">{props.label}</td>
         {cs}
         <td className="cell-label">{props.label}</td>
