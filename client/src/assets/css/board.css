@@ -11,8 +11,13 @@
 
 .move-list {
   margin: 1em;
-  width: 16em;
+  width: 18em;
   min-width: 16em;
+}
+
+.move-list-body {
+  max-height: 33em;
+  overflow: scroll;
 }
 
 .conversion-panel {
