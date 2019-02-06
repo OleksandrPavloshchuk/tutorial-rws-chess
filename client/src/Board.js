@@ -13,7 +13,7 @@ export default function Board(props) {
     squares.push(<LRow aKey="top" key="top" labels={labels}/>);
     for( var i=1; i<=8; i++ ) {
         const l = props.app.state.whiteMe ? 9 - i : i;
-        const key = "r" + i;
+        const key = "c" + i;
         squares.push(<Row label={l} key={key} aKey={key} type={i % 2} app={props.app} />);
     }
     squares.push(<LRow aKey="bottom" key="bottom" labels={labels}/>);
@@ -40,7 +40,7 @@ function Row(props) {
 
     for(var i=1; i<=8; i++ ) {
         const lc = props.app.state.whiteMe ? i  : 9 - i;
-        const key = 'c' + props.label + lc;
+        const key = props.label + lc;
         cs.push(<Cell key={key} aKey={key} white={(i % 2) !== props.type} app={props.app} />);
     }
 
