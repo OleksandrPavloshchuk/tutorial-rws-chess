@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import Logo from './Logo';
+import Navigation from './Navigation';
 
 export default class LoginPage extends Component {
 
@@ -39,7 +39,7 @@ export default class LoginPage extends Component {
 
   render = () => (
       <div className="container col-md-6">
-        <nav className="navbar navbar-light bg-light navbar-small"><Logo/></nav>
+        <Navigation/>
         {this.state.errorMessage &&
         <div className="alert alert-danger">{this.state.errorMessage}</div>
         }

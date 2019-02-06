@@ -4,7 +4,7 @@ import './assets/css/board.css';
 
 import Board from './Board';
 import MoveList from './MoveList';
-import Logo from './Logo';
+import Navigation from './Navigation';
 import ConversionPanel from './ConversionPanel';
 import QuestionModal from './QuestionModal';
 
@@ -28,7 +28,7 @@ export default class BoardPage extends Component {
         {this.props.app.isConfirm() &&
             <QuestionModal app={this.props.app} />
         }
-        <nav className="navbar navbar-light bg-light navbar-small"><Logo/>
+        <Navigation>
           {this.props.app.state.message &&
           <div className="navbar-small float-right">{this.props.app.state.message}</div>
           }
@@ -49,7 +49,7 @@ export default class BoardPage extends Component {
             >Exit</button>
           </div>
           }
-        </nav>
+        </Navigation>
         <div className="row">
           <Board app={this.props.app} />
           {this.props.app.state.showConversion &&
