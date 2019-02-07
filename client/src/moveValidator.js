@@ -69,21 +69,35 @@ export default class MoveValidator {
         this.checkSeries = this.checkSeries.bind(this);
         this.allowedShortCastling = this.allowedShortCastling.bind(this);
         this.allowedLongCastling = this.allowedLongCastling.bind(this);
+        this.testCastlingForCheck = this.testCastlingForCheck.bind(this);
     }
 
     allowedLongCastling() {
-        // TODO: check for possible check
-        return !this.board.kingMoved && !this.board.rook1Moved
+        const result = !this.board.kingMoved && !this.board.rook1Moved
             && !this.board.get(key(this.x-1,this.y))
             && !this.board.get(key(this.x-2,this.y))
             && !this.board.get(key(this.x-3,this.y));
+        if( !result ) { return false; }    
+        return this.testCastlingForCheck(-1, 3);
     }
 
     allowedShortCastling() {
-        // TODO: check for possible check
-        return !this.board.kingMoved && !this.board.rook8Moved
+        const result = !this.board.kingMoved && !this.board.rook8Moved
             && !this.board.get(key(this.x+1,this.y))
             && !this.board.get(key(this.x+2,this.y));
+        if( !result ) { return false; }
+        return this.testCastlingForCheck(1, 7);
+    }
+    
+    testCastlingForCheck(step,lastX) {
+        const y = this.piece.white ? 1 : 8;
+        if( isCheck(this.board, this.piece.white) ) { return false; }
+        for( var x=5+step; x<=lastX; x += step ) {
+            const probeBoard = new BoardData(this.piece.white, this.board);
+            probeBoard.doMove(this.src, key(x,y), this.piece.type);
+            if ( isCheck(probeBoard, this.piece.white) ) { return false; }
+        }
+        return true;
     }
 
     calculateAvailableCells() {
