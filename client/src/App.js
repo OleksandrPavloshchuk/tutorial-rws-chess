@@ -131,8 +131,9 @@ export default class App extends Component {
 		let moveFrom = src.piece;
     	var take = this.isTake(moveTo);
     	if( this.state.board.move(moveFrom, moveTo) ) {
-      		const step = this.state.white ? 1 : -1;
-        	const pawnKey = key(x(moveTo), y(moveTo)+step);
+      		const step = this.state.whiteMe ? 1 : -1;
+        	const pawnKey = key(x(moveTo), y(moveTo)-step);
+
             var takeOnPassage = undefined;
         	if( this.state.passage===pawnKey) {
           		take = this.isTake(pawnKey);
