@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import Logo from './Logo';
+import Navigation from './Navigation';
 
 export default class PlayerListPage extends Component {
 
@@ -26,13 +26,11 @@ export default class PlayerListPage extends Component {
 
     return (
       <div className="container">
-        <nav className="navbar navbar-light bg-light navbar-small"><Logo/>
+        <Navigation>
           <span className="navbar-text">{this.props.app.state.player}</span>
           <button className="btn btn-outline-secondary" onClick={this.props.app.logout}>Logout</button>
-        </nav>
-        <ul className="list-group">
-          {items}
-        </ul>
+        </Navigation>
+        <ul className="list-group">{items}</ul>
       </div>
     );
   }

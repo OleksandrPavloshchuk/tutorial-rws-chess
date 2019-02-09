@@ -1,7 +1,8 @@
 package main
 
 import (
-	"./players"
+	"./dispatcher"
+	"./service/authentication"	
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"io"
@@ -36,14 +37,14 @@ func registerWebSocket() {
 				return
 			}
 
-			msgSrc := players.Message{}
+			msgSrc := dispatcher.Message{}
 			if err := json.Unmarshal(msgData, &msgSrc); err != nil {
 				log.Printf("web socket: can't parse message. Ignored: %v\n", err)
 			} else {
 				// TODO remove trace
 				//log.Printf("TRACE: msg=%v\n", msgSrc)
 
-				if msgRes, doExit := players.DispatchMessage(&msgSrc, &msgData, conn); doExit {
+				if msgRes, doExit := dispatcher.DispatchMessage(&msgSrc, &msgData, conn); doExit {
 					return
 				} else if msgRes != nil {
 					msgData, _ = json.Marshal(*msgRes)
@@ -61,12 +62,13 @@ func exitIfError(err error, conn *websocket.Conn) bool {
 		return false
 	}
 	log.Printf("web socket error: %v. Close connection.\n", err)
-	players.RemovePlayer(conn.RemoteAddr())
+	dispatcher.RemovePlayer(conn.RemoteAddr())
 	return true
 }
 
 func main() {
-	players.Init()
+    authentication.Init()
+	dispatcher.Init()	
 
 	registerAbout()
 	registerWebSocket()

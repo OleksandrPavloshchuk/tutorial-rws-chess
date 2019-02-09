@@ -6,7 +6,7 @@ import LoginPage from './LoginPage';
 import PlayerListPage from './PlayerListPage';
 import BoardPage from './BoardPage';
 import MediatorClient from './mediatorClientService';
-import BoardData,{key, startY, y} from './boardData';
+import BoardData,{key, startY, y, x} from './boardData';
 import MoveValidator, {isCheck} from './moveValidator.js';
 
 export default class App extends Component {
@@ -29,7 +29,8 @@ export default class App extends Component {
 	  confirmDeuce: false,
       askSurrender: false,
       moves: [],
-      moveOtherTo: undefined
+      moveOtherTo: undefined,
+      passage: undefined
     };
 
     this.setPlayer = this.setPlayer.bind(this);
@@ -52,20 +53,30 @@ export default class App extends Component {
     this.isConversion = this.isConversion.bind(this);
     this.isConfirm = this.isConfirm.bind(this);
     this.sendGameMessage = this.sendGameMessage.bind(this);
+    this.amendLastMove = this.amendLastMove.bind(this);
+    this.determinePassage = this.determinePassage.bind(this);
   }
 
  sendGameMessage(v) {
    v.from = this.state.player;
    v.to = this.state.otherPlayer;
    this.mediatorClient.sendGameMessage(v);
+   // TODO remove trace
+   // console.log('SENT', v)   
  }
 
   isTake = moveTo => !!this.state.board.get(moveTo);
   setPlayer = player => this.setState({player : player});
   isConfirm = () => this.state.askSurrender || this.state.confirmDeuce || this.state.askDeuce;
-  onAskDeuce = () => this.setState({myMove:true, confirmDeuce:true});
-  win = message => this.setState({myMove:true, message:message, endGame:true});
-  deuce = () => this.setState({myMove:true, message:"Deuce", endGame:true});
+  onAskDeuce = () => this.setState({myMove:false, confirmDeuce:true});
+  win = message => {
+    this.setState({myMove:true, message:message, endGame:true});
+    this.amendLastMove('X');
+  }
+  deuce = () => { 
+    this.setState({myMove:true, message:"Deuce", endGame:true});
+    this.amendLastMove(' deuce');
+  }
   logout = () => { this.mediatorClient.logout(this.state.player); this.setState({player : undefined}); }
 
   startGameMe(other, white) {
@@ -98,14 +109,15 @@ export default class App extends Component {
   }
 
   moveStart(src) {
-    this.state.board.calculateAvailableCells(src);
+
+    this.state.board.calculateAvailableCells(src, this.state.passage);
     this.setState({board: this.state.board});
   }
 
-  moveComplete(moveFrom, moveTo, take, newPieceType) {
+  moveComplete(moveFrom, moveTo, take, newPieceType, takeOnPassage) {
     this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:newPieceType});
     this.state.board.setNewPieceType( moveTo, newPieceType );
-    this.sendGameMessage({what:"MOVE", moveFrom:moveFrom, moveTo:moveTo, piece:newPieceType} );
+    this.sendGameMessage({what:"MOVE", moveFrom:moveFrom, moveTo:moveTo, piece:newPieceType, takeOnPassage:takeOnPassage} );
     this.setState({myMove:false, board: this.state.board});
   }
   
@@ -115,50 +127,89 @@ export default class App extends Component {
     return (this.state.whiteMe && 8===y(moveTo)) || (!this.state.whiteMe && 1===y(moveTo));
   }
 
-  dropPiece(src, moveTo) {
-    let moveFrom = src.piece;
-    let take = this.isTake(moveTo);
-    if( this.state.board.move(moveFrom, moveTo) ) {
-      if( this.isConversion(moveFrom, moveTo) ) {
-        this.setState({take:take, moveFrom:moveFrom, moveTo:moveTo, showConversion:true});
-      } else {
-        this.moveComplete( moveFrom, moveTo, take );
-      }
-    }
-    this.state.board.clearAvailableCells();
-    this.setState({board: this.state.board});
+	dropPiece(src, moveTo) {
+		let moveFrom = src.piece;
+    	var take = this.isTake(moveTo);
+    	if( this.state.board.move(moveFrom, moveTo) ) {
+      		const step = this.state.whiteMe ? 1 : -1;
+        	const pawnKey = key(x(moveTo), y(moveTo)-step);
+
+            var takeOnPassage = undefined;
+        	if( this.state.passage===pawnKey) {
+          		take = this.isTake(pawnKey);
+          		this.state.board.removePiece(pawnKey);
+                takeOnPassage = pawnKey;
+      		}
+      		if( this.isConversion(moveFrom, moveTo) ) {
+        		this.setState({take:take, moveFrom:moveFrom, moveTo:moveTo, showConversion:true});
+      		} else {
+        		this.moveComplete( moveFrom, moveTo, take, undefined, takeOnPassage );
+      		}
+    	}
+    	this.state.board.clearAvailableCells();
+    	this.setState({board: this.state.board});
+  	}
+
+  determinePassage(moveFrom,moveTo) {
+     const piece = this.state.board.get(moveFrom);
+     if( !piece ) { return undefined; }
+     if( "pawn"!==piece.type ) { return undefined; }
+     const yFrom = y(moveFrom);
+     const yTo = y(moveTo);
+     if( 2!==Math.abs(yFrom-yTo)) { return undefined; }
+     return moveTo;
   }
 
-  moveOther(moveFrom, moveTo, piece, message) {
-    this.setState({ moveOtherTo:moveTo });
-    let take = this.isTake(moveTo);
-    this.state.board.moveOther(moveFrom, moveTo, piece);
-    let check = false;
-    if( isCheck( this.state.board, this.state.whiteMe ) ) {
-       const kingPos = this.state.board.getMyKingPos(this.state.whiteMe);
-       const kingMoves = new MoveValidator(kingPos, this.state.board).calculateAvailableCells();
-       if( kingMoves.length===1) {
-           this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:piece, suffix:'X'});
-           this.setState({myMove:false, endGame:true, message:'Mate. You lose.', askSurrender:false});
-           this.sendGameMessage({what: "SURRENDER",  text:"Your opponent just got mate. You win."}); 
-           return;
-       } else {       
-	       message = "Check";
-           check = true;
-       }
+	moveOther(moveFrom, moveTo, piece, message, takeOnPassage) {
+	    const passage = this.determinePassage(moveFrom, moveTo);
+
+	    this.setState({ moveOtherTo:moveTo, passage:passage });
+	    let take = this.isTake(moveTo);
+	    this.state.board.moveOther(moveFrom, moveTo, piece);
+	    if( takeOnPassage ) {
+			this.state.board.removePiece(takeOnPassage);
+		}
+	    let check = isCheck( this.state.board, this.state.whiteMe );        
+    
+	    // Calculate all moves (TODO refactor):
+	    const myFigures = this.state.board.getPieces(true, this.state.whiteMe);
+	    var counter = 0;
+	    for( var i=0; i<myFigures.length; i++ ) {
+	      const moves = new MoveValidator(myFigures[i], this.state.board).calculateAvailableCells();
+	      counter += moves.length-1;
+	    }
+    
+	    if( 0===counter) {
+	        const msgMy = check ? "Mate. You loose." : "Stalemate. Deuce."; 
+	        const msgOther = check ? "Your opponent just got mate. You win." : "Stalemate. Deuce.";
+	        const what = check ? "SURRENDER" : "DEUCE";
+	        const suffix = check ? 'X' : ' deuce';
+        
+	        this.addMoveToList({ moveFrom:moveFrom, moveTo:moveTo, take:take, newType:piece, suffix:suffix });
+	        this.setState({ myMove:false, endGame:true, message:msgMy, askSurrender:false });
+	        this.sendGameMessage({ what:"AMEND_LAST_MOVE", text:suffix }); 
+	        this.sendGameMessage({ what:what, text:msgOther }); 
+
+	        return;
+	    } else if( check ) { message = "Check"; }
+	    const suffix = check ? '+' : undefined;
+	    this.sendGameMessage({what: "AMEND_LAST_MOVE",  text:suffix}); 
+	    this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:piece, suffix:suffix});
+	    this.setState({myMove:true, message:message, board: this.state.board, moveOtherTo:undefined});
+	}
+  
+  amendLastMove(suffix) {
+    if( this.state.moves.length > 0 ) {
+      const lastMove = this.state.moves[this.state.moves.length-1];
+      const v = this.state.whiteMe ? lastMove.white : lastMove.black;
+      v.suffix = suffix;
+      this.setState({moves:this.state.moves});
     }
-    const suffix = check ? '+' : undefined;
-    this.addMoveToList({moveFrom:moveFrom, moveTo:moveTo, take:take, newType:piece, suffix:suffix});
-    this.setState({myMove:true, message:message, board: this.state.board, moveOtherTo:undefined});
   }
 
   addMoveToList(v) {
     let p = this.state.board.get(v.moveTo);
     v.piece = p.type;
-//    let v = { piece:p.type, moveFrom:moveFrom, moveTo:moveTo, take:take, newType: newPieceType, check:check, mate:mate };
-
-    // TODO (2019/02/02) show check or mate for this player
-
     let moves = this.state.moves;
     if( p.white ) {
       moves.push({num:this.state.moves.length+1, white :v});
@@ -202,15 +253,9 @@ export default class App extends Component {
 
     return (
       <div className="container">
-        {!this.state.player &&
-          <LoginPage app={this}/>
-        }
-        {(this.state.player && !this.state.otherPlayer) &&
-          <PlayerListPage app={this} />
-        }
-        {(this.state.player && this.state.otherPlayer) &&
-          <BoardPage app={this} />
-        }
+        {this.state.player
+			? this.state.otherPlayer  ? 	<BoardPage app={this} /> :  <PlayerListPage app={this} />
+            : <LoginPage app={this}/> }
       </div>
     );
   }

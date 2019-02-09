@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import Logo from './Logo';
+import Navigation from './Navigation';
 
 export default class LoginPage extends Component {
 
@@ -14,50 +14,32 @@ export default class LoginPage extends Component {
     this.onReset = this.onReset.bind(this);
   }
   
-  onReset(event) {
-    event.preventDefault();
-    this.setState({ login: "", password: "", errorMessage: null });    
-  }
+  onReset = event => { event.preventDefault(); this.setState({ login: "", password: "", errorMessage: undefined }) };    
+  onChange = event => this.setState({ [event.target.name] : event.target.value });
 
-  onChange(event) {
-    this.setState({
-        [event.target.name] : event.target.value
-    });
-  }
-
-  onSubmit(event) {
+  onSubmit = event => {
     event.preventDefault();
     this.props.app.mediatorClient.startSession(
       this.state.login,
-      this.state.password,
-      // - login is accepted by server
-      player => {this.props.app.setPlayer(player);},
-      // - retrieve other players list
-      players => {this.props.app.playersAdd(players);},
-      // - remove players from list
-      players => {this.props.app.playersRemove(players);},
-      // - start game
-      (other, white) => {this.props.app.startGame(other, white);},
-      // - accept move by othe player
-      (moveFrom, moveTo, piece, message) => {this.props.app.moveOther(moveFrom, moveTo, piece, message);},
-      // - accept surrender by other player
-      (message) => {this.props.app.win(message)},
-      // - accept query for deuce by other player
-      () => {this.props.app.onAskDeuce();},
-      // - deuce is accepted by other player
-      () => {this.props.app.deuce();},
-      // - handle error
-      errorMessage => {
-        this.setState({errorMessage : errorMessage});
-        console.log("LOGIN ERROR", errorMessage);
+      this.state.password,      
+      {
+        "LOGIN_ERROR":     msg => { this.setState({errorMessage:msg.text}); console.log("ERROR", msg.text); },
+        "PLAYERS_ADD":     msg => this.props.app.playersAdd(msg.players),
+        "PLAYERS_REMOVE":  msg => this.props.app.playersRemove(msg.players),
+        "GAME_START":      msg => this.props.app.startGame(msg.from, msg.white),
+        "MOVE":            msg => this.props.app.moveOther(msg.moveFrom, msg.moveTo, msg.piece, msg.text, msg.takeOnPassage),
+        "SURRENDER":       msg => this.props.app.win(msg.text),
+        "AMEND_LAST_MOVE": msg => this.props.app.amendLastMove(msg.text),
+        "ASK_DEUCE":       ()  => this.props.app.onAskDeuce(),
+        "DEUCE":           ()  => this.props.app.deuce(),
+        "LOGIN_OK":        ()  => this.props.app.setPlayer(this.state.login)
       }
     );
-  }
+  };
 
-  render() {
-    return (
+  render = () => (
       <div className="container col-md-6">
-        <nav className="navbar navbar-light bg-light navbar-small"><Logo/></nav>
+        <Navigation/>
         {this.state.errorMessage &&
         <div className="alert alert-danger">{this.state.errorMessage}</div>
         }
@@ -78,7 +60,6 @@ export default class LoginPage extends Component {
           </div>
         </form>
       </div>
-    );
-  }
+  );
 
 }
