@@ -27,7 +27,7 @@ export default class LoginPage extends Component {
         "PLAYERS_ADD":     msg => this.props.app.playersAdd(msg.players),
         "PLAYERS_REMOVE":  msg => this.props.app.playersRemove(msg.players),
         "GAME_START":      msg => this.props.app.startGame(msg.from, msg.white),
-        "MOVE":            msg => this.props.app.moveOther(msg.moveFrom, msg.moveTo, msg.piece, msg.text),
+        "MOVE":            msg => this.props.app.moveOther(msg.moveFrom, msg.moveTo, msg.piece, msg.text, msg.takeOnPassage),
         "SURRENDER":       msg => this.props.app.win(msg.text),
         "AMEND_LAST_MOVE": msg => this.props.app.amendLastMove(msg.text),
         "ASK_DEUCE":       ()  => this.props.app.onAskDeuce(),

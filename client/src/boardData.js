@@ -15,6 +15,7 @@ export default class BoardData {
         this.doMove = this.doMove.bind(this);
         this.setNewPieceType = this.setNewPieceType.bind(this);
         this.getPieces = this.getPieces.bind(this);
+        this.removePiece = this.removePiece.bind(this);
     
         const y = startY(whiteMe);
 
@@ -25,6 +26,8 @@ export default class BoardData {
         if(src) { this.copyData(src); } else { this.init(); }
         this.availableCells = [];
     }
+
+    removePiece = pos => delete this.data[pos];
 
     get = pos => this.data[pos];
   
@@ -89,7 +92,7 @@ export default class BoardData {
     }
 
     clearAvailableCells = () => { this.availableCells = []; };
-    calculateAvailableCells = src => { this.availableCells = new MoveValidator(src, this).calculateAvailableCells(); };
+    calculateAvailableCells = (src, passage) => { this.availableCells = new MoveValidator(src, this, passage).calculateAvailableCells(); };
     isAvailable = c => this.availableCells.includes(c);
 
     getPieces(my, whiteMe) {

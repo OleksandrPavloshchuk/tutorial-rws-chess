@@ -3,9 +3,10 @@ import CheckDetector from './checkDetector';
 
 export default class MoveValidator {
 
-    constructor(src, board) {
+    constructor(src, board, passage) {
         this.src = src; this.x = x(src); this.y = y(src);
         this.board = board; this.piece = this.board.get(this.src);
+        this.passage = passage;
 
         this.pieceValidators = {
         pawn : () => { let r = [];
@@ -17,8 +18,15 @@ export default class MoveValidator {
             }
             this.checkPawnTake(r, this.x-1, this.y+step);
             this.checkPawnTake(r, this.x+1, this.y+step);
-            // TODO take on passage
 
+            if( this.passage ) {
+				const passX = x(this.passage);
+             	const passY = y(this.passage);
+
+                if( ( passX===this.x-1 || passX===this.x+1 ) && passY===this.y) {
+					add( r, passX, passY+step );
+                }
+            }
             return r;
         },
         knight : () => { let r = [];
