@@ -20,11 +20,10 @@ export default class MoveValidator {
             this.checkPawnTake(r, this.x+1, this.y+step);
 
             if( this.passage ) {
-				const passX = x(this.passage);
+		const passX = x(this.passage);
              	const passY = y(this.passage);
-
                 if( ( passX===this.x-1 || passX===this.x+1 ) && passY===this.y) {
-					add( r, passX, passY+step );
+                    add( r, passX, passY+step );
                 }
             }
             return r;
