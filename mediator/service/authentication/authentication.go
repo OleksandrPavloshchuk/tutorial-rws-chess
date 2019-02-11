@@ -9,13 +9,13 @@ func Init() {
 	passwords["player-2"] = "654321"
 	passwords["me"] = "1"
 	passwords["player-3"] = "1"
-	passwords["other"] = "2";  
+	passwords["other"] = "2"
 }
 
 func CheckPassword(name string, password string) bool {
 	if foundPassword, found := passwords[name]; found && foundPassword == password {
-	    return true
+		return true
 	} else {
-	    return false
+		return false
 	}
 }

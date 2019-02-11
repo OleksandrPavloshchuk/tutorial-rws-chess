@@ -1,11 +1,9 @@
 import React from 'react';
 
-import Logo from './Logo';
-
 export default function Navigation(props) { 
-    return (
-        <nav className="navbar navbar-light bg-light navbar-small"><Logo/>{props.children}</nav>
-    );
+    return   <nav className="navbar navbar-light bg-light navbar-small"><Logo/>{props.children}</nav>;
 }
 
-
+function Logo(props) { 
+    return <span className="navbar-brand"><span role="img" aria-label="RWS">🍀</span></span>; 
+}
