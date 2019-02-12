@@ -52,7 +52,11 @@ function ExitButton(props) {
 
 function GameActions(props) {
     return <div className="btn-group float-right" role="group">
-        <button className="btn btn-outline-secondary" onClick={props.deuce}>Deuce</button>
-        <button className="btn btn-outline-secondary" onClick={props.surrender}>Surrender</button>
+        <AskButton action={props.deuce} text="Deuce" />
+        <AskButton action={props.surrender} text="Surrender" />
     </div>;
+}
+
+function AskButton(props) {
+	return <button className="btn btn-outline-secondary" onClick={props.action}>{props.text}</button>
 }
