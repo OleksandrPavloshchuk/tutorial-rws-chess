@@ -10,8 +10,7 @@ var closeSocket = () => { socket.close(); socket = undefined; };
 export default class MediatorClient {
 
     startSession(player, password, dispatcher) {  
-        this.config = new Configuration();    
-        socket = new WebSocket(this.config.webSocketUrl);
+        socket = new WebSocket(new Configuration().webSocketUrl);
 
         socket.onopen = event => {
             console.log("Connected to", event.currentTarget.url);
