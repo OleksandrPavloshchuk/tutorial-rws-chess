@@ -5,9 +5,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import LoginPage from './LoginPage';
 import PlayerListPage from './PlayerListPage';
 import BoardPage from './BoardPage';
-import MediatorClient from './mediatorClientService';
-import BoardData, {key, startY, y, x} from './boardData';
-import MoveValidator, {isCheck} from './moveValidator.js';
+import MediatorClient from '../services/mediatorClientService';
+import BoardData, {key, startY, y, x} from '../services/boardData';
+import MoveValidator, {isCheck} from '../services/moveValidator';
 
 export default class App extends Component {
     constructor(props) {

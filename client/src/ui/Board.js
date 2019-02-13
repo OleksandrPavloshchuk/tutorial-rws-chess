@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Draggable, Droppable } from 'react-drag-and-drop';
 import {Motion, spring} from 'react-motion';
 
-import './assets/css/board.css';
+import '../assets/css/board.css';
 
 export default function Board(props) {
     let squares = [];

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import './assets/css/board.css';
+import '../assets/css/board.css';
 
 import Board from './Board';
 import MoveList from './MoveList';
