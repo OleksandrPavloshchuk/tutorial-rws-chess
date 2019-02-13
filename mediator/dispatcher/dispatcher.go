@@ -74,12 +74,12 @@ func DispatchMessage(msg *Message, unparsedMsg *[]byte, connection *websocket.Co
 		res := Message{What: "PLAYERS_ADD", Players: retrievePlayers()}
 		return &res, false
 	case "GAME_START":
-		changePlayersMode(msg, "PLAYERS_REMOVE", playing)
+		changePlayersMode(msg, playing)
 		return nil, false
 	case "MOVE", "ASK_DEUCE", "AMEND_LAST_MOVE", "SURRENDER", "DEUCE":
 		passMessageToReceiver(msg.To, unparsedMsg)
 		if msg.What == "SURRENDER" || msg.What == "DEUCE" {
-			changePlayersMode(msg, "PLAYERS_ADD", waiting)
+			changePlayersMode(msg, waiting)
 		}
 		return nil, false
 	default:
@@ -89,7 +89,11 @@ func DispatchMessage(msg *Message, unparsedMsg *[]byte, connection *websocket.Co
 	return nil, false
 }
 
-func changePlayersMode(msg *Message, what string, mode int) {
+func changePlayersMode(msg *Message, mode int) {
+    what := "PLAYERS_ADD"
+    if mode==playing {
+		what = "PLAYERS_REMOVE"
+	}
 	changePlayerMode(msg.From, msg.To, mode)
 	changePlayerMode(msg.To, msg.From, mode)
 	updatePlayers(what, []string{msg.From, msg.To})
