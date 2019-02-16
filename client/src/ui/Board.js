@@ -68,6 +68,8 @@ function Cell(props) {
         const cellIsAvailable = props.app.state.board.isAvailable(props.aKey);        
         const className = 'cell-' + (props.white ? 'white' : 'black') + (cellIsAvailable ? ' cell-available' : '');
 
+        // TODO use props.app.state.useDragAndDrop here or onClick
+
         return <td className={className} key={props.aKey}>
             <Droppable types={['piece']} onDrop={key => props.app.dropPiece(key, props.aKey)}>
                 {piece 
@@ -91,6 +93,8 @@ class Piece extends Component {
     render() {
         const color = this.props.white ? "-white" : "-black";
         const className = this.props.type + color + " piece";
+
+        // TODO use props.app.state.useDragAndDrop here or onClick
   
         return this.props.draggable
             ? <Draggable type="piece" data={this.props.position} className={className}

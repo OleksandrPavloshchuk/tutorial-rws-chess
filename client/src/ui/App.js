@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import LoginPage from './LoginPage';
+import LoginPage from './LoginPage';   
 import PlayerListPage from './PlayerListPage';
 import BoardPage from './BoardPage';
 import MediatorClient from '../services/mediatorClientService';
@@ -30,7 +30,8 @@ export default class App extends Component {
             askSurrender: false,
             moves: [],
             moveOtherTo: undefined,
-            passage: undefined
+            passage: undefined,
+            useDragAndDrop: undefined
         };
 
         this.setPlayer = this.setPlayer.bind(this);
@@ -57,6 +58,12 @@ export default class App extends Component {
         this.determinePassage = this.determinePassage.bind(this);
         this.sendEndGameMessage = this.sendEndGameMessage.bind(this);
     }
+
+    componentDidMount() {
+        this.setState({
+			useDragAndDrop: detectUseDragAndDrop()       
+        });
+    }    
 
     sendGameMessage(m) {
         m.from = this.state.player;
@@ -285,4 +292,9 @@ export default class App extends Component {
                         : <LoginPage app={this}/> }
         </div>);
     }
+}
+
+function detectUseDragAndDrop() {
+	let platform = window.navigator.platform.toUpperCase();    
+	return !platform.includes("IPHONE") && !platform.includes("ANDROID");
 }
