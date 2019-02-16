@@ -20,11 +20,9 @@ export default class MoveValidator {
             this.checkPawnTake(r, this.x+1, this.y+step);
 
             if( this.passage ) {
-				const passX = x(this.passage);
-             	const passY = y(this.passage);
-
+		        const passX = x(this.passage); const passY = y(this.passage);
                 if( ( passX===this.x-1 || passX===this.x+1 ) && passY===this.y) {
-					add( r, passX, passY+step );
+                    add( r, passX, passY+step );
                 }
             }
             return r;
@@ -165,8 +163,7 @@ export function isCheck(board, white) {
     const opponentPieces = board.getPieces(false, white);
 
     for( var i=0; i<opponentPieces.length; i++ ) {
-        const opponentPieceCoord = opponentPieces[i];
-        if( new CheckDetector(opponentPieceCoord, board).isCheck() ) { return true; }
+        if( new CheckDetector(opponentPieces[i], board).isCheck() ) { return true; }
     }
     return false;   
 }

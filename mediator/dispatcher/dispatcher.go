@@ -1,12 +1,12 @@
 package dispatcher
 
 import (
+	"../service/authentication"
 	"encoding/json"
 	"errors"
 	"github.com/gorilla/websocket"
 	"log"
 	"net"
-	"../service/authentication"
 )
 
 const (
@@ -15,13 +15,13 @@ const (
 )
 
 type Message struct {
-	What      string   `json:"what"`
-	From      string   `json:"from"`
-	To        string   `json:"to"`
-	Players   []string `json:"players"`
-	Password  string   `json:"password"`
-	White     bool     `json:"white"`
-	Text      string   `json:"text"`
+	What     string   `json:"what"`
+	From     string   `json:"from"`
+	To       string   `json:"to"`
+	Players  []string `json:"players"`
+	Password string   `json:"password"`
+	White    bool     `json:"white"`
+	Text     string   `json:"text"`
 }
 
 type playerSession struct {
@@ -41,7 +41,7 @@ func RemovePlayer(addr net.Addr) {
 	for name, session := range activePlayers {
 		if session.connection.RemoteAddr() == addr {
 			log.Printf("Connection to player %v is lost\n", name)
-			if session.mode==playing {
+			if session.mode == playing {
 				// Warn opponent that he wins:
 				content, _ := json.Marshal(Message{What: "SURRENDER", Text: "You win, because your opponent is gone"})
 				if otherSession, found := activePlayers[session.otherPlayer]; found {
@@ -74,12 +74,12 @@ func DispatchMessage(msg *Message, unparsedMsg *[]byte, connection *websocket.Co
 		res := Message{What: "PLAYERS_ADD", Players: retrievePlayers()}
 		return &res, false
 	case "GAME_START":
-		changePlayersMode(msg, "PLAYERS_REMOVE", playing)
+		changePlayersMode(msg, playing)
 		return nil, false
 	case "MOVE", "ASK_DEUCE", "AMEND_LAST_MOVE", "SURRENDER", "DEUCE":
 		passMessageToReceiver(msg.To, unparsedMsg)
-		if msg.What=="SURRENDER" || msg.What=="DEUCE" {
-		    changePlayersMode(msg, "PLAYERS_ADD", waiting)
+		if msg.What == "SURRENDER" || msg.What == "DEUCE" {
+			changePlayersMode(msg, waiting)
 		}
 		return nil, false
 	default:
@@ -89,7 +89,11 @@ func DispatchMessage(msg *Message, unparsedMsg *[]byte, connection *websocket.Co
 	return nil, false
 }
 
-func changePlayersMode(msg *Message, what string, mode int) {
+func changePlayersMode(msg *Message, mode int) {
+    what := "PLAYERS_ADD"
+    if mode==playing {
+		what = "PLAYERS_REMOVE"
+	}
 	changePlayerMode(msg.From, msg.To, mode)
 	changePlayerMode(msg.To, msg.From, mode)
 	updatePlayers(what, []string{msg.From, msg.To})
@@ -102,7 +106,7 @@ func changePlayersMode(msg *Message, what string, mode int) {
 func changePlayerMode(player string, otherPlayer string, mode int) {
 	s, _ := activePlayers[player]
 	s.mode = mode
-	if mode==playing {
+	if mode == playing {
 		s.otherPlayer = otherPlayer
 	} else {
 		s.otherPlayer = ""

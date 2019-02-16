@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Modal, ModalFooter } from 'reactstrap';
 
-import './assets/css/QuestionModal.css';
+import '../assets/css/QuestionModal.css';
 
 export default class QuestionModal extends React.Component {
   constructor(props) {

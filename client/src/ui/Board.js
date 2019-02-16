@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Draggable, Droppable } from 'react-drag-and-drop';
 import {Motion, spring} from 'react-motion';
 
-import './assets/css/board.css';
+import '../assets/css/board.css';
 
 export default function Board(props) {
     let squares = [];
@@ -79,31 +79,26 @@ function Cell(props) {
 
 class Piece extends Component {
 
-   constructor(props) {
-      super(props);
-      this.isCurrent = this.isCurrent.bind(this);
-   }
+    constructor(props) {
+        super(props);
+        this.isCurrent = this.isCurrent.bind(this);
+    }
 
-   isCurrent() {
-     if( !this.props.app.state.moveOtherTo) {
-       return false;
-     }
-    return this.props.position===this.props.app.state.moveOtherTo;
-   }
+    isCurrent = () => this.props.app.state.moveOtherTo 
+        ? (this.props.position===this.props.app.state.moveOtherTo)
+        : false;
 
-  render() {
-    const color = this.props.white ? "-white" : "-black";
+    render() {
+        const color = this.props.white ? "-white" : "-black";
+        const className = this.props.type + color + " piece";
   
-    return (
-     
-      this.props.draggable
-      ? <Draggable type="piece" data={this.props.position} className={this.props.type + color + " piece" }
-          onDragStart={val => this.props.app.moveStart(this.props.position)}></Draggable>
-      : <div className={this.props.type + color + " piece" }>
-          <Motion defaultStyle={{opacity:1}} style={{opacity: spring(this.isCurrent() ? 1 : 0)}}>{
-            style => <div style={{opacity: !this.props.app.state.myMove ? 0 : style.opacity}} className="haze"></div>
-          }</Motion>
-        </div>
-    );
-  }
+        return this.props.draggable
+            ? <Draggable type="piece" data={this.props.position} className={className}
+                onDragStart={val => this.props.app.moveStart(this.props.position)}></Draggable>
+            : <div className={className}>
+                <Motion defaultStyle={{opacity:1}} style={{opacity: spring(this.isCurrent() ? 1 : 0)}}>
+                    {style => <div style={{opacity: !this.props.app.state.myMove ? 0 : style.opacity}} className="haze"></div>}
+                </Motion>
+              </div>;
+    }
 }
