@@ -68,14 +68,24 @@ function Cell(props) {
         const cellIsAvailable = props.app.state.board.isAvailable(props.aKey);        
         const className = 'cell-' + (props.white ? 'white' : 'black') + (cellIsAvailable ? ' cell-available' : '');
 
-        // TODO use props.app.state.useDragAndDrop here or onClick
-
-        return <td className={className} key={props.aKey}>
-            <Droppable types={['piece']} onDrop={key => props.app.dropPiece(key, props.aKey)}>
+    var renderDroppable = () => <Droppable types={['piece']} onDrop={key => props.app.dropPiece(key, props.aKey)}>
                 {piece 
                     ? <Piece white={piece.white} type={piece.type} position={props.aKey} draggable={draggable} app={props.app} />
                     : <div className="cell-empty">&nbsp;</div>}
-            </Droppable>
+            </Droppable>;
+
+      var renderClickable = () => <div onClick={event => props.app.dropPiece({piece:props.app.state.moveFrom}, props.aKey)}>
+                {piece 
+                    ? <Piece white={piece.white} type={piece.type} position={props.aKey} draggable={draggable} app={props.app} />
+                    : <div className="cell-empty">&nbsp;</div>}
+            </div>;
+
+        // TODO use props.app.state.useDragAndDrop here or onClick
+
+        return <td className={className} key={props.aKey}>
+            {props.app.state.useDragAndDrop  
+			? renderDroppable()
+            : renderClickable()}
         </td>;
 }
 
@@ -84,6 +94,9 @@ class Piece extends Component {
     constructor(props) {
         super(props);
         this.isCurrent = this.isCurrent.bind(this);
+        this.renderDraggable = this.renderDraggable.bind(this);
+        this.renderClickable = this.renderClickable.bind(this);
+        this.renderCommon = this.renderCommon.bind(this);
     }
 
     isCurrent = () => this.props.app.state.moveOtherTo 
@@ -94,15 +107,26 @@ class Piece extends Component {
         const color = this.props.white ? "-white" : "-black";
         const className = this.props.type + color + " piece";
 
-        // TODO use props.app.state.useDragAndDrop here or onClick
-  
         return this.props.draggable
-            ? <Draggable type="piece" data={this.props.position} className={className}
-                onDragStart={val => this.props.app.moveStart(this.props.position)}></Draggable>
-            : <div className={className}>
-                <Motion defaultStyle={{opacity:1}} style={{opacity: spring(this.isCurrent() ? 1 : 0)}}>
-                    {style => <div style={{opacity: !this.props.app.state.myMove ? 0 : style.opacity}} className="haze"></div>}
-                </Motion>
-              </div>;
+            ? (this.props.app.state.useDragAndDrop 
+				? this.renderDraggable(className)
+                 : this.renderClickable(className))
+            : this.renderCommon(className);
+    }
+
+    renderClickable(className) { return <div className={className} 
+		onClick={event => this.props.app.moveStart(this.props.position)} 
+        ></div>;
+    }
+
+	renderDraggable(className) { return <Draggable type="piece" data={this.props.position} className={className}
+    	onDragStart={val => this.props.app.moveStart(this.props.position)}></Draggable>;		
+    }
+
+	renderCommon(className) { return <div className={className}>
+    		<Motion defaultStyle={{opacity:1}} style={{opacity: spring(this.isCurrent() ? 1 : 0)}}>
+        		{style => <div style={{opacity: !this.props.app.state.myMove ? 0 : style.opacity}} className="haze"></div>}
+        	</Motion>
+    	</div>;
     }
 }

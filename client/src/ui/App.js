@@ -105,7 +105,8 @@ export default class App extends Component {
             board: new BoardData(white),
             moves: [],
             newPieceType: undefined,
-            showConversion: false
+            showConversion: false,
+            moveFrom: undefined
         });
     }
 
@@ -116,13 +117,14 @@ export default class App extends Component {
             myMove: undefined,
             endGame: false,
             message: undefined,
-            board: undefined
+            board: undefined,
+            moveFrom: undefined
         });
     }
 
-    moveStart(src) {
-        this.state.board.calculateAvailableCells(src, this.state.passage);
-        this.setState({board: this.state.board});
+    moveStart(moveFrom) {
+        this.state.board.calculateAvailableCells(moveFrom, this.state.passage);
+        this.setState({board: this.state.board, moveFrom:moveFrom});
     }
 
     moveComplete(moveFrom, moveTo, take, newPieceType, takeOnPassage) {
@@ -130,7 +132,7 @@ export default class App extends Component {
         this.state.board.setNewPieceType(moveTo, newPieceType);
         this.sendGameMessage({what: "MOVE", moveFrom: moveFrom, moveTo: moveTo,
             piece: newPieceType, takeOnPassage: takeOnPassage});
-        this.setState({myMove: false, board: this.state.board});
+        this.setState({myMove: false, board: this.state.board, moveFrom:undefined});
     }
 
     isConversion(moveTo) {
@@ -143,6 +145,10 @@ export default class App extends Component {
     }
 
     dropPiece(src, moveTo) {
+        if(!src.piece) {
+           return;
+        }
+
         let moveFrom = src.piece;
         var take = this.isTake(moveTo);
         if (this.state.board.move(moveFrom, moveTo)) {
@@ -225,7 +231,7 @@ export default class App extends Component {
         if (this.state.moves.length > 0) {
             const lastMove = this.state.moves[this.state.moves.length - 1];
             const v = this.state.whiteMe ? lastMove.white : lastMove.black;
-            v.suffix = suffix;
+            if( v )  { v.suffix = suffix; }
             this.setState({moves: this.state.moves});
         }
     }
@@ -295,6 +301,10 @@ export default class App extends Component {
 }
 
 function detectUseDragAndDrop() {
+//    /*
 	let platform = window.navigator.platform.toUpperCase();    
 	return !platform.includes("IPHONE") && !platform.includes("ANDROID");
+//    */
+    // TODO remporary!
+    // return false;
 }
