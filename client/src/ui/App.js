@@ -292,7 +292,8 @@ export default class App extends Component {
     render() {
 
         return (
-        <div className="container">
+        <div className="container"
+             ref={elem=>this.elem = elem}>
             {this.state.player
                         ? this.state.otherPlayer ? <BoardPage app={this} /> : <PlayerListPage app={this} />
                         : <LoginPage app={this}/> }
@@ -301,10 +302,6 @@ export default class App extends Component {
 }
 
 function detectUseDragAndDrop() {
-//    /*
 	let platform = window.navigator.platform.toUpperCase();    
 	return !platform.includes("IPHONE") && !platform.includes("ANDROID");
-//    */
-    // TODO remporary!
-    // return false;
 }

@@ -80,8 +80,6 @@ function Cell(props) {
                     : <div className="cell-empty">&nbsp;</div>}
             </div>;
 
-        // TODO use props.app.state.useDragAndDrop here or onClick
-
         return <td className={className} key={props.aKey}>
             {props.app.state.useDragAndDrop  
 			? renderDroppable()
@@ -93,10 +91,19 @@ class Piece extends Component {
 
     constructor(props) {
         super(props);
+
+        const screenWidth = this.props.app.elem.clientWidth;
+        var cellWidth = screenWidth / 13;
+        if( cellWidth > 45 ) {
+            cellWidth = 45;
+        }
+
+        this.state = {cellSize:cellWidth};
         this.isCurrent = this.isCurrent.bind(this);
         this.renderDraggable = this.renderDraggable.bind(this);
         this.renderClickable = this.renderClickable.bind(this);
         this.renderCommon = this.renderCommon.bind(this);
+        this.getStyle = this.getStyle.bind(this);
     }
 
     isCurrent = () => this.props.app.state.moveOtherTo 
@@ -104,6 +111,7 @@ class Piece extends Component {
         : false;
 
     render() {
+
         const color = this.props.white ? "-white" : "-black";
         const className = this.props.type + color + " piece";
 
@@ -115,18 +123,29 @@ class Piece extends Component {
     }
 
     renderClickable(className) { return <div className={className} 
+        style={this.getStyle()}
 		onClick={event => this.props.app.moveStart(this.props.position)} 
         ></div>;
     }
 
 	renderDraggable(className) { return <Draggable type="piece" data={this.props.position} className={className}
+        style={this.getStyle()}
     	onDragStart={val => this.props.app.moveStart(this.props.position)}></Draggable>;		
     }
 
-	renderCommon(className) { return <div className={className}>
+	renderCommon(className) { return <div className={className}  style={this.getStyle()} >
     		<Motion defaultStyle={{opacity:1}} style={{opacity: spring(this.isCurrent() ? 1 : 0)}}>
         		{style => <div style={{opacity: !this.props.app.state.myMove ? 0 : style.opacity}} className="haze"></div>}
         	</Motion>
     	</div>;
     }
+
+    getStyle = () => {
+       const s =  this.state.cellSize + 'px';
+       const bs = (this.state.cellSize * 6) + 'px ' + (this.state.cellSize * 2) + 'px ';
+       return {
+			backgroundSize: bs, 
+            width: s, height: s
+       };
+    };
 }
