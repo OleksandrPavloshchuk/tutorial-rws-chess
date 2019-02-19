@@ -55,36 +55,52 @@ function LCell(props) {
     return <td className="cell-label" key={props.aKey}>{props.text}</td>;
 }
 
-function Cell(props) {
+class Cell extends Component {
 
-    const piece = props.app.state.board.get(props.aKey);
-    const draggable = piece 
-        && props.app.state.myMove 
-        && !props.app.state.showConversion 
-        && !props.app.state.endGame
-        && ((props.app.state.whiteMe && piece.white)
-        || (!props.app.state.whiteMe && !piece.white));
+    constructor(props) {
+        super(props);
 
-        const cellIsAvailable = props.app.state.board.isAvailable(props.aKey);        
-        const className = 'cell-' + (props.white ? 'white' : 'black') + (cellIsAvailable ? ' cell-available' : '');
+        this.getStyle = this.getStyle.bind(this);
+    }
 
-    var renderDroppable = () => <Droppable types={['piece']} onDrop={key => props.app.dropPiece(key, props.aKey)}>
+    getStyle = () => {
+       const cs = this.props.app.state.cellSize; 
+       const s =  cs + 'px';
+       return {
+            width: s, height: s            
+       };
+    };
+
+    render() {
+    	const piece = this.props.app.state.board.get(this.props.aKey);
+    	const draggable = piece 
+        && this.props.app.state.myMove 
+        && !this.props.app.state.showConversion 
+        && !this.props.app.state.endGame
+        && ((this.props.app.state.whiteMe && piece.white)
+        || (!this.props.app.state.whiteMe && !piece.white));
+
+        const cellIsAvailable = this.props.app.state.board.isAvailable(this.props.aKey);        
+        const className = 'cell-' + (this.props.white ? 'white' : 'black') + (cellIsAvailable ? ' cell-available' : '');
+
+    var renderDroppable = () => <Droppable types={['piece']} onDrop={key => this.props.app.dropPiece(key, this.props.aKey)} style={this.getStyle()}>
                 {piece 
-                    ? <Piece white={piece.white} type={piece.type} position={props.aKey} draggable={draggable} app={props.app} />
+                    ? <Piece white={piece.white} type={piece.type} position={this.props.aKey} draggable={draggable} app={this.props.app} />
                     : <div className="cell-empty">&nbsp;</div>}
             </Droppable>;
 
-      var renderClickable = () => <div onClick={event => props.app.dropPiece({piece:props.app.state.moveFrom}, props.aKey)}>
+      var renderClickable = () => <div onClick={event => this.props.app.dropPiece({piece:this.props.app.state.moveFrom}, this.props.aKey)} style={this.getStyle()}>
                 {piece 
-                    ? <Piece white={piece.white} type={piece.type} position={props.aKey} draggable={draggable} app={props.app} />
+                    ? <Piece white={piece.white} type={piece.type} position={this.props.aKey} draggable={draggable} app={this.props.app} />
                     : <div className="cell-empty">&nbsp;</div>}
             </div>;
 
-        return <td className={className} key={props.aKey}>
-            {props.app.state.useDragAndDrop  
+        return <td className={className} key={this.props.aKey}>
+            {this.props.app.state.useDragAndDrop  
 			? renderDroppable()
             : renderClickable()}
         </td>;
+    }
 }
 
 class Piece extends Component {
@@ -141,10 +157,11 @@ class Piece extends Component {
     }
 
     getStyle = () => {
-       const s =  this.state.cellSize + 'px';
-       const bs = (this.state.cellSize * 6) + 'px ' + (this.state.cellSize * 2) + 'px ';
-       const offsetX = backgroundOffsets[this.props.type] * baseSize;
-       const offsetY =  this.props.white ? 0 : baseSize;
+       const cs = this.props.app.state.cellSize; 
+       const s =  cs + 'px';
+       const bs = (cs * 6) + 'px ' + (cs * 2) + 'px ';
+       const offsetX = backgroundOffsets[this.props.type] * cs;
+       const offsetY =  this.props.white ? 0 : cs;
        return {
 			backgroundSize: bs, 
             backgroundPosition: offsetX + 'px ' + offsetY + 'px',

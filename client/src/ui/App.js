@@ -60,8 +60,15 @@ export default class App extends Component {
     }
 
     componentDidMount() {
+        const screenWidth = this.elem.clientWidth;
+        var cellSize = screenWidth / 13;
+        if( cellSize > baseSize ) {
+            cellSize = baseSize;
+        }       
+
         this.setState({
-			useDragAndDrop: detectUseDragAndDrop()       
+			useDragAndDrop: detectUseDragAndDrop(),
+            cellSize
         });
     }    
 
@@ -305,3 +312,5 @@ function detectUseDragAndDrop() {
 	let platform = window.navigator.platform.toUpperCase();    
 	return !platform.includes("IPHONE") && !platform.includes("ANDROID");
 }
+
+const baseSize = 45;
