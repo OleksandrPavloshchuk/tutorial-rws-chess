@@ -94,8 +94,8 @@ class Piece extends Component {
 
         const screenWidth = this.props.app.elem.clientWidth;
         var cellWidth = screenWidth / 13;
-        if( cellWidth > 45 ) {
-            cellWidth = 45;
+        if( cellWidth > baseSize ) {
+            cellWidth = baseSize;
         }
 
         this.state = {cellSize:cellWidth};
@@ -143,9 +143,18 @@ class Piece extends Component {
     getStyle = () => {
        const s =  this.state.cellSize + 'px';
        const bs = (this.state.cellSize * 6) + 'px ' + (this.state.cellSize * 2) + 'px ';
+       const offsetX = backgroundOffsets[this.props.type] * baseSize;
+       const offsetY =  this.props.white ? 0 : baseSize;
        return {
 			backgroundSize: bs, 
+            backgroundPosition: offsetX + 'px ' + offsetY + 'px',
             width: s, height: s
+            
        };
     };
+}
+
+const baseSize = 45;
+const backgroundOffsets = {
+	king: 0.0, queen: 5.0, bishop: 4.0, knight: 3.0, rook: 2.0, pawn: 1.0
 }

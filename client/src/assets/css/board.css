@@ -88,7 +88,7 @@
 }
 .bishop-white {
   background-image: url("../images/Chess_Pieces_Sprite.svg");
-  background-position: 12.5rem 0;
+  background-position: 12.5rem 0; 
 }
 .knight-white {
   background-image: url("../images/Chess_Pieces_Sprite.svg");
