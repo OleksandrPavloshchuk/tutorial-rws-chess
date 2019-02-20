@@ -127,30 +127,25 @@ class Piece extends Component {
         : false;
 
     render() {
-
-        //const color = this.props.white ? "-white" : "-black";
-        //const className = this.props.type + color + " piece";
-        const className = "piece";
-
         return this.props.draggable
             ? (this.props.app.state.useDragAndDrop 
-				? this.renderDraggable(className)
-                 : this.renderClickable(className))
-            : this.renderCommon(className);
+		        ? this.renderDraggable()
+                : this.renderClickable())
+            : this.renderCommon();
     }
 
-    renderClickable(className) { return <div className={className} 
+    renderClickable() { return <div className="piece" 
         style={this.getStyle()}
 		onClick={event => this.props.app.moveStart(this.props.position)} 
         ></div>;
     }
 
-	renderDraggable(className) { return <Draggable type="piece" data={this.props.position} className={className}
+	renderDraggable() { return <Draggable type="piece" data={this.props.position} className="piece"
         style={this.getStyle()}
     	onDragStart={val => this.props.app.moveStart(this.props.position)}></Draggable>;		
     }
 
-	renderCommon(className) { return <div className={className}  style={this.getStyle()} >
+	renderCommon() { return <div className="piece"  style={this.getStyle()} >
     		<Motion defaultStyle={{opacity:1}} style={{opacity: spring(this.isCurrent() ? 1 : 0)}}>
         		{style => <div style={{opacity: !this.props.app.state.myMove ? 0 : style.opacity}} className="haze"></div>}
         	</Motion>
