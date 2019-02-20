@@ -18,7 +18,7 @@ export default function Board(props) {
     }
     squares.push(<LRow aKey="bottom" key="bottom" labels={labels}/>);
 
-    return <div className="card board "><div className="card-body"><table><tbody>
+    return <div className="card board "><div className="card-body board-wrapper"><table><tbody>
         <Player name={props.app.state.otherPlayer} />
         {squares}
         <Player name={props.app.state.player} />
@@ -81,7 +81,7 @@ class Cell extends Component {
         || (!this.props.app.state.whiteMe && !piece.white));
 
         const cellIsAvailable = this.props.app.state.board.isAvailable(this.props.aKey);        
-        const className = 'cell-' + (this.props.white ? 'white' : 'black') + (cellIsAvailable ? ' cell-available' : '');
+        const className = 'board-cell cell-' + (this.props.white ? 'white' : 'black') + (cellIsAvailable ? ' cell-available' : '');
 
     var renderDroppable = () => <Droppable types={['piece']} onDrop={key => this.props.app.dropPiece(key, this.props.aKey)} style={this.getStyle()}>
                 {piece 
@@ -128,8 +128,9 @@ class Piece extends Component {
 
     render() {
 
-        const color = this.props.white ? "-white" : "-black";
-        const className = this.props.type + color + " piece";
+        //const color = this.props.white ? "-white" : "-black";
+        //const className = this.props.type + color + " piece";
+        const className = "piece";
 
         return this.props.draggable
             ? (this.props.app.state.useDragAndDrop 
