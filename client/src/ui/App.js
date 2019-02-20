@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import LoginPage from './LoginPage';
+import LoginPage from './LoginPage';   
 import PlayerListPage from './PlayerListPage';
 import BoardPage from './BoardPage';
 import MediatorClient from '../services/mediatorClientService';
@@ -30,7 +30,8 @@ export default class App extends Component {
             askSurrender: false,
             moves: [],
             moveOtherTo: undefined,
-            passage: undefined
+            passage: undefined,
+            useDragAndDrop: undefined
         };
 
         this.setPlayer = this.setPlayer.bind(this);
@@ -57,6 +58,19 @@ export default class App extends Component {
         this.determinePassage = this.determinePassage.bind(this);
         this.sendEndGameMessage = this.sendEndGameMessage.bind(this);
     }
+
+    componentDidMount() {
+        const screenWidth = this.elem.clientWidth;
+        var cellSize = screenWidth / 13;
+        if( cellSize > baseSize ) {
+            cellSize = baseSize;
+        }       
+
+        this.setState({
+			useDragAndDrop: detectUseDragAndDrop(),
+            cellSize
+        });
+    }    
 
     sendGameMessage(m) {
         m.from = this.state.player;
@@ -98,7 +112,8 @@ export default class App extends Component {
             board: new BoardData(white),
             moves: [],
             newPieceType: undefined,
-            showConversion: false
+            showConversion: false,
+            moveFrom: undefined
         });
     }
 
@@ -109,13 +124,14 @@ export default class App extends Component {
             myMove: undefined,
             endGame: false,
             message: undefined,
-            board: undefined
+            board: undefined,
+            moveFrom: undefined
         });
     }
 
-    moveStart(src) {
-        this.state.board.calculateAvailableCells(src, this.state.passage);
-        this.setState({board: this.state.board});
+    moveStart(moveFrom) {
+        this.state.board.calculateAvailableCells(moveFrom, this.state.passage);
+        this.setState({board: this.state.board, moveFrom:moveFrom});
     }
 
     moveComplete(moveFrom, moveTo, take, newPieceType, takeOnPassage) {
@@ -123,7 +139,7 @@ export default class App extends Component {
         this.state.board.setNewPieceType(moveTo, newPieceType);
         this.sendGameMessage({what: "MOVE", moveFrom: moveFrom, moveTo: moveTo,
             piece: newPieceType, takeOnPassage: takeOnPassage});
-        this.setState({myMove: false, board: this.state.board});
+        this.setState({myMove: false, board: this.state.board, moveFrom:undefined});
     }
 
     isConversion(moveTo) {
@@ -136,6 +152,10 @@ export default class App extends Component {
     }
 
     dropPiece(src, moveTo) {
+        if(!src.piece) {
+           return;
+        }
+
         let moveFrom = src.piece;
         var take = this.isTake(moveTo);
         if (this.state.board.move(moveFrom, moveTo)) {
@@ -218,7 +238,7 @@ export default class App extends Component {
         if (this.state.moves.length > 0) {
             const lastMove = this.state.moves[this.state.moves.length - 1];
             const v = this.state.whiteMe ? lastMove.white : lastMove.black;
-            v.suffix = suffix;
+            if( v )  { v.suffix = suffix; }
             this.setState({moves: this.state.moves});
         }
     }
@@ -279,10 +299,18 @@ export default class App extends Component {
     render() {
 
         return (
-        <div className="container">
+        <div className="container"
+             ref={elem=>this.elem = elem}>
             {this.state.player
                         ? this.state.otherPlayer ? <BoardPage app={this} /> : <PlayerListPage app={this} />
                         : <LoginPage app={this}/> }
         </div>);
     }
 }
+
+function detectUseDragAndDrop() {
+	let platform = window.navigator.platform.toUpperCase();    
+	return !platform.includes("IPHONE") && !platform.includes("ANDROID");
+}
+
+const baseSize = 45;

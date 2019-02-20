@@ -5,6 +5,7 @@ export default class ConversionPanel extends Component {
 	constructor(props) {
     	super(props);
     	this.selectPieceType = this.selectPieceType.bind(this);
+    	this.getStyle = this.getStyle.bind(this);
   	}
 
   	selectPieceType(type) {
@@ -12,21 +13,39 @@ export default class ConversionPanel extends Component {
     	this.props.app.moveComplete(this.props.app.state.moveFrom,
       		this.props.app.state.moveTo, this.props.app.state.take, type);
   	}
+  	
+    getStyle = type => {
+       const cs = this.props.app.state.cellSize; 
+       const s =  cs + 'px';
+       const bs = (cs * 6) + 'px ' + (cs * 2) + 'px ';
+       const offsetX = backgroundOffsets[type] * cs;
+       const offsetY = this.props.app.state.whiteMe ? 0 : cs;
+       return {
+			backgroundSize: bs, 
+            backgroundPosition: offsetX + 'px ' + offsetY + 'px',
+            width: s, height: s            
+       };
+    };  	
 
   	render() {
     	const color = this.props.app.state.whiteMe ? "white" : "black";
+    	const style = this.getStyle();
     	return  <div className="conversion-panel">
       		<div className="btn-group-vertical conversion-panel" role="group">
-				<Option color={color} type="queen" select={this.selectPieceType} />
-				<Option color={color} type="rook" select={this.selectPieceType} />
-				<Option color={color} type="bishop" select={this.selectPieceType} />
-				<Option color={color} type="knight" select={this.selectPieceType} />
+				<Option color={color} style={this.getStyle("queen")} select={this.selectPieceType} type="queen" />
+				<Option color={color} style={this.getStyle("rook")} select={this.selectPieceType} type="rook" />
+				<Option color={color} style={this.getStyle("bishop")} select={this.selectPieceType} type="bishop" />
+				<Option color={color} style={this.getStyle("knight")} select={this.selectPieceType} type="knight" />
       		</div>
       	</div>;
   	}
 }
 
 function Option(props) {
-    const className = "btn btn-light piece " + props.type + "-" + props.color;
-	return <button type="button" className={className} onClick={e=>props.select(props.type)}></button>;
+	return <button type="button" style={props.style} className="btn btn-light piece" onClick={e=>props.select(props.type)}></button>;
+}
+
+const baseSize = 45;
+const backgroundOffsets = {
+	king: 0.0, queen: 5.0, bishop: 4.0, knight: 3.0, rook: 2.0, pawn: 1.0
 }

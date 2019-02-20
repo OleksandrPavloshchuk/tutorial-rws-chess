@@ -18,7 +18,7 @@ export default function Board(props) {
     }
     squares.push(<LRow aKey="bottom" key="bottom" labels={labels}/>);
 
-    return <div className="card board "><div className="card-body"><table><tbody>
+    return <div className="card board "><div className="card-body board-wrapper"><table><tbody>
         <Player name={props.app.state.otherPlayer} />
         {squares}
         <Player name={props.app.state.player} />
@@ -55,33 +55,71 @@ function LCell(props) {
     return <td className="cell-label" key={props.aKey}>{props.text}</td>;
 }
 
-function Cell(props) {
+class Cell extends Component {
 
-    const piece = props.app.state.board.get(props.aKey);
-    const draggable = piece 
-        && props.app.state.myMove 
-        && !props.app.state.showConversion 
-        && !props.app.state.endGame
-        && ((props.app.state.whiteMe && piece.white)
-        || (!props.app.state.whiteMe && !piece.white));
+    constructor(props) {
+        super(props);
 
-        const cellIsAvailable = props.app.state.board.isAvailable(props.aKey);        
-        const className = 'cell-' + (props.white ? 'white' : 'black') + (cellIsAvailable ? ' cell-available' : '');
+        this.getStyle = this.getStyle.bind(this);
+    }
 
-        return <td className={className} key={props.aKey}>
-            <Droppable types={['piece']} onDrop={key => props.app.dropPiece(key, props.aKey)}>
+    getStyle = () => {
+       const cs = this.props.app.state.cellSize; 
+       const s =  cs + 'px';
+       return {
+            width: s, height: s            
+       };
+    };
+
+    render() {
+    	const piece = this.props.app.state.board.get(this.props.aKey);
+    	const draggable = piece 
+        && this.props.app.state.myMove 
+        && !this.props.app.state.showConversion 
+        && !this.props.app.state.endGame
+        && ((this.props.app.state.whiteMe && piece.white)
+        || (!this.props.app.state.whiteMe && !piece.white));
+
+        const cellIsAvailable = this.props.app.state.board.isAvailable(this.props.aKey);        
+        const className = 'board-cell cell-' + (this.props.white ? 'white' : 'black') + (cellIsAvailable ? ' cell-available' : '');
+
+    var renderDroppable = () => <Droppable types={['piece']} onDrop={key => this.props.app.dropPiece(key, this.props.aKey)} style={this.getStyle()}>
                 {piece 
-                    ? <Piece white={piece.white} type={piece.type} position={props.aKey} draggable={draggable} app={props.app} />
+                    ? <Piece white={piece.white} type={piece.type} position={this.props.aKey} draggable={draggable} app={this.props.app} />
                     : <div className="cell-empty">&nbsp;</div>}
-            </Droppable>
+            </Droppable>;
+
+      var renderClickable = () => <div onClick={event => this.props.app.dropPiece({piece:this.props.app.state.moveFrom}, this.props.aKey)} style={this.getStyle()}>
+                {piece 
+                    ? <Piece white={piece.white} type={piece.type} position={this.props.aKey} draggable={draggable} app={this.props.app} />
+                    : <div className="cell-empty">&nbsp;</div>}
+            </div>;
+
+        return <td className={className} key={this.props.aKey}>
+            {this.props.app.state.useDragAndDrop  
+			? renderDroppable()
+            : renderClickable()}
         </td>;
+    }
 }
 
 class Piece extends Component {
 
     constructor(props) {
         super(props);
+
+        const screenWidth = this.props.app.elem.clientWidth;
+        var cellWidth = screenWidth / 13;
+        if( cellWidth > baseSize ) {
+            cellWidth = baseSize;
+        }
+
+        this.state = {cellSize:cellWidth};
         this.isCurrent = this.isCurrent.bind(this);
+        this.renderDraggable = this.renderDraggable.bind(this);
+        this.renderClickable = this.renderClickable.bind(this);
+        this.renderCommon = this.renderCommon.bind(this);
+        this.getStyle = this.getStyle.bind(this);
     }
 
     isCurrent = () => this.props.app.state.moveOtherTo 
@@ -89,16 +127,47 @@ class Piece extends Component {
         : false;
 
     render() {
-        const color = this.props.white ? "-white" : "-black";
-        const className = this.props.type + color + " piece";
-  
         return this.props.draggable
-            ? <Draggable type="piece" data={this.props.position} className={className}
-                onDragStart={val => this.props.app.moveStart(this.props.position)}></Draggable>
-            : <div className={className}>
-                <Motion defaultStyle={{opacity:1}} style={{opacity: spring(this.isCurrent() ? 1 : 0)}}>
-                    {style => <div style={{opacity: !this.props.app.state.myMove ? 0 : style.opacity}} className="haze"></div>}
-                </Motion>
-              </div>;
+            ? (this.props.app.state.useDragAndDrop 
+		        ? this.renderDraggable()
+                : this.renderClickable())
+            : this.renderCommon();
     }
+
+    renderClickable() { return <div className="piece" 
+        style={this.getStyle()}
+		onClick={event => this.props.app.moveStart(this.props.position)} 
+        ></div>;
+    }
+
+	renderDraggable() { return <Draggable type="piece" data={this.props.position} className="piece"
+        style={this.getStyle()}
+    	onDragStart={val => this.props.app.moveStart(this.props.position)}></Draggable>;		
+    }
+
+	renderCommon() { return <div className="piece"  style={this.getStyle()} >
+    		<Motion defaultStyle={{opacity:1}} style={{opacity: spring(this.isCurrent() ? 1 : 0)}}>
+        		{style => <div style={{opacity: !this.props.app.state.myMove ? 0 : style.opacity}} className="haze"></div>}
+        	</Motion>
+    	</div>;
+    }
+
+    getStyle = () => {
+       const cs = this.props.app.state.cellSize; 
+       const s =  cs + 'px';
+       const bs = (cs * 6) + 'px ' + (cs * 2) + 'px ';
+       const offsetX = backgroundOffsets[this.props.type] * cs;
+       const offsetY =  this.props.white ? 0 : cs;
+       return {
+			backgroundSize: bs, 
+            backgroundPosition: offsetX + 'px ' + offsetY + 'px',
+            width: s, height: s
+            
+       };
+    };
+}
+
+const baseSize = 45;
+const backgroundOffsets = {
+	king: 0.0, queen: 5.0, bishop: 4.0, knight: 3.0, rook: 2.0, pawn: 1.0
 }
