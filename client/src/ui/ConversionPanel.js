@@ -28,14 +28,12 @@ export default class ConversionPanel extends Component {
     };  	
 
   	render() {
-    	const color = this.props.app.state.whiteMe ? "white" : "black";
-    	const style = this.getStyle();
     	return  <div className="conversion-panel">
       		<div className="btn-group-vertical conversion-panel" role="group">
-				<Option color={color} style={this.getStyle("queen")} select={this.selectPieceType} type="queen" />
-				<Option color={color} style={this.getStyle("rook")} select={this.selectPieceType} type="rook" />
-				<Option color={color} style={this.getStyle("bishop")} select={this.selectPieceType} type="bishop" />
-				<Option color={color} style={this.getStyle("knight")} select={this.selectPieceType} type="knight" />
+				<Option style={this.getStyle("queen")} select={this.selectPieceType} type="queen" />
+				<Option style={this.getStyle("rook")} select={this.selectPieceType} type="rook" />
+				<Option style={this.getStyle("bishop")} select={this.selectPieceType} type="bishop" />
+				<Option style={this.getStyle("knight")} select={this.selectPieceType} type="knight" />
       		</div>
       	</div>;
   	}
@@ -45,7 +43,6 @@ function Option(props) {
 	return <button type="button" style={props.style} className="btn btn-light piece" onClick={e=>props.select(props.type)}></button>;
 }
 
-const baseSize = 45;
 const backgroundOffsets = {
 	king: 0.0, queen: 5.0, bishop: 4.0, knight: 3.0, rook: 2.0, pawn: 1.0
 }
