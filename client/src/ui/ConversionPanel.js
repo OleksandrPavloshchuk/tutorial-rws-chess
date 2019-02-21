@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import getPieceStyle from './pieceStyleSupplier';
 
 export default class ConversionPanel extends Component {
 
@@ -14,18 +15,8 @@ export default class ConversionPanel extends Component {
       		this.props.app.state.moveTo, this.props.app.state.take, type);
   	}
   	
-    getStyle = type => {
-       const cs = this.props.app.state.cellSize; 
-       const s =  cs + 'px';
-       const bs = (cs * 6) + 'px ' + (cs * 2) + 'px ';
-       const offsetX = backgroundOffsets[type] * cs;
-       const offsetY = this.props.app.state.whiteMe ? 0 : cs;
-       return {
-			backgroundSize: bs, 
-            backgroundPosition: offsetX + 'px ' + offsetY + 'px',
-            width: s, height: s            
-       };
-    };  	
+  	
+  	getStyle = type => getPieceStyle(this.props.app.state.cellSize, type, this.props.app.state.whiteMe); 	
 
   	render() {
     	return  <div className="conversion-panel">
@@ -41,8 +32,4 @@ export default class ConversionPanel extends Component {
 
 function Option(props) {
 	return <button type="button" style={props.style} className="btn btn-light piece" onClick={e=>props.select(props.type)}></button>;
-}
-
-const backgroundOffsets = {
-	king: 0.0, queen: 5.0, bishop: 4.0, knight: 3.0, rook: 2.0, pawn: 1.0
 }

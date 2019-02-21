@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Draggable, Droppable } from 'react-drag-and-drop';
-import {Motion, spring} from 'react-motion';
+import { Motion, spring } from 'react-motion';
+import getPieceStyle from './pieceStyleSupplier';
 
 import '../assets/css/board.css';
 
@@ -59,16 +60,12 @@ class Cell extends Component {
 
     constructor(props) {
         super(props);
-
         this.getStyle = this.getStyle.bind(this);
     }
 
     getStyle = () => {
-       const cs = this.props.app.state.cellSize; 
-       const s =  cs + 'px';
-       return {
-            width: s, height: s            
-       };
+       const s =  this.props.app.state.cellSize + 'px';
+       return { width: s, height: s };
     };
 
     render() {
@@ -107,14 +104,6 @@ class Piece extends Component {
 
     constructor(props) {
         super(props);
-
-        const screenWidth = this.props.app.elem.clientWidth;
-        var cellWidth = screenWidth / 13;
-        if( cellWidth > baseSize ) {
-            cellWidth = baseSize;
-        }
-
-        this.state = {cellSize:cellWidth};
         this.isCurrent = this.isCurrent.bind(this);
         this.renderDraggable = this.renderDraggable.bind(this);
         this.renderClickable = this.renderClickable.bind(this);
@@ -125,6 +114,24 @@ class Piece extends Component {
     isCurrent = () => this.props.app.state.moveOtherTo 
         ? (this.props.position===this.props.app.state.moveOtherTo)
         : false;
+        
+    renderClickable() { return <div className="piece" style={this.getStyle()}
+		onClick={event => this.props.app.moveStart(this.props.position)}></div>;
+    }
+
+	renderDraggable() { return <Draggable type="piece" data={this.props.position} 
+	    className="piece" style={this.getStyle()}
+    	onDragStart={val => this.props.app.moveStart(this.props.position)}></Draggable>;		
+    }
+
+	renderCommon() { return <div className="piece" style={this.getStyle()} >
+    		<Motion defaultStyle={{opacity:1}} style={{opacity: spring(this.isCurrent() ? 1 : 0)}}>
+        		{style => <div style={{opacity: !this.props.app.state.myMove ? 0 : style.opacity}} className="haze"></div>}
+        	</Motion>
+    	</div>;
+    }
+    
+    getStyle = () => getPieceStyle(this.props.app.state.cellSize, this.props.type, this.props.white);            
 
     render() {
         return this.props.draggable
@@ -134,40 +141,4 @@ class Piece extends Component {
             : this.renderCommon();
     }
 
-    renderClickable() { return <div className="piece" 
-        style={this.getStyle()}
-		onClick={event => this.props.app.moveStart(this.props.position)} 
-        ></div>;
-    }
-
-	renderDraggable() { return <Draggable type="piece" data={this.props.position} className="piece"
-        style={this.getStyle()}
-    	onDragStart={val => this.props.app.moveStart(this.props.position)}></Draggable>;		
-    }
-
-	renderCommon() { return <div className="piece"  style={this.getStyle()} >
-    		<Motion defaultStyle={{opacity:1}} style={{opacity: spring(this.isCurrent() ? 1 : 0)}}>
-        		{style => <div style={{opacity: !this.props.app.state.myMove ? 0 : style.opacity}} className="haze"></div>}
-        	</Motion>
-    	</div>;
-    }
-
-    getStyle = () => {
-       const cs = this.props.app.state.cellSize; 
-       const s =  cs + 'px';
-       const bs = (cs * 6) + 'px ' + (cs * 2) + 'px ';
-       const offsetX = backgroundOffsets[this.props.type] * cs;
-       const offsetY =  this.props.white ? 0 : cs;
-       return {
-			backgroundSize: bs, 
-            backgroundPosition: offsetX + 'px ' + offsetY + 'px',
-            width: s, height: s
-            
-       };
-    };
-}
-
-const baseSize = 45;
-const backgroundOffsets = {
-	king: 0.0, queen: 5.0, bishop: 4.0, knight: 3.0, rook: 2.0, pawn: 1.0
 }
