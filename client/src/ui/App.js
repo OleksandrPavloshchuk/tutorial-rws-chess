@@ -8,6 +8,7 @@ import BoardPage from './BoardPage';
 import MediatorClient from '../services/mediatorClientService';
 import BoardData, {key, startY, y, x} from '../services/boardData';
 import MoveValidator, {isCheck} from '../services/moveValidator';
+import UUID from 'uuid-js';
 
 export default class App extends Component {
     constructor(props) {
@@ -57,6 +58,7 @@ export default class App extends Component {
         this.amendLastMove = this.amendLastMove.bind(this);
         this.determinePassage = this.determinePassage.bind(this);
         this.sendEndGameMessage = this.sendEndGameMessage.bind(this);
+        this.startSession = this.startSession.bind(this);
     }
 
     componentDidMount() {
@@ -70,6 +72,30 @@ export default class App extends Component {
 			useDragAndDrop: detectUseDragAndDrop(),
             cellSize
         });
+    }
+    
+    startSession() {
+        const login = UUID.create().toString();
+        
+        console.log('UUID', login);
+        
+        this.mediatorClient.startSession( login, '', {
+                "LOGIN_ERROR": msg => {
+                     this.setState({message: msg.text});
+                     console.log("ERROR", msg.text);
+                },
+                "PLAYERS_ADD": msg => this.playersAdd(msg.players),
+                "PLAYERS_REMOVE": msg => this.playersRemove(msg.players),
+                "GAME_START": msg => this.startGame(msg.from, msg.white),
+                "MOVE": msg => this.moveOther(msg.moveFrom, msg.moveTo, msg.piece,
+                     msg.text, msg.takeOnPassage),
+                "SURRENDER": msg => this.win(msg.text),
+                "AMEND_LAST_MOVE": msg => this.amendLastMove(msg.text),
+                "ASK_DEUCE": () => this.onAskDeuce(),
+                "DEUCE": () => this.deuce(),
+                "LOGIN_OK": () => this.setPlayer(login)
+            }
+        );    
     }    
 
     sendGameMessage(m) {
