@@ -15,18 +15,18 @@ export default class QuestionModal extends React.Component {
 
   surrender() {
       this.props.app.setState({myMove:false, endGame:true, message:'You lose', askSurrender:false});
-      this.props.app.sendGameMessage({what:"SURRENDER",  text:"Your opponent just have surrendered. You win."});
+      this.props.app.sendGameMessage({type:"SURRENDER",  text:"Your opponent just have surrendered. You win."});
   }
 
   askDeuce() {
       this.props.app.setState({askDeuce:false});
-      this.props.app.sendGameMessage({what:"ASK_DEUCE"});
+      this.props.app.sendGameMessage({type:"ASK_DEUCE"});
   }
 
   acceptDeuce() {
       this.props.app.setState({myMove:false, confirmDeuce:false});
       this.props.app.deuce();
-      this.props.app.sendGameMessage({what:"DEUCE"});
+      this.props.app.sendGameMessage({type:"DEUCE"});
   }
 
   cancel = () => this.props.app.setState({askSurrender:false, askDeuce:false, confirmDeuce:false});

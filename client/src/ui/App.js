@@ -137,7 +137,7 @@ export default class App extends Component {
     moveComplete(moveFrom, moveTo, take, newPieceType, takeOnPassage) {
         this.addMoveToList({moveFrom: moveFrom, moveTo: moveTo, take: take, newType: newPieceType});
         this.state.board.setNewPieceType(moveTo, newPieceType);
-        this.sendGameMessage({what: "MOVE", moveFrom: moveFrom, moveTo: moveTo,
+        this.sendGameMessage({type: "MOVE", moveFrom: moveFrom, moveTo: moveTo,
             piece: newPieceType, takeOnPassage: takeOnPassage});
         this.setState({myMove: false, board: this.state.board, moveFrom:undefined});
     }
@@ -221,15 +221,15 @@ export default class App extends Component {
 
             this.addMoveToList({moveFrom: moveFrom, moveTo: moveTo, take: take, newType: piece, suffix: suffix});
             this.setState({myMove: false, endGame: true, message: msgMy, askSurrender: false});
-            this.sendGameMessage({what: "AMEND_LAST_MOVE", text: suffix});
-            this.sendGameMessage({what: what, text: msgOther});
+            this.sendGameMessage({type: "AMEND_LAST_MOVE", text: suffix});
+            this.sendGameMessage({type: what, text: msgOther});
 
             return;
         } else if (check) {
             message = "Check";
         }
         const suffix = check ? '+' : undefined;
-        this.sendGameMessage({what: "AMEND_LAST_MOVE", text: suffix});
+        this.sendGameMessage({type: "AMEND_LAST_MOVE", text: suffix});
         this.addMoveToList({moveFrom: moveFrom, moveTo: moveTo, take: take, newType: piece, suffix: suffix});
         this.setState({myMove: true, message: message, board: this.state.board, moveOtherTo: undefined});
     }

@@ -14,7 +14,7 @@ export default class MediatorClient {
 
         socket.onopen = event => {
             console.log("Connected to", event.currentTarget.url);
-            this.sendGameMessage({what:"ASK_LOGIN", from:player, password:password});
+            this.sendGameMessage({type:"ASK_LOGIN", from:player});
         };
         socket.onclose = event => console.log("Disconnected");
         socket.onerror = event => dispatcher["LOGIN_ERROR"]({text:socketErrorText});
@@ -23,8 +23,8 @@ export default class MediatorClient {
             // console.log('RECEIVED', event.data)
 
             var msg = JSON.parse(event.data);
-            if( "LOGIN_ERROR"===msg.what) { closeSocket(); }
-            var msgHandler = dispatcher[msg.what];
+            if( "LOGIN_ERROR"===msg.type) { closeSocket(); }
+            var msgHandler = dispatcher[msg.type];
             if( msgHandler ) {
                 msgHandler(msg);
             } else {
@@ -34,12 +34,12 @@ export default class MediatorClient {
     }
 
     logout = player => {
-        this.sendGameMessage({ what:"LOGOUT", from:player });
+        this.sendGameMessage({type:"LOGOUT", from:player});
         closeSocket();
     };
 
-    retrieveWaitingPlayers = () => this.sendGameMessage({what:"ASK_PLAYERS" });
-    startGame = (player, other, white) => this.sendGameMessage({what:"GAME_START", from:player, to:other, white:white});
+    retrieveWaitingPlayers = () => this.sendGameMessage({type:"ASK_PLAYERS" });
+    startGame = (player, other, white) => this.sendGameMessage({type:"GAME_START", from:player, to:other, white:white});
     sendGameMessage = v => sendContent(v);
 
 }
