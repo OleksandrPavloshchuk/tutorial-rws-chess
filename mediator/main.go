@@ -2,7 +2,6 @@ package main
 
 import (
 	"./dispatcher"
-	"./service/authentication"
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"io"
@@ -67,7 +66,6 @@ func exitIfError(err error, conn *websocket.Conn) bool {
 }
 
 func main() {
-	authentication.Init()
 	dispatcher.Init()
 
 	registerAbout()
@@ -81,4 +79,6 @@ func main() {
 const ABOUT = `
 --------
 Chess React.js + Web Sockets + Go mediator
+
+Version: 0.0.1 (external authentication)
 --------`

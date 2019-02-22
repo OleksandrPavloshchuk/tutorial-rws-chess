@@ -1,7 +1,6 @@
 package dispatcher
 
 import (
-	"../service/authentication"
 	"encoding/json"
 	"errors"
 	"github.com/gorilla/websocket"
@@ -15,11 +14,10 @@ const (
 )
 
 type Message struct {
-	What     string   `json:"what"`
+	What     string   `json:"type"`
 	From     string   `json:"from"`
 	To       string   `json:"to"`
 	Players  []string `json:"players"`
-	Password string   `json:"password"`
 	White    bool     `json:"white"`
 	Text     string   `json:"text"`
 }
@@ -59,7 +57,7 @@ func RemovePlayer(addr net.Addr) {
 func DispatchMessage(msg *Message, unparsedMsg *[]byte, connection *websocket.Conn) (*Message, bool) {
 	switch msg.What {
 	case "ASK_LOGIN":
-		err := login(msg.From, msg.Password, connection)
+		err := login(msg.From, connection)
 		res := Message{What: "LOGIN_OK"}
 		if err != nil {
 			res.What = "LOGIN_ERROR"
@@ -135,19 +133,15 @@ func updatePlayers(what string, players []string) {
 	}
 }
 
-func login(name string, password string, connection *websocket.Conn) error {
+func login(name string, connection *websocket.Conn) error {
 
 	if _, found := activePlayers[name]; found {
 		return errors.New("This player is already logged in")
 	}
-	if authentication.CheckPassword(name, password) {
-		activePlayers[name] = playerSession{name: name, connection: connection, mode: waiting}
-		updatePlayers("PLAYERS_ADD", []string{name})
-		log.Printf("login: %v\n", name)
-		return nil
-	}
-
-	return errors.New("Login failed")
+	activePlayers[name] = playerSession{name: name, connection: connection, mode: waiting}
+	updatePlayers("PLAYERS_ADD", []string{name})
+	log.Printf("login: %v\n", name)
+	return nil
 }
 
 func removePlayer(name string) {
