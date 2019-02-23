@@ -40,7 +40,7 @@ function Row(props) {
     for(var i=1; i<=8; i++ ) {
         const lc = props.app.state.whiteMe ? i  : 9 - i;
         const key = 'c' + props.label + lc;
-        cells.push(<Cell key={key} aKey={key} white={(i % 2) !== props.type} app={props.app} />);
+        cells.push(<Cell key={key} aKey={key} white={(i % 2) === props.type} app={props.app} />);
     }
     
     const rowNum = <td className="cell-label">{props.label}</td>;
