@@ -7,15 +7,15 @@ export default class QuestionModal extends React.Component {
   constructor(props) {
     super(props);
 
-    this.surrender = this.surrender.bind(this);
+    this.resign = this.resign.bind(this);
     this.askDeuce = this.askDeuce.bind(this);
     this.acceptDeuce = this.acceptDeuce.bind(this);
     this.cancel = this.cancel.bind(this);
   }
 
-  surrender() {
-      this.props.app.setState({myMove:false, endGame:true, message:'You lose', askSurrender:false});
-      this.props.app.sendGameMessage({type:"SURRENDER",  text:"Your opponent just have surrendered. You win."});
+  resign() {
+      this.props.app.setState({myMove:false, endGame:true, message:'You lose', askResign:false});
+      this.props.app.sendGameMessage({type:"RESIGN",  text:"Your opponent just have resigned. You win."});
   }
 
   askDeuce() {
@@ -29,7 +29,7 @@ export default class QuestionModal extends React.Component {
       this.props.app.sendGameMessage({type:"DEUCE"});
   }
 
-  cancel = () => this.props.app.setState({askSurrender:false, askDeuce:false, confirmDeuce:false});
+  cancel = () => this.props.app.setState({askResign:false, askDeuce:false, confirmDeuce:false});
 
   render() {
     return (
@@ -41,8 +41,8 @@ export default class QuestionModal extends React.Component {
             {this.props.app.state.confirmDeuce &&
                <Button color="outline-primary" onClick={this.acceptDeuce}>Accept deuce</Button>
             }
-            {this.props.app.state.askSurrender &&
-               <Button color="outline-danger" onClick={this.surrender}>Surrender</Button>
+            {this.props.app.state.askResign &&
+               <Button color="outline-danger" onClick={this.resign}>Resign</Button>
             }
             <Button color="outline-secondary" onClick={this.cancel}>Cancel</Button>
           </ModalFooter>

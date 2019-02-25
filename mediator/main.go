@@ -80,5 +80,5 @@ const ABOUT = `
 --------
 Chess React.js + Web Sockets + Go mediator
 
-Version: 0.0.1 (external authentication)
+Version: 0.0.2 (Redux) 2019-02-25
 --------`

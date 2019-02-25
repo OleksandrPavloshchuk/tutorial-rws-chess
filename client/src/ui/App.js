@@ -28,7 +28,7 @@ export default class App extends Component {
             showConversion: false,
             askDeuce: false,
             confirmDeuce: false,
-            askSurrender: false,
+            askResign: false,
             moves: [],
             moveOtherTo: undefined,
             passage: undefined,
@@ -89,7 +89,7 @@ export default class App extends Component {
                 "GAME_START": msg => this.startGame(msg.from, msg.white),
                 "MOVE": msg => this.moveOther(msg.moveFrom, msg.moveTo, msg.piece,
                      msg.text, msg.takeOnPassage),
-                "SURRENDER": msg => this.win(msg.text),
+                "RESIGN": msg => this.win(msg.text),
                 "AMEND_LAST_MOVE": msg => this.amendLastMove(msg.text),
                 "ASK_DEUCE": () => this.onAskDeuce(),
                 "DEUCE": () => this.deuce(),
@@ -115,7 +115,7 @@ export default class App extends Component {
     setPlayer = player => this.setState({player: player}
         )
 
-    isConfirm = () => this.state.askSurrender || this.state.confirmDeuce || this.state.askDeuce
+    isConfirm = () => this.state.askResign || this.state.confirmDeuce || this.state.askDeuce
     onAskDeuce = () => this.setState({myMove: false, confirmDeuce: true}
         )
 
@@ -240,13 +240,13 @@ export default class App extends Component {
         }
 
         if (0 === counter) {
-            const msgMy = check ? "Mate. You loose." : "Stalemate. Deuce.";
-            const msgOther = check ? "Your opponent just got mate. You win." : "Stalemate. Deuce.";
-            const what = check ? "SURRENDER" : "DEUCE";
+            const msgMy = check ? "Checkmate. You loose." : "Stalemate. Deuce.";
+            const msgOther = check ? "Your opponent just got checkmate. You win." : "Stalemate. Deuce.";
+            const what = check ? "RESIGN" : "DEUCE";
             const suffix = check ? 'X' : ' deuce';
 
             this.addMoveToList({moveFrom: moveFrom, moveTo: moveTo, take: take, newType: piece, suffix: suffix});
-            this.setState({myMove: false, endGame: true, message: msgMy, askSurrender: false});
+            this.setState({myMove: false, endGame: true, message: msgMy, askResign: false});
             this.sendGameMessage({type: "AMEND_LAST_MOVE", text: suffix});
             this.sendGameMessage({type: what, text: msgOther});
 

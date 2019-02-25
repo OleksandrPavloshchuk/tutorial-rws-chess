@@ -41,7 +41,7 @@ func RemovePlayer(addr net.Addr) {
 			log.Printf("Connection to player %v is lost\n", name)
 			if session.mode == playing {
 				// Warn opponent that he wins:
-				content, _ := json.Marshal(Message{What: "SURRENDER", Text: "You win, because your opponent is gone"})
+				content, _ := json.Marshal(Message{What: "RESIGN", Text: "You win, because your opponent is gone"})
 				if otherSession, found := activePlayers[session.otherPlayer]; found {
 					changePlayerMode(session.otherPlayer, "", waiting)
 					otherSession.connection.WriteMessage(websocket.TextMessage, content)
@@ -74,9 +74,9 @@ func DispatchMessage(msg *Message, unparsedMsg *[]byte, connection *websocket.Co
 	case "GAME_START":
 		changePlayersMode(msg, playing)
 		return nil, false
-	case "MOVE", "ASK_DEUCE", "AMEND_LAST_MOVE", "SURRENDER", "DEUCE":
+	case "MOVE", "ASK_DEUCE", "AMEND_LAST_MOVE", "RESIGN", "DEUCE":
 		passMessageToReceiver(msg.To, unparsedMsg)
-		if msg.What == "SURRENDER" || msg.What == "DEUCE" {
+		if msg.What == "RESIGN" || msg.What == "DEUCE" {
 			changePlayersMode(msg, waiting)
 		}
 		return nil, false
