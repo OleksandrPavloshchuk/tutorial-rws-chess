@@ -7,6 +7,14 @@ const mediatorClient = new MediatorClient();
 
 export default (state, action) => {
     switch (action.type) {
+        default:
+            return state;
+    }    
+};
+
+/*
+export default (state, action) => {
+    switch (action.type) {
         case "PLAYERS_ADD": 
             return playersAdd(state, action.payload.players);
         case "PLAYERS_REMOVE":
@@ -130,8 +138,4 @@ const playersRemove = (state, players) => {
     return r;
 }
 
-/*
-                "AMEND_LAST_MOVE": msg => this.amendLastMove(msg.payload.text),
-                "ASK_DEUCE": () => this.onAskDeuce(),
-                "LOGIN_OK": () => this.setPlayer(login)
 */                

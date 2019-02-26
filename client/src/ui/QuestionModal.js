@@ -35,13 +35,13 @@ export default class QuestionModal extends React.Component {
     return (
         <Modal isOpen={this.props.app.isConfirm()} className="modal-narrow" >
           <ModalFooter className="modal-footer-center">
-            {this.props.app.state.askDeuce &&
+            {this.props.app.getState().askDeuce &&
                <Button color="outline-danger" onClick={this.askDeuce}>Ask deuce</Button>
             }
-            {this.props.app.state.confirmDeuce &&
+            {this.props.app.getState().confirmDeuce &&
                <Button color="outline-primary" onClick={this.acceptDeuce}>Accept deuce</Button>
             }
-            {this.props.app.state.askResign &&
+            {this.props.app.getState().askResign &&
                <Button color="outline-danger" onClick={this.resign}>Resign</Button>
             }
             <Button color="outline-secondary" onClick={this.cancel}>Cancel</Button>

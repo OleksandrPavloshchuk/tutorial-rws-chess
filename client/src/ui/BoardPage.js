@@ -26,17 +26,17 @@ export default class BoardPage extends Component {
         <div className="container">
             {this.props.app.isConfirm() && <QuestionModal app={this.props.app} />}
             <Navigation>
-                {this.props.app.state.message && <Message text={this.props.app.state.message}/>}
-                {this.props.app.state.endGame 
+                {this.props.app.getState().message && <Message text={this.props.app.getState().message}/>}
+                {this.props.app.getState().endGame 
                     ? ( <ExitButton onClick={this.returnToPlayerList} /> ) 
-                    : ( this.props.app.state.myMove 
+                    : ( this.props.app.getState().myMove 
                         ? ( <GameActions deuce={this.deuce} resign={this.resign} /> ) 
                         : ( <Waiting/> )
                 )}
             </Navigation>
             <div className="row">
                 <Board app={this.props.app} />
-                {this.props.app.state.showConversion && <ConversionPanel app={this.props.app} />}
+                {this.props.app.getState().showConversion && <ConversionPanel app={this.props.app} />}
                 <MoveList app={this.props.app} />
             </div>
         </div>);

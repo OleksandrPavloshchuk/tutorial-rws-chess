@@ -39,7 +39,7 @@ export default class MoveList extends Component {
           <div className="card-body move-list-body">
             <table className="table small">
               <tbody>
-              {this.props.app.state.moves.map( m => this.renderRow(m))}
+              {this.props.app.getState().moves.map( m => this.renderRow(m))}
               </tbody>
             </table>
           </div>

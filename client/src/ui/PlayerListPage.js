@@ -11,11 +11,11 @@ export default class PlayerListPage extends Component {
     render() {
         return <div className="container">
             <Navigation>
-                <span className="navbar-text">{this.props.app.state.player}</span>
+                <span className="navbar-text">{this.props.app.getState().player}</span>
                 <button className="btn btn-outline-secondary" onClick={this.props.app.logout}>Logout</button>
             </Navigation>
             <ul className="list-group">
-                {this.props.app.state.waitingPlayers.map( name => <Player playerName={name} app={this.props.app} key={name} /> )}
+                {this.props.app.getState().waitingPlayers.map( name => <Player playerName={name} app={this.props.app} key={name} /> )}
             </ul>
         </div>;
     }
