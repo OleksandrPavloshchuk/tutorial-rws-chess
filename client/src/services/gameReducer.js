@@ -13,6 +13,18 @@ export default (state, action) => {
             return playersRemove(state, action.payload.players);
         case "LOGIN_ERROR":
             return loginError(state, action.payload.text);
+        case "GAME_START":
+            return gameStart(state, action.payload.from, action.payload.white);    
+        case "MOVE":
+            return moveOther(state, action.payload.moveFrom, action.payload.moveTo, 
+                action.payload.piece, action.payload.text, action.payload.takeOnPassage);
+        case "RESIGN":
+            return sendEndGameMessage(state, action.payload.text, 'X');
+        case "DEUCE":
+            return sendEndGameMessage(state, 'Deuce', ' deuce');
+        case "LOGIN_OK":
+            return onLoginOK(state);
+        
             
         // TODO
              
@@ -20,6 +32,68 @@ export default (state, action) => {
             return state;
     }    
 };
+
+const moveOther = (state, moveFrom, moveTo, piece, message, takeOnPassage) => {
+    const r = Object.assign({}, state);
+
+    const passage = determinePassage(moveFrom, moveTo);
+    r.moveOtherTo = moveTo;
+    r.passage = passage;
+    let take = isTake(moveTo);
+    r.board.moveOther(moveFrom, moveTo, piece);
+    if (takeOnPassage) {
+        r.board.removePiece(takeOnPassage);
+    }
+    let check = isCheck(r.board, r.whiteMe);
+
+    // Calculate all moves (TODO refactor):
+    const myFigures = r.board.getPieces(true, r.whiteMe);
+    var counter = 0;
+    for (var i = 0; i < myFigures.length; i++) {
+        const moves = new MoveValidator(myFigures[i], r.board).calculateAvailableCells();
+        counter += moves.length - 1;
+    }
+
+    if (0 === counter) {
+        const msgMy = check ? "Checkmate. You loose." : "Stalemate. Deuce.";
+        const msgOther = check ? "Your opponent just got checkmate. You win." : "Stalemate. Deuce.";
+        const what = check ? "RESIGN" : "DEUCE";
+        const suffix = check ? 'X' : ' deuce';
+
+        addMoveToList({moveFrom: moveFrom, moveTo: moveTo, take: take, newType: piece, suffix: suffix}, r);
+        r.myMove = false;
+        r.endGame = true;
+        r.message = msgMy;
+        r.askResign = false;
+        sendGameMessage({type: "AMEND_LAST_MOVE", payload:{text: suffix}});
+        sendGameMessage({type: what, payload:{text: msgOther}});
+
+        return r;
+    } else if (check) {
+        message = "Check";
+    }
+    const suffix = check ? '+' : undefined;
+    sendGameMessage({type: "AMEND_LAST_MOVE", payload: {text: suffix}});
+    addMoveToList({moveFrom: moveFrom, moveTo: moveTo, take: take, newType: piece, suffix: suffix}, r);
+    r.myMove = true;
+    r.message = message;
+    r.moveOtherTo = undefined;
+    return r;
+}
+
+const gameStart = (state, otherPlayer, white) => {
+    const r = Object.assign({}, state);
+    r.endGame = false;
+    r.whiteMe = white;
+    r.otherPlayer = otherPlayer;
+    r.myMove = white;
+    r.board = new BoardData(white);
+    r.moves = [];
+    r.newPieceType = undefined;
+    r.showConversion = false;
+    r.moveFrom = undefined;
+    return r;
+}
 
 const loginError = (state, text) => {
     const r = Object.assign({}, state);
@@ -57,12 +131,7 @@ const playersRemove = (state, players) => {
 }
 
 /*
-                "GAME_START": msg => this.startGame(msg.payload.from, msg.payload.white),
-                "MOVE": msg => this.moveOther(msg.payload.moveFrom, msg.payload.moveTo, msg.payload.piece,
-                     msg.payload.text, msg.payload.takeOnPassage),
-                "RESIGN": msg => this.win(msg.payload.text),
                 "AMEND_LAST_MOVE": msg => this.amendLastMove(msg.payload.text),
                 "ASK_DEUCE": () => this.onAskDeuce(),
-                "DEUCE": () => this.deuce(),
                 "LOGIN_OK": () => this.setPlayer(login)
 */                
