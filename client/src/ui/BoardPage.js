@@ -13,14 +13,14 @@ export default class BoardPage extends Component {
     constructor(props) {
         super(props);
 
-        this.surrender = this.surrender.bind(this);
+        this.resign = this.resign.bind(this);
         this.deuce = this.deuce.bind(this);
         this.returnToPlayerList = this.returnToPlayerList.bind(this);
     }
 
     returnToPlayerList = () => this.props.app.endGame();  
-    surrender = () => this.props.app.setState({askSurrender:true, acceptDeuce:false, askDeuce:false, confirmDeuce:false});
-    deuce = () => this.props.app.setState({askDeuce:true, acceptDeuce:false, askSurrender:false, confirmDeuce:false});
+    resign = () => this.props.app.setState({askResign:true, acceptDeuce:false, askDeuce:false, confirmDeuce:false});
+    deuce = () => this.props.app.setState({askDeuce:true, acceptDeuce:false, askResign:false, confirmDeuce:false});
 
     render = () => (
         <div className="container">
@@ -30,7 +30,7 @@ export default class BoardPage extends Component {
                 {this.props.app.state.endGame 
                     ? ( <ExitButton onClick={this.returnToPlayerList} /> ) 
                     : ( this.props.app.state.myMove 
-                        ? ( <GameActions deuce={this.deuce} surrender={this.surrender} /> ) 
+                        ? ( <GameActions deuce={this.deuce} resign={this.resign} /> ) 
                         : ( <Waiting/> )
                 )}
             </Navigation>
@@ -53,7 +53,7 @@ function ExitButton(props) {
 function GameActions(props) {
     return <div className="btn-group float-right" role="group">
         <AskButton action={props.deuce} text="Deuce" />
-        <AskButton action={props.surrender} text="Surrender" />
+        <AskButton action={props.resign} text="Resign" />
     </div>;
 }
 

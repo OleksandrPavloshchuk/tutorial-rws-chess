@@ -40,6 +40,9 @@ export default class MediatorClient {
 
     retrieveWaitingPlayers = () => this.sendGameMessage({type:"ASK_PLAYERS" });
     startGame = (player, other, white) => this.sendGameMessage({type:"GAME_START", from:player, to:other, white:white});
-    sendGameMessage = v => sendContent(v);
+    sendGameMessage = v => {
+        // console.log('SENT', v);        
+        sendContent(v);
+    }
 
 }
