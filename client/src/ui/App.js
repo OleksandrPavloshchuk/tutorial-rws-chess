@@ -75,22 +75,19 @@ export default class App extends Component {
     }
     
     startSession() {
-        const login = UUID.create().toString();
-        
-        console.log('UUID', login);
-        
+        const login = UUID.create().toString();        
         this.mediatorClient.startSession( login, '', {
                 "LOGIN_ERROR": msg => {
-                     this.setState({message: msg.text});
-                     console.log("ERROR", msg.text);
+                     this.setState({message: msg.payload.text});
+                     console.log("ERROR", msg.payload.text);
                 },
-                "PLAYERS_ADD": msg => this.playersAdd(msg.players),
-                "PLAYERS_REMOVE": msg => this.playersRemove(msg.players),
-                "GAME_START": msg => this.startGame(msg.from, msg.white),
-                "MOVE": msg => this.moveOther(msg.moveFrom, msg.moveTo, msg.piece,
-                     msg.text, msg.takeOnPassage),
-                "RESIGN": msg => this.win(msg.text),
-                "AMEND_LAST_MOVE": msg => this.amendLastMove(msg.text),
+                "PLAYERS_ADD": msg => this.playersAdd(msg.payload.players),
+                "PLAYERS_REMOVE": msg => this.playersRemove(msg.payload.players),
+                "GAME_START": msg => this.startGame(msg.payload.from, msg.payload.white),
+                "MOVE": msg => this.moveOther(msg.payload.moveFrom, msg.payload.moveTo, msg.payload.piece,
+                     msg.payload.text, msg.payload.takeOnPassage),
+                "RESIGN": msg => this.win(msg.payload.text),
+                "AMEND_LAST_MOVE": msg => this.amendLastMove(msg.payload.text),
                 "ASK_DEUCE": () => this.onAskDeuce(),
                 "DEUCE": () => this.deuce(),
                 "LOGIN_OK": () => this.setPlayer(login)
@@ -99,8 +96,11 @@ export default class App extends Component {
     }    
 
     sendGameMessage(m) {
-        m.from = this.state.player;
-        m.to = this.state.otherPlayer;
+        if(!m.payload) {
+            m.payload = {};
+        }
+        m.payload.from = this.state.player;
+        m.payload.to = this.state.otherPlayer;
         this.mediatorClient.sendGameMessage(m);
     }
 
@@ -163,8 +163,8 @@ export default class App extends Component {
     moveComplete(moveFrom, moveTo, take, newPieceType, takeOnPassage) {
         this.addMoveToList({moveFrom: moveFrom, moveTo: moveTo, take: take, newType: newPieceType});
         this.state.board.setNewPieceType(moveTo, newPieceType);
-        this.sendGameMessage({type: "MOVE", moveFrom: moveFrom, moveTo: moveTo,
-            piece: newPieceType, takeOnPassage: takeOnPassage});
+        this.sendGameMessage({type: "MOVE", payload:{moveFrom: moveFrom, moveTo: moveTo,
+            piece: newPieceType, takeOnPassage: takeOnPassage}});
         this.setState({myMove: false, board: this.state.board, moveFrom:undefined});
     }
 
@@ -247,15 +247,15 @@ export default class App extends Component {
 
             this.addMoveToList({moveFrom: moveFrom, moveTo: moveTo, take: take, newType: piece, suffix: suffix});
             this.setState({myMove: false, endGame: true, message: msgMy, askResign: false});
-            this.sendGameMessage({type: "AMEND_LAST_MOVE", text: suffix});
-            this.sendGameMessage({type: what, text: msgOther});
+            this.sendGameMessage({type: "AMEND_LAST_MOVE", payload:{text: suffix}});
+            this.sendGameMessage({type: what, payload:{text: msgOther}});
 
             return;
         } else if (check) {
             message = "Check";
         }
         const suffix = check ? '+' : undefined;
-        this.sendGameMessage({type: "AMEND_LAST_MOVE", text: suffix});
+        this.sendGameMessage({type: "AMEND_LAST_MOVE", payload: {text: suffix}});
         this.addMoveToList({moveFrom: moveFrom, moveTo: moveTo, take: take, newType: piece, suffix: suffix});
         this.setState({myMove: true, message: message, board: this.state.board, moveOtherTo: undefined});
     }

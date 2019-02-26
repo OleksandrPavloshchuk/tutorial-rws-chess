@@ -15,7 +15,7 @@ export default class QuestionModal extends React.Component {
 
   resign() {
       this.props.app.setState({myMove:false, endGame:true, message:'You lose', askResign:false});
-      this.props.app.sendGameMessage({type:"RESIGN",  text:"Your opponent just have resigned. You win."});
+      this.props.app.sendGameMessage({type:"RESIGN",  payload:{text:"Your opponent just have resigned. You win."}});
   }
 
   askDeuce() {

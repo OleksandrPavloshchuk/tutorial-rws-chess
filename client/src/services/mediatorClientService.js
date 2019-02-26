@@ -14,10 +14,10 @@ export default class MediatorClient {
 
         socket.onopen = event => {
             console.log("Connected to", event.currentTarget.url);
-            this.sendGameMessage({type:"ASK_LOGIN", from:player});
+            this.sendGameMessage({type:"ASK_LOGIN", payload:{from:player}});
         };
         socket.onclose = event => console.log("Disconnected");
-        socket.onerror = event => dispatcher["LOGIN_ERROR"]({text:socketErrorText});
+        socket.onerror = event => dispatcher["LOGIN_ERROR"]({payload:{text:socketErrorText}});
         socket.onmessage = event => {
 
             // console.log('RECEIVED', event.data)
@@ -34,12 +34,12 @@ export default class MediatorClient {
     }
 
     logout = player => {
-        this.sendGameMessage({type:"LOGOUT", from:player});
+        this.sendGameMessage({type:"LOGOUT", payload:{from:player}});
         closeSocket();
     };
 
     retrieveWaitingPlayers = () => this.sendGameMessage({type:"ASK_PLAYERS" });
-    startGame = (player, other, white) => this.sendGameMessage({type:"GAME_START", from:player, to:other, white:white});
+    startGame = (player, other, white) => this.sendGameMessage({type:"GAME_START", payload:{from:player, to:other, white:white}});
     sendGameMessage = v => {
         // console.log('SENT', v);        
         sendContent(v);
