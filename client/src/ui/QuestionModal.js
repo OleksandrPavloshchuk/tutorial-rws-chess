@@ -24,9 +24,7 @@ export default class QuestionModal extends React.Component {
   }
 
   acceptDeuce() {
-      this.props.app.setState({myMove:false, confirmDeuce:false});
-      this.props.app.deuce();
-      this.props.app.sendGameMessage({type:"DEUCE"});
+    this.props.app.dispatch({type:"UI_ACCEPT_DEUCE"});
   }
 
   cancel = () => this.props.app.setState({askResign:false, askDeuce:false, confirmDeuce:false});

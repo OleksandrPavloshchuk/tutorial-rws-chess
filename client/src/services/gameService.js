@@ -10,11 +10,9 @@ export default class GameService {
         this.mediatorClient = new MediatorClient();
 
         this.setPlayer = this.setPlayer.bind(this);
-        this.logout = this.logout.bind(this);
         this.playersAdd = this.playersAdd.bind(this);
         this.playersRemove = this.playersRemove.bind(this);
         this.startGame = this.startGame.bind(this);
-        this.startGameMe = this.startGameMe.bind(this);
         this.moveStart = this.moveStart.bind(this);
         this.moveComplete = this.moveComplete.bind(this);
         this.moveOther = this.moveOther.bind(this);
@@ -101,16 +99,6 @@ export default class GameService {
     isConfirm = () => this.getState().askResign || this.getState().confirmDeuce || this.getState().askDeuce
     onAskDeuce = () => this.setState({myMove: false, confirmDeuce: true}
         )
-
-    logout = () => {
-        this.mediatorClient.logout(this.getState().player);
-        this.setState({player: undefined});
-    }
-
-    startGameMe(other, white) {
-        this.mediatorClient.startGame(this.getState().player, other, !white);
-        this.startGame(other, white);
-    }
 
     startGame(other, white) {
         this.setState({

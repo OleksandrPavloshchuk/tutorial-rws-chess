@@ -12,7 +12,7 @@ export default class PlayerListPage extends Component {
         return <div className="container">
             <Navigation>
                 <span className="navbar-text">{this.props.app.getState().player}</span>
-                <button className="btn btn-outline-secondary" onClick={this.props.app.logout}>Logout</button>
+                <button className="btn btn-outline-secondary" onClick={e => this.props.app.dispatch({type:"UI_LOGOUT"})}>Logout</button>
             </Navigation>
             <ul className="list-group">
                 {this.props.app.getState().waitingPlayers.map( name => <Player playerName={name} app={this.props.app} key={name} /> )}
@@ -25,16 +25,15 @@ function Player(props) {
     return <li className="list-group-item list-group-item-action" key={props.playerName}>
         {props.playerName}
         <div className="btn-group float-right" role="group">
-            <Button text="Play White" clickHandler={e => 
-                props.app.dispatch({type:"UI_START_GAME", payload: {from:props.playerName, white:true}})} />
-            <Button text="Play Black" clickHandler={e => 
-                props.app.dispatch({type:"UI_START_GAME", payload: {from:props.playerName, white:false}})} />
+            <Button text="Play White" white={true} app={props.app} otherPlayer={props.playerName} />
+            <Button text="Play Black" white={false} app={props.app} otherPlayer={props.playerName} />
         </div>
     </li>;
 }
 
 function Button(props) {
-    return <button className="btn btn-outline-success" onClick={props.clickHandler}>{props.text}</button>;
+    return <button className="btn btn-outline-success" 
+        onClick={e => props.app.dispatch({type:"UI_START_GAME", payload: {from:props.otherPlayer, white:props.white}})}>{props.text}</button>;
 }
 
 

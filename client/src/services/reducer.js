@@ -33,6 +33,10 @@ export default ( state = initialState, action, service ) => {
             return updateState(state, s => retrievePlayers(s, service));            
         case "UI_START_GAME":
             return updateState(state, s => startGameMe(s, action, service));            
+        case "UI_LOGOUT":
+            return updateState(state, s => logout(s, service)); 
+        case "UI_ACCEPT_DEUCE":
+            return updateState(state, s => acceptDeuce(s, service));                       
         default:
             return state;
     }
@@ -79,4 +83,15 @@ const startGame = (state, action, service) => {
     state.newPieceType = undefined;
     state.showConversion = false;
     state.moveFrom = undefined;
+}
+
+const logout = (state, service) => {
+    service.mediatorClient.logout(state.player);
+    state.player = undefined;
+}
+
+const acceptDeuce = (state, service) => {    
+    state.myMove = true; state.confirmDeuce = false; state.endGame = true; state.message = 'Deuce';
+    service.amendLastMove('deuce');
+    service.sendGameMessage({type:"DEUCE"});
 }
