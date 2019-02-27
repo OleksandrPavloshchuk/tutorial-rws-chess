@@ -148,12 +148,7 @@ export default class GameService {
         return lastLine === y(moveTo);
     }
 
-    dropPiece(src, moveTo) {
-        if(!src.piece) {
-           return;
-        }
-
-        let moveFrom = src.piece;
+    dropPiece(moveFrom, moveTo) {
         var take = this.isTake(moveTo);
         if (this.getState().board.move(moveFrom, moveTo)) {
             const step = this.getState().whiteMe ? 1 : -1;

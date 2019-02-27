@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 import '../assets/css/board.css';
 
@@ -8,55 +8,37 @@ import Navigation from './Navigation';
 import ConversionPanel from './ConversionPanel';
 import QuestionModal from './QuestionModal';
 
-export default class BoardPage extends Component {
+export default props => {
+	const dispatch = type => props.app.dispatch({type}); 
 
-    constructor(props) {
-        super(props);
-
-        this.resign = this.resign.bind(this);
-        this.deuce = this.deuce.bind(this);
-        this.returnToPlayerList = this.returnToPlayerList.bind(this);
-    }
-
-    returnToPlayerList = () => this.props.app.endGame();  
-    resign = () => this.props.app.dispatch({type:"UI_ASK_RESIGN"});
-    deuce = () => this.props.app.dispatch({type:"UI_ASK_DEUCE"});
-
-    render = () => (
-        <div className="container">
-            {this.props.app.isConfirm() && <QuestionModal app={this.props.app} />}
+	return <div className="container">
+            {props.app.isConfirm() && <QuestionModal app={props.app} />}
             <Navigation>
-                {this.props.app.getState().message && <Message text={this.props.app.getState().message}/>}
-                {this.props.app.getState().endGame 
-                    ? ( <ExitButton onClick={this.returnToPlayerList} /> ) 
-                    : ( this.props.app.getState().myMove 
-                        ? ( <GameActions deuce={this.deuce} resign={this.resign} /> ) 
+                {props.app.getState().message && <Message text={props.app.getState().message}/>}
+                {props.app.getState().endGame 
+                    ? ( <ExitButton onClick={e => dispatch("UI_END_GAME")} /> ) 
+                    : ( props.app.getState().myMove 
+                        ? ( <GameActions deuce={e => dispatch("UI_ASK_DEUCE")} resign={e => dispatch("UI_ASK_RESIGN")} /> ) 
                         : ( <Waiting/> )
                 )}
             </Navigation>
             <div className="row">
-                <Board app={this.props.app} />
-                {this.props.app.getState().showConversion && <ConversionPanel app={this.props.app} />}
-                <MoveList app={this.props.app} />
+                <Board app={props.app} />
+                {props.app.getState().showConversion && <ConversionPanel app={props.app} />}
+                <MoveList app={props.app} />
             </div>
-        </div>);
+        </div>;
 }
 
-function Waiting(props) { return <div className="waiting-opponent navbar-small float-right"></div>; }
-function Message(props) { return <div className="navbar-small float-right">{props.text}</div>; }
-function ExitButton(props) {
-    return <div className="btn-group float-right" role="group">
-        <button className="btn btn-outline-secondary" onClick={props.onClick}>Exit</button>
-    </div>;
-}
+const Waiting = props => <div className="waiting-opponent navbar-small float-right"></div>;
+const Message = props => <div className="navbar-small float-right">{props.text}</div>;
+const ExitButton = props => <div className="btn-group float-right" role="group">
+	<button className="btn btn-outline-secondary" onClick={props.onClick}>Exit</button>
+</div>;
 
-function GameActions(props) {
-    return <div className="btn-group float-right" role="group">
-        <AskButton action={props.deuce} text="Deuce" />
-        <AskButton action={props.resign} text="Resign" />
-    </div>;
-}
+const GameActions = props => <div className="btn-group float-right" role="group">
+	<AskButton action={props.deuce} text="Deuce" />
+    <AskButton action={props.resign} text="Resign" />
+</div>;
 
-function AskButton(props) {
-	return <button className="btn btn-outline-secondary" onClick={props.action}>{props.text}</button>
-}
+const AskButton = props => <button className="btn btn-outline-secondary" onClick={props.action}>{props.text}</button>;

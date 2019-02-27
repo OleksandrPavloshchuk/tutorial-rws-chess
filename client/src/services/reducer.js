@@ -46,7 +46,13 @@ export default ( state = initialState, action, service ) => {
 		case "UI_ASK_RESIGN":
             return updateState(state, s => askResign(s, service));  
 		case "UI_ASK_DEUCE":
-            return updateState(state, s => askDeuce(s, service));                    
+            return updateState(state, s => askDeuce(s, service)); 
+		case "UI_END_GAME":
+            return updateState(state, s => endGame(s, service));                   
+		case "UI_MOVE_START":
+            return updateState(state, s => moveStart(s, action, service));   
+		case "UI_MOVE_END":
+            return updateState(state, s => moveEnd(s, action, service));                  
         default:
             return state;
     }
@@ -134,4 +140,22 @@ const askDeuce = (state, service) => {
 	state.acceptDeuce = false;
 	state.askDeuce = true;
 	state.confirmDeuce = false;
+}
+
+const endGame = (state, service) => {
+	state.otherPlayer = undefined;
+    state.whiteMe = undefined;
+    state.myMove = undefined;
+    state.endGame = false;
+    state.message = undefined;
+    state.board = undefined;
+    state.moveFrom = undefined;
+}
+
+const moveStart = (state, action, service) => {
+	service.moveStart(action.payload.moveFrom);	
+}
+
+const moveEnd = (state, action, service) => {
+	service.dropPiece(action.payload.moveFrom, action.payload.moveTo);	
 }
