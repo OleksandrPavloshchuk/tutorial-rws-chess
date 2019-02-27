@@ -1,4 +1,5 @@
-import MediatorClient from './mediatorClientService';
+// import MediatorClient from './mediatorClientService';
+import SocketProvider from './socketProvider';
 import BoardData, {key, startY, y, x} from './boardData';
 import MoveValidator, {isCheck} from './moveValidator';
 import UUID from 'uuid-js';
@@ -7,7 +8,10 @@ export default class GameService {
 
     constructor(component) {
         this.component = component;        
-        this.mediatorClient = new MediatorClient();
+        this.dispatch = this.component.props.dispatch;
+        
+        const login = UUID.create().toString();        
+        this.socketProvider = new SocketProvider(this.dispatch, login);
 
         this.setPlayer = this.setPlayer.bind(this);
         this.logout = this.logout.bind(this);
@@ -32,7 +36,7 @@ export default class GameService {
         this.amendLastMove = this.amendLastMove.bind(this);
         this.determinePassage = this.determinePassage.bind(this);
         this.sendEndGameMessage = this.sendEndGameMessage.bind(this);
-        this.startSession = this.startSession.bind(this);
+        // this.startSession = this.startSession.bind(this);
         this.setInitialState = this.setInitialState.bind(this);
         this.setState = this.setState.bind(this);
         this.getState = this.getState.bind(this);
@@ -75,6 +79,7 @@ export default class GameService {
         });
     }
     
+    /*
     startSession() {
         const login = UUID.create().toString();        
         this.mediatorClient.startSession( login, '', {
@@ -94,7 +99,8 @@ export default class GameService {
                 "LOGIN_OK": () => this.setPlayer(login)
             }
         );    
-    }    
+    } 
+    */   
 
     sendGameMessage(m) {
         if(!m.payload) {
@@ -102,7 +108,7 @@ export default class GameService {
         }
         m.payload.from = this.getState().player;
         m.payload.to = this.getState().otherPlayer;
-        this.mediatorClient.sendGameMessage(m);
+        this.socketProvider.sendAction(m);
     }
 
     sendEndGameMessage = (msg, suffix) => {

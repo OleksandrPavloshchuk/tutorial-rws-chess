@@ -1,31 +1,22 @@
 import Configuration from "./config";
 
-const socketErrorText = "Can't connect to server";
-
-export default (dispatch, player) => {
-    const socket = new WebSocket(new Configuration().webSocketUrl);
+export default class SocketProvider {
+    constructor(dispatch, player) {
+        this.socket = new WebSocket(new Configuration().webSocketUrl);
     
-    const sendAction = v => socket.send(JSON.stringify(v));
+        this.socket.onopen = event => this.sendAction({type:"ASK_LOGIN", payload:{from:player}});
+        this.socket.onerror = event => dispatch({type:"LOGIN_ERROR",payload:{text:"Can't connect to server"}});
+        this.socket.onmessage = event => {
+            // console.log('RECEIVED', event.data)
+            dispatch(JSON.parse(event.data));
+        };   
+        
+        this.sendAction = this.sendAction.bind(this);
+        this.logout = this.logout.bind(this);  
+        this.retrieveWaitingPlayers = this.retrieveWaitingPlayers.bind(this);  
+    }        
     
-    socket.onopen = event => {
-        console.log("Connected to", event.currentTarget.url);
-        sendAction({type:"ASK_LOGIN", payload:{from:player}});
-    };
-    socket.onerror = event => dispatch({type:"LOGIN_ERROR",payload:{text:socketErrorText}});
-    socket.onmessage = event => {
-        // console.log('RECEIVED', event.data)
-        dispatch(JSON.parse(event.data));
-    };
-    return socket;
+    sendAction = v => this.socket.send(JSON.stringify(v));
+    logout = player => this.sendAction({type:"LOGOUT", payload:{from:player}});
+    retrieveWaitingPlayers = () => this.sendAction({type:"ASK_PLAYERS" });    
 }
-
-/*
-   logout = player => {
-        this.sendGameMessage({type:"LOGOUT", payload:{from:player}});
-        closeSocket();
-    };
-
-    retrieveWaitingPlayers = () => this.sendGameMessage({type:"ASK_PLAYERS" });
-    startGame = (player, other, white) => this.sendGameMessage({type:"GAME_START", payload:{from:player, to:other, white:white}});
-*/    
-

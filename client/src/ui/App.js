@@ -11,7 +11,7 @@ export default class App extends Component {
     constructor(props) {
         super(props);
         this.gameService = new GameService(this);  
-        this.state = {};      
+//        this.state = {};      
     }
 
     componentDidMount() {
