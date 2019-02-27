@@ -1,19 +1,26 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import configureStore from './services/store.js';
+import { Provider, connect } from 'react-redux';
+import { createStore } from 'redux';
+import UUID from 'uuid-js';
+
+import reducer from './services/reducer';
+import socketProvider from './services/socketProvider';
 
 import './assets/css/index.css';
 import App from './ui/App';
 import * as serviceWorker from './serviceWorker';
 
+const store = createStore(reducer);
+const player = UUID.create().toString();
+socketProvider(store.dispatch, player);
+
+const ConnectedApp = connect(state => state)(App);
+
 ReactDOM.render(
-    <Provider store={configureStore()}>
-        <App/>
+    <Provider store={store}>
+        <ConnectedApp/>
     </Provider>
   , document.getElementById('root'));
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
 serviceWorker.unregister();
