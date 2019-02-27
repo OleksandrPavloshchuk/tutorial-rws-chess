@@ -3,37 +3,23 @@ import { Button, Modal, ModalFooter } from 'reactstrap';
 
 import '../assets/css/QuestionModal.css';
 
-export default class QuestionModal extends React.Component {
-  constructor(props) {
-    super(props);
+export default function QuestionModal(props) {	
+	const dispatch = actionType => props.app.dispatch({type:actionType});
 
-    this.resign = this.resign.bind(this);
-    this.askDeuce = this.askDeuce.bind(this);
-    this.acceptDeuce = this.acceptDeuce.bind(this);
-    this.cancel = this.cancel.bind(this);
-  }
-
-  	resign = () => this.props.app.dispatch({type:"UI_RESIGN"});
-	askDeuce = () => this.props.app.dispatch({type:"UI_ASK_DEUCE"});
-  	acceptDeuce = () => this.props.app.dispatch({type:"UI_ACCEPT_DEUCE"});
-	cancel = () => this.props.app.dispatch({type:"UI_CANCEL"});
-
-  	render() {
-    	return (
-        	<Modal isOpen={this.props.app.isConfirm()} className="modal-narrow" >
-          		<ModalFooter className="modal-footer-center">
-            		{this.props.app.getState().askDeuce &&
-               		<Button color="outline-danger" onClick={this.askDeuce}>Ask deuce</Button>
-            		}
-            		{this.props.app.getState().confirmDeuce &&
-               		<Button color="outline-primary" onClick={this.acceptDeuce}>Accept deuce</Button>
-            		}
-            		{this.props.app.getState().askResign &&
-               		<Button color="outline-danger" onClick={this.resign}>Resign</Button>
-            		}
-            		<Button color="outline-secondary" onClick={this.cancel}>Cancel</Button>
-          		</ModalFooter>
-        	</Modal>
+   	return (
+       	<Modal isOpen={props.app.isConfirm()} className="modal-narrow" >
+			<ModalFooter className="modal-footer-center">
+          		{props.app.getState().askDeuce &&
+           		<Button color="outline-danger" onClick={e => dispatch("UI_DEUCE")}>Ask deuce</Button>
+           		}
+          		{props.app.getState().confirmDeuce &&
+           		<Button color="outline-primary" onClick={e => dispatch("UI_ACCEPT_DEUCE")}>Accept deuce</Button>
+           		}
+           		{props.app.getState().askResign &&
+           		<Button color="outline-danger" onClick={e => dispatch("UI_RESIGN")}>Resign</Button>
+           		}
+           		<Button color="outline-secondary" onClick={e => dispatch("UI_CANCEL")}>Cancel</Button>
+       		</ModalFooter>
+      	</Modal>
     );
-  }
 }

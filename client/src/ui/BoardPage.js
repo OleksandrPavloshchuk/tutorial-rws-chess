@@ -19,8 +19,8 @@ export default class BoardPage extends Component {
     }
 
     returnToPlayerList = () => this.props.app.endGame();  
-    resign = () => this.props.app.setState({askResign:true, acceptDeuce:false, askDeuce:false, confirmDeuce:false});
-    deuce = () => this.props.app.setState({askDeuce:true, acceptDeuce:false, askResign:false, confirmDeuce:false});
+    resign = () => this.props.app.dispatch({type:"UI_ASK_RESIGN"});
+    deuce = () => this.props.app.dispatch({type:"UI_ASK_DEUCE"});
 
     render = () => (
         <div className="container">
