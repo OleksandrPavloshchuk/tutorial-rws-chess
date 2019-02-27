@@ -36,7 +36,13 @@ export default ( state = initialState, action, service ) => {
         case "UI_LOGOUT":
             return updateState(state, s => logout(s, service)); 
         case "UI_ACCEPT_DEUCE":
-            return updateState(state, s => acceptDeuce(s, service));                       
+            return updateState(state, s => acceptDeuce(s, service));  
+		case "UI_RESIGN":
+            return updateState(state, s => resign(s, service)); 
+		case "UI_ASK_DEUCE":
+            return updateState(state, s => askDeuce(s, service));                      
+		case "UI_CANCEL":
+            return updateState(state, s => cancel(s, service));                      
         default:
             return state;
     }
@@ -94,4 +100,20 @@ const acceptDeuce = (state, service) => {
     state.myMove = true; state.confirmDeuce = false; state.endGame = true; state.message = 'Deuce';
     service.amendLastMove('deuce');
     service.sendGameMessage({type:"DEUCE"});
+}
+
+const resign = (state, service) => {
+	state.myMove = false; state.endGame = true; state.message = "You lose."; state.askResign = false;
+	service.sendGameMessage({type:"RESIGN",  payload:{text:"Your opponent just have resigned. You win."}});
+}
+
+const askDeuce = (state, service) => {
+	state.askDeuce = false;
+	service.sendGameMessage({type:"ASK_DEUCE"});
+}
+
+const cancel = (state, service) => {
+	state.askResign = false;
+	state.askDeuce = false;
+	state.confirmDeuce = false;
 }

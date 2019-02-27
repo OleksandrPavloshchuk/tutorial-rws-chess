@@ -13,38 +13,27 @@ export default class QuestionModal extends React.Component {
     this.cancel = this.cancel.bind(this);
   }
 
-  resign() {
-      this.props.app.setState({myMove:false, endGame:true, message:'You lose', askResign:false});
-      this.props.app.sendGameMessage({type:"RESIGN",  payload:{text:"Your opponent just have resigned. You win."}});
-  }
+  	resign = () => this.props.app.dispatch({type:"UI_RESIGN"});
+	askDeuce = () => this.props.app.dispatch({type:"UI_ASK_DEUCE"});
+  	acceptDeuce = () => this.props.app.dispatch({type:"UI_ACCEPT_DEUCE"});
+	cancel = () => this.props.app.dispatch({type:"UI_CANCEL"});
 
-  askDeuce() {
-      this.props.app.setState({askDeuce:false});
-      this.props.app.sendGameMessage({type:"ASK_DEUCE"});
-  }
-
-  acceptDeuce() {
-    this.props.app.dispatch({type:"UI_ACCEPT_DEUCE"});
-  }
-
-  cancel = () => this.props.app.setState({askResign:false, askDeuce:false, confirmDeuce:false});
-
-  render() {
-    return (
-        <Modal isOpen={this.props.app.isConfirm()} className="modal-narrow" >
-          <ModalFooter className="modal-footer-center">
-            {this.props.app.getState().askDeuce &&
-               <Button color="outline-danger" onClick={this.askDeuce}>Ask deuce</Button>
-            }
-            {this.props.app.getState().confirmDeuce &&
-               <Button color="outline-primary" onClick={this.acceptDeuce}>Accept deuce</Button>
-            }
-            {this.props.app.getState().askResign &&
-               <Button color="outline-danger" onClick={this.resign}>Resign</Button>
-            }
-            <Button color="outline-secondary" onClick={this.cancel}>Cancel</Button>
-          </ModalFooter>
-        </Modal>
+  	render() {
+    	return (
+        	<Modal isOpen={this.props.app.isConfirm()} className="modal-narrow" >
+          		<ModalFooter className="modal-footer-center">
+            		{this.props.app.getState().askDeuce &&
+               		<Button color="outline-danger" onClick={this.askDeuce}>Ask deuce</Button>
+            		}
+            		{this.props.app.getState().confirmDeuce &&
+               		<Button color="outline-primary" onClick={this.acceptDeuce}>Accept deuce</Button>
+            		}
+            		{this.props.app.getState().askResign &&
+               		<Button color="outline-danger" onClick={this.resign}>Resign</Button>
+            		}
+            		<Button color="outline-secondary" onClick={this.cancel}>Cancel</Button>
+          		</ModalFooter>
+        	</Modal>
     );
   }
 }
