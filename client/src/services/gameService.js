@@ -4,6 +4,8 @@ import BoardData, {key, startY, y, x} from './boardData';
 import MoveValidator, {isCheck} from './moveValidator';
 import UUID from 'uuid-js';
 
+export var socketProvider;
+
 export default class GameService {
 
     constructor(component) {
@@ -11,7 +13,8 @@ export default class GameService {
         this.dispatch = this.component.props.dispatch;
         
         const login = UUID.create().toString();        
-        this.socketProvider = new SocketProvider(this.dispatch, login);
+        socketProvider = new SocketProvider(this.dispatch, login);
+        this.socketProvider = socketProvider;
 
         this.setPlayer = this.setPlayer.bind(this);
         this.logout = this.logout.bind(this);
