@@ -1,7 +1,6 @@
 import MediatorClient from './mediatorClientService';
 import BoardData, {key, startY, y, x} from './boardData';
 import MoveValidator, {isCheck} from './moveValidator';
-import UUID from 'uuid-js';
 import reducer from './reducer';
 
 export default class GameService {
@@ -33,7 +32,6 @@ export default class GameService {
         this.amendLastMove = this.amendLastMove.bind(this);
         this.determinePassage = this.determinePassage.bind(this);
         this.sendEndGameMessage = this.sendEndGameMessage.bind(this);
-        this.startSession = this.startSession.bind(this);
         this.setInitialState = this.setInitialState.bind(this);
         this.setState = this.setState.bind(this);
         this.getState = this.getState.bind(this);
@@ -78,28 +76,7 @@ export default class GameService {
 			useDragAndDrop: detectUseDragAndDrop(),
             cellSize
         });
-    }
-    
-    startSession() {
-        const login = UUID.create().toString();        
-        this.mediatorClient.startSession( login, '', {
-                "LOGIN_ERROR": msg => {
-                     this.setState({message: msg.payload.text});
-                     console.log("ERROR", msg.payload.text);
-                },
-                "PLAYERS_ADD": msg => this.playersAdd(msg.payload.players),
-                "PLAYERS_REMOVE": msg => this.playersRemove(msg.payload.players),
-                "GAME_START": msg => this.startGame(msg.payload.from, msg.payload.white),
-                "MOVE": msg => this.moveOther(msg.payload.moveFrom, msg.payload.moveTo, msg.payload.piece,
-                     msg.payload.text, msg.payload.takeOnPassage),
-                "RESIGN": msg => this.win(msg.payload.text),
-                "AMEND_LAST_MOVE": msg => this.amendLastMove(msg.payload.text),
-                "ASK_DEUCE": () => this.onAskDeuce(),
-                "DEUCE": () => this.deuce(),
-                "LOGIN_OK": () => this.setPlayer(login)
-            }
-        );    
-    }    
+    }   
 
     sendGameMessage(m) {
         if(!m.payload) {

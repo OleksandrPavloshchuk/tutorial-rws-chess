@@ -20,7 +20,7 @@ export default class MediatorClient {
         socket.onerror = event => dispatcher["LOGIN_ERROR"]({payload:{text:socketErrorText}});
         socket.onmessage = event => {
 
-            // console.log('RECEIVED', event.data)
+            console.log('RECEIVED', event.data)
 
             var msg = JSON.parse(event.data);
             if( "LOGIN_ERROR"===msg.type) { closeSocket(); }
@@ -38,7 +38,6 @@ export default class MediatorClient {
         closeSocket();
     };
 
-    retrieveWaitingPlayers = () => this.sendGameMessage({type:"ASK_PLAYERS" });
     startGame = (player, other, white) => this.sendGameMessage({type:"GAME_START", payload:{from:player, to:other, white:white}});
     sendGameMessage = v => {
         // console.log('SENT', v);        

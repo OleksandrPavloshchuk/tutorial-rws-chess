@@ -5,7 +5,7 @@ import Navigation from './Navigation';
 export default class PlayerListPage extends Component {
 
     componentDidMount() {
-        this.props.app.mediatorClient.retrieveWaitingPlayers();
+        this.props.app.dispatch({type:"UI_RETRIEVE_PLAYERS"});
     }
 
     render() {
@@ -25,8 +25,10 @@ function Player(props) {
     return <li className="list-group-item list-group-item-action" key={props.playerName}>
         {props.playerName}
         <div className="btn-group float-right" role="group">
-            <Button text="Play White" clickHandler={e => props.app.startGameMe(props.playerName, true)} />
-            <Button text="Play Black" clickHandler={e => props.app.startGameMe(props.playerName, false)} />
+            <Button text="Play White" clickHandler={e => 
+                props.app.dispatch({type:"UI_START_GAME", payload: {from:props.playerName, white:true}})} />
+            <Button text="Play Black" clickHandler={e => 
+                props.app.dispatch({type:"UI_START_GAME", payload: {from:props.playerName, white:false}})} />
         </div>
     </li>;
 }
