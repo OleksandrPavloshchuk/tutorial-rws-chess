@@ -2,6 +2,7 @@ import MediatorClient from './mediatorClientService';
 import BoardData, {key, startY, y, x} from './boardData';
 import MoveValidator, {isCheck} from './moveValidator';
 import UUID from 'uuid-js';
+import reducer from './reducer';
 
 export default class GameService {
 
@@ -38,7 +39,11 @@ export default class GameService {
         this.getState = this.getState.bind(this);
         this.calculateCellSize = this.calculateCellSize.bind(this);
         
+        this.dispatch = this.dispatch.bind(this);
+        this.reducer = reducer;      
     }
+    
+    dispatch = action => this.setState( this.reducer( this.getState(), action, this ) );
     
     setInitialState = () => this.setState({
             waitingPlayers: [],
