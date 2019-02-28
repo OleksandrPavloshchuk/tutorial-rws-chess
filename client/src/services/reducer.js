@@ -118,17 +118,17 @@ const logout = (state, service) => {
 const acceptDeuce = (state, service) => {    
     state.myMove = true; state.confirmDeuce = false; state.endGame = true; state.message = 'Deuce';
     amendLastMove(state, {payload:{text:'deuce'}}, service);    
-    service.sendGameMessage({type:"DEUCE"});
+    service.sendGameMessage(state, {type:"DEUCE"});
 }
 
 const resign = (state, service) => {
 	state.myMove = false; state.endGame = true; state.message = "You lose."; state.askResign = false;
-	service.sendGameMessage({type:"RESIGN",  payload:{text:"Your opponent just have resigned. You win."}});
+	service.sendGameMessage(state, {type:"RESIGN",  payload:{text:"Your opponent just have resigned. You win."}});
 }
 
 const deuce = (state, service) => {
 	state.askDeuce = false;
-	service.sendGameMessage({type:"ASK_DEUCE"});
+	service.sendGameMessage(state, {type:"ASK_DEUCE"});
 }
 
 const cancel = (state, service) => {
@@ -162,12 +162,13 @@ const endGame = (state, service) => {
 }
 
 const moveStart = (state, action, service) => {
-	service.moveStart(action.payload.moveFrom);	
+    state.moveFrom = action.payload.moveFrom;
+    state.board.calculateAvailableCells(action.payload.moveFrom, state.passage)
 }
 
 const moveEnd = (state, action, service) => {
     state.myMove = false;
-	service.dropPiece(action.payload.moveFrom, action.payload.moveTo);	
+	service.dropPiece(state, action.payload.moveFrom, action.payload.moveTo);	
 }
 
 const loginError = (state, action) => { state.message = action.payload.text; };
@@ -194,7 +195,7 @@ const move = (state, action, service) => {
     state.myMove = true; 
     state.moveOtherTo = action.payload.moveTo;
     
-    service.moveOther(action.payload.moveFrom, action.payload.moveTo, action.payload.piece,
+    service.moveOther(state, action.payload.moveFrom, action.payload.moveTo, action.payload.piece,
         action.payload.text, action.payload.takeOnPassage);
 } 
 
@@ -226,5 +227,5 @@ const acceptRemoteDeuce = (state, service) => {
 
 const sendEndGameMessage = (state, msg, suffix, service) => {
     state.myMove = true; state.message = msg; state.endGame = true;
-    service.amendLastMove(suffix);
+    amendLastMove(state, {payload:{text:suffix}}, service);
 }
