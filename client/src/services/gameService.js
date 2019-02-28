@@ -9,16 +9,9 @@ export default class GameService {
         this.component = component;        
         this.mediatorClient = new MediatorClient();
 
-        this.playersAdd = this.playersAdd.bind(this);
-        this.playersRemove = this.playersRemove.bind(this);
-        this.startGame = this.startGame.bind(this);
         this.moveStart = this.moveStart.bind(this);
         this.moveComplete = this.moveComplete.bind(this);
         this.moveOther = this.moveOther.bind(this);
-        this.onAskDeuce = this.onAskDeuce.bind(this);
-        this.win = this.win.bind(this);
-        this.deuce = this.deuce.bind(this);
-        this.endGame = this.endGame.bind(this);
         this.addMoveToList = this.addMoveToList.bind(this);
         this.isTake = this.isTake.bind(this);
         this.dropPiece = this.dropPiece.bind(this);
@@ -90,38 +83,8 @@ export default class GameService {
     }
 
     isTake = moveTo => !!this.getState().board.get(moveTo)
-    win = msg => this.sendEndGameMessage(msg, 'X')
-    deuce = () => this.sendEndGameMessage('Deuce', ' deuce')
 
     isConfirm = () => this.getState().askResign || this.getState().confirmDeuce || this.getState().askDeuce
-    onAskDeuce = () => this.setState({myMove: false, confirmDeuce: true}
-        )
-
-    startGame(other, white) {
-        this.setState({
-            endGame: false,
-            whiteMe: white,
-            otherPlayer: other,
-            myMove: white,
-            board: new BoardData(white),
-            moves: [],
-            newPieceType: undefined,
-            showConversion: false,
-            moveFrom: undefined
-        });
-    }
-
-    endGame() {
-        this.setState({
-            otherPlayer: undefined,
-            whiteMe: undefined,
-            myMove: undefined,
-            endGame: false,
-            message: undefined,
-            board: undefined,
-            moveFrom: undefined
-        });
-    }
 
     moveStart(moveFrom) {
         this.getState().board.calculateAvailableCells(moveFrom, this.getState().passage);
@@ -260,31 +223,6 @@ export default class GameService {
         }
         return key(xTo, py) === moveTo;
     }
-
-    playersAdd(players) {
-        if (!this.getState().player) {
-            return;
-        }
-        var p = [];
-        this.getState().waitingPlayers.forEach(i => p.push(i));
-        players.forEach(i => {
-            if (this.getState().player !== i && !p.includes(i)) {
-                p.push(i);
-            }
-        });
-        this.setState({waitingPlayers: p});
-    }
-
-    playersRemove(players) {
-        var p = [];
-        this.getState().waitingPlayers.forEach(i => {
-            if (this.getState().player !== i && !players.includes(i)) {
-                p.push(i);
-            }
-        });
-        this.setState({waitingPlayers: p});
-    }
-
 }
 
 function detectUseDragAndDrop() {

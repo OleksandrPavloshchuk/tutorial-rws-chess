@@ -72,7 +72,7 @@ export default ( state = initialState, action, service ) => {
         case "ASK_DEUCE":
             return updateState(state, s => askAcceptDeuce(s, action, service));                                                
         case "DEUCE":
-            return updateState(state, s => deuce(s, action, service));                                                
+            return updateState(state, s => acceptRemoteDeuce(s, action, service));                                                
         case "LOGIN_OK":
             return updateState(state, s => loginOk(s, action, service));                                                
         default:
@@ -117,7 +117,7 @@ const logout = (state, service) => {
 
 const acceptDeuce = (state, service) => {    
     state.myMove = true; state.confirmDeuce = false; state.endGame = true; state.message = 'Deuce';
-    service.amendLastMove('deuce');
+    amendLastMove(state, {payload:{text:'deuce'}}, service);    
     service.sendGameMessage({type:"DEUCE"});
 }
 
@@ -166,6 +166,7 @@ const moveStart = (state, action, service) => {
 }
 
 const moveEnd = (state, action, service) => {
+    state.myMove = false;
 	service.dropPiece(action.payload.moveFrom, action.payload.moveTo);	
 }
 
@@ -190,25 +191,38 @@ const playersRemove = (state, action) => {
 } 
 
 const move = (state, action, service) => {
+    state.myMove = true; 
+    state.moveOtherTo = action.payload.moveTo;
+    
     service.moveOther(action.payload.moveFrom, action.payload.moveTo, action.payload.piece,
         action.payload.text, action.payload.takeOnPassage);
 } 
 
 const win = (state, action, service) => {
     sendEndGameMessage(state, action.payload.text, 'X', service);
-}  
-
-const amendLastMove = (state, action, service) => {
-    service.amendLastMove(action.payload.text);    
-}  
+}
 
 const askAcceptDeuce = (state, action, service) => {
-    service.onAskDeuce();    
-}  
+    state.myMove = false; state.confirmDeuce = true;
+} 
+
+const amendLastMove = (state, action, service) => {
+    if (state.moves.length > 0) {
+        const suffix = action.payload.text;
+        const lastMove = state.moves[state.moves.length - 1];
+        const v = state.whiteMe ? lastMove.white : lastMove.black;
+        if (v)  { v.suffix = suffix; }
+    }
+}    
 
 const loginOk = (state, action, service) => {
     state.player = action.payload.from;
-}  
+} 
+
+const acceptRemoteDeuce = (state, service) => {    
+    state.myMove = true; state.confirmDeuce = false; state.endGame = true; state.message = 'Deuce';
+    amendLastMove(state, {payload:{text:'deuce'}}, service);
+} 
 
 const sendEndGameMessage = (state, msg, suffix, service) => {
     state.myMove = true; state.message = msg; state.endGame = true;
