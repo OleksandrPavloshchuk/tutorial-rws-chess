@@ -128,6 +128,7 @@ const resign = (state, service) => {
 
 const deuce = (state, service) => {
 	state.askDeuce = false;
+	state.myMove = false;
 	service.sendGameMessage(state, {type:"ASK_DEUCE"});
 }
 

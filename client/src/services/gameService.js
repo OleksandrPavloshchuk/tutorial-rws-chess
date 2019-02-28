@@ -77,7 +77,11 @@ export default class GameService {
 
     isTake = (state, moveTo) => !!state.board.get(moveTo)
 
-    isConfirm = state => state.askResign || state.confirmDeuce || state.askDeuce
+//    isConfirm = state => state.askResign || state.confirmDeuce || state.askDeuce
+    isConfirm = () => {
+        const state = this.getState();
+        return state.askResign || state.confirmDeuce || state.askDeuce;
+    }
 
     moveStart(state, moveFrom) {
         state.board.calculateAvailableCells(moveFrom, state.passage);
@@ -115,7 +119,7 @@ export default class GameService {
                 state.take = true; state.moveFrom = moveFrom; state.moveTo = moveTo;
                 state.showConversion = true;
             } else {
-                this.moveComplete(moveFrom, moveTo, take, undefined, takeOnPassage);
+                this.moveComplete(state, moveFrom, moveTo, take, undefined, takeOnPassage);
             }
         }
         state.board.clearAvailableCells();
