@@ -54,6 +54,8 @@ export default ( state = initialState, action, service ) => {
             return updateState(state, s => moveStart(s, action, service));   
 		case "UI_MOVE_END":
             return updateState(state, s => moveEnd(s, action, service));
+		case "UI_CONVERT_PIECE":
+            return updateState(state, s => convertPiece(s, action, service));
         // FROM WS:
         case "LOGIN_ERROR": 
             return updateState(state, s => loginError(s, action));
@@ -220,6 +222,11 @@ const amendLastMove = (state, action, service) => {
 const loginOk = (state, action, service) => {
     state.player = action.payload.from;
 } 
+
+const convertPiece = (state, action, service) => {
+    state.showConversion = false;
+    service.moveComplete( state, state.moveFrom, state.moveTo, state.take, action.payload.type );
+}
 
 const acceptRemoteDeuce = (state, service) => {    
     state.myMove = true; state.confirmDeuce = false; state.endGame = true; state.message = 'Deuce';

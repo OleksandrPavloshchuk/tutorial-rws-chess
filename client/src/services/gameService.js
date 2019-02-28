@@ -9,7 +9,6 @@ export default class GameService {
         this.component = component;        
         this.mediatorClient = new MediatorClient();
 
-        this.moveStart = this.moveStart.bind(this);
         this.moveComplete = this.moveComplete.bind(this);
         this.moveOther = this.moveOther.bind(this);
         this.addMoveToList = this.addMoveToList.bind(this);
@@ -77,16 +76,10 @@ export default class GameService {
 
     isTake = (state, moveTo) => !!state.board.get(moveTo)
 
-//    isConfirm = state => state.askResign || state.confirmDeuce || state.askDeuce
     isConfirm = () => {
         const state = this.getState();
         return state.askResign || state.confirmDeuce || state.askDeuce;
-    }
-
-    moveStart(state, moveFrom) {
-        state.board.calculateAvailableCells(moveFrom, state.passage);
-        state.moveFrom = moveFrom;
-    }
+    }   
 
     moveComplete(state, moveFrom, moveTo, take, newPieceType, takeOnPassage) {
         this.addMoveToList(state, {moveFrom: moveFrom, moveTo: moveTo, take: take, newType: newPieceType});
