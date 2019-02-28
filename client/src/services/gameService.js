@@ -9,10 +9,10 @@ export default class GameService {
         this.component = component;        
         this.mediatorClient = new MediatorClient();
 
-        this.moveComplete = this.moveComplete.bind(this);
-        this.moveOther = this.moveOther.bind(this);
-        this.addMoveToList = this.addMoveToList.bind(this);
-        this.isTake = this.isTake.bind(this);
+        this.moveComplete = this.moveComplete.bind(this);        
+        this.moveOther = this.moveOther.bind(this);        
+        this.addMoveToList = this.addMoveToList.bind(this);        
+        this.isTake = this.isTake.bind(this);        
         this.dropPiece = this.dropPiece.bind(this);
         this.isCastling = this.isCastling.bind(this);
         this.isConversion = this.isConversion.bind(this);
