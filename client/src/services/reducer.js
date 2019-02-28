@@ -27,7 +27,8 @@ const initialState = {
 // TODO gameService is temporary. remove it
 export default ( state = initialState, action, service ) => {
     switch (action.type) {
-        case "OPEN_SESSION":
+        // FROM UI:    
+        case "UI_OPEN_SESSION":
             return updateState(state, s => openSession(s, service));
         case "UI_RETRIEVE_PLAYERS":
             return updateState(state, s => retrievePlayers(s, service));            
@@ -52,7 +53,28 @@ export default ( state = initialState, action, service ) => {
 		case "UI_MOVE_START":
             return updateState(state, s => moveStart(s, action, service));   
 		case "UI_MOVE_END":
-            return updateState(state, s => moveEnd(s, action, service));                  
+            return updateState(state, s => moveEnd(s, action, service));
+        // FROM WS:
+        case "LOGIN_ERROR": 
+            return updateState(state, s => loginError(s, action));
+        case "PLAYERS_ADD":
+            return updateState(state, s => playersAdd(s, action));
+        case "PLAYERS_REMOVE":
+            return updateState(state, s => playersRemove(s, action));            
+        case "GAME_START":
+            return updateState(state, s => startGame(s, action, service));  
+        case "MOVE":
+            return updateState(state, s => move(s, action, service));
+        case "RESIGN":
+            return updateState(state, s => win(s, action, service)); 
+        case "AMEND_LAST_MOVE":
+            return updateState(state, s => amendLastMove(s, action, service));                                                
+        case "ASK_DEUCE":
+            return updateState(state, s => askAcceptDeuce(s, action, service));                                                
+        case "DEUCE":
+            return updateState(state, s => deuce(s, action, service));                                                
+        case "LOGIN_OK":
+            return updateState(state, s => loginOk(s, action, service));                                                
         default:
             return state;
     }
@@ -64,20 +86,7 @@ const updateState = (state, updater) => {
 
 const openSession = (state, service) => {
     const login = UUID.create().toString();        
-    service.mediatorClient.startSession( login, '', {
-        "LOGIN_ERROR": msg => { state.message = msg.payload.text; },
-        "PLAYERS_ADD": msg => service.playersAdd(msg.payload.players),
-        "PLAYERS_REMOVE": msg => service.playersRemove(msg.payload.players),
-        "GAME_START": msg => service.startGame( msg.payload.from, msg.payload.white),
-        "MOVE": msg => service.moveOther(msg.payload.moveFrom, msg.payload.moveTo, msg.payload.piece,
-             msg.payload.text, msg.payload.takeOnPassage),
-        "RESIGN": msg => service.win(msg.payload.text),
-        "AMEND_LAST_MOVE": msg => service.amendLastMove(msg.payload.text),
-        "ASK_DEUCE": () => service.onAskDeuce(),
-        "DEUCE": () => service.deuce(),
-        "LOGIN_OK": () => service.setPlayer(login)
-        }
-    );        
+    service.mediatorClient.startSession( login, service.dispatch);        
 };
 
 const retrievePlayers = (state, service) => {
@@ -159,3 +168,44 @@ const moveStart = (state, action, service) => {
 const moveEnd = (state, action, service) => {
 	service.dropPiece(action.payload.moveFrom, action.payload.moveTo);	
 }
+
+const loginError = (state, action) => { state.message = action.payload.text; };
+
+const playersAdd = (state, action) => {
+    if (!state.player) { return; }
+    var p = [];
+    state.waitingPlayers.forEach(i => p.push(i));
+    action.payload.players.forEach(i => {
+        if (state.player !== i && !p.includes(i)) { p.push(i); }
+    });
+    state.waitingPlayers = p;
+}
+    
+const playersRemove = (state, action) => {
+    var p = [];
+    state.waitingPlayers.forEach(i => {
+        if (state.player !== i && !action.payload.players.includes(i)) { p.push(i);}
+    });
+    state.waitingPlayers = p;
+} 
+
+const move = (state, action, service) => {
+    service.moveOther(action.payload.moveFrom, action.payload.moveTo, action.payload.piece,
+        action.payload.text, action.payload.takeOnPassage);
+} 
+
+const win = (state, action, service) => {
+    service.win(action.payload.text);    
+}  
+
+const amendLastMove = (state, action, service) => {
+    service.amendLastMove(action.payload.text);    
+}  
+
+const askAcceptDeuce = (state, action, service) => {
+    service.onAskDeuce();    
+}  
+
+const loginOk = (state, action, service) => {
+    state.player = action.payload.from;
+}  

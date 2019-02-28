@@ -9,7 +9,6 @@ export default class GameService {
         this.component = component;        
         this.mediatorClient = new MediatorClient();
 
-        this.setPlayer = this.setPlayer.bind(this);
         this.playersAdd = this.playersAdd.bind(this);
         this.playersRemove = this.playersRemove.bind(this);
         this.startGame = this.startGame.bind(this);
@@ -93,8 +92,6 @@ export default class GameService {
     isTake = moveTo => !!this.getState().board.get(moveTo)
     win = msg => this.sendEndGameMessage(msg, 'X')
     deuce = () => this.sendEndGameMessage('Deuce', ' deuce')
-    setPlayer = player => this.setState({player: player}
-        )
 
     isConfirm = () => this.getState().askResign || this.getState().confirmDeuce || this.getState().askDeuce
     onAskDeuce = () => this.setState({myMove: false, confirmDeuce: true}
