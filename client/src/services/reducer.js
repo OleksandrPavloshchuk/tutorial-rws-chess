@@ -195,7 +195,7 @@ const move = (state, action, service) => {
 } 
 
 const win = (state, action, service) => {
-    service.win(action.payload.text);    
+    sendEndGameMessage(state, action.payload.text, 'X', service);
 }  
 
 const amendLastMove = (state, action, service) => {
@@ -209,3 +209,8 @@ const askAcceptDeuce = (state, action, service) => {
 const loginOk = (state, action, service) => {
     state.player = action.payload.from;
 }  
+
+const sendEndGameMessage = (state, msg, suffix, service) => {
+    state.myMove = true; state.message = msg; state.endGame = true;
+    service.amendLastMove(suffix);
+}
