@@ -172,6 +172,7 @@ const moveStart = (state, action, service) => {
 const moveEnd = (state, action, service) => {
     if (action.payload.moveFrom!==action.payload.moveTo) {
     	state.myMove = false;
+		state.message = undefined;
 	}
 	service.dropPiece(state, action.payload.moveFrom, action.payload.moveTo);	
 }
