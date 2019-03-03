@@ -62,7 +62,7 @@ func DispatchMessage(msg *Message, unparsedMsg *[]byte, connection *websocket.Co
 	switch msg.What {
 	case "ASK_LOGIN":
 		err := login(msg.Payload.From, connection)
-		res := Message{What: "LOGIN_OK"}
+		res := Message{What: "LOGIN_OK", Payload:MessagePayload{From:msg.Payload.From}}
 		if err != nil {
 			res.What = "LOGIN_ERROR"
 			res.Payload = MessagePayload{Text: err.Error()}

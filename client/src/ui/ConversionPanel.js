@@ -10,9 +10,7 @@ export default class ConversionPanel extends Component {
   	}
 
   	selectPieceType(type) {
-    	this.props.app.setState({ showConversion: false });
-    	this.props.app.moveComplete(this.props.app.getState().moveFrom,
-      		this.props.app.getState().moveTo, this.props.app.getState().take, type);
+  	    this.props.app.dispatch({type:'UI_CONVERT_PIECE',payload:{type:type}});
   	}
   	
   	
