@@ -6,13 +6,13 @@ import reducer from './reducer';
 export default class GameService {
 
     constructor(component) {
-        this.component = component;        
+        this.component = component;
         this.mediatorClient = new MediatorClient();
 
-        this.moveComplete = this.moveComplete.bind(this);        
-        this.moveOther = this.moveOther.bind(this);        
-        this.addMoveToList = this.addMoveToList.bind(this);        
-        this.isTake = this.isTake.bind(this);        
+        this.moveComplete = this.moveComplete.bind(this);
+        this.moveOther = this.moveOther.bind(this);
+        this.addMoveToList = this.addMoveToList.bind(this);
+        this.isTake = this.isTake.bind(this);
         this.dropPiece = this.dropPiece.bind(this);
         this.isCastling = this.isCastling.bind(this);
         this.isConversion = this.isConversion.bind(this);
@@ -23,13 +23,13 @@ export default class GameService {
         this.setState = this.setState.bind(this);
         this.getState = this.getState.bind(this);
         this.calculateCellSize = this.calculateCellSize.bind(this);
-        
+
         this.dispatch = this.dispatch.bind(this);
-        this.reducer = reducer;      
+        this.reducer = reducer;
     }
-    
+
     dispatch = action => this.setState( this.reducer( this.getState(), action, this ) );
-    
+
     setInitialState = () => this.setState({
             waitingPlayers: [],
             player: undefined,
@@ -49,21 +49,21 @@ export default class GameService {
             passage: undefined,
             useDragAndDrop: undefined
         });
-    
+
     setState = s => this.component.setState(s);
-    getState = () => this.component.state;        
+    getState = () => this.component.state;
 
     calculateCellSize(screenWidth) {
         var cellSize = screenWidth / 13;
         if( cellSize > baseSize ) {
             cellSize = baseSize;
-        }       
+        }
 
         this.setState({
 			useDragAndDrop: detectUseDragAndDrop(),
             cellSize
         });
-    }   
+    }
 
     sendGameMessage(state, m) {
         if(!m.payload) {
@@ -72,21 +72,21 @@ export default class GameService {
         m.payload.from = state.player;
         m.payload.to = state.otherPlayer;
         this.mediatorClient.sendGameMessage(m);
-    }  
+    }
 
     isTake = (state, moveTo) => !!state.board.get(moveTo)
 
     isConfirm = () => {
         const state = this.getState();
         return state.askResign || state.confirmDeuce || state.askDeuce;
-    }   
+    }
 
     moveComplete(state, moveFrom, moveTo, take, newPieceType, takeOnPassage) {
         this.addMoveToList(state, {moveFrom: moveFrom, moveTo: moveTo, take: take, newType: newPieceType});
         state.board.setNewPieceType(moveTo, newPieceType);
         this.sendGameMessage(state, {type: "MOVE", payload:{moveFrom: moveFrom, moveTo: moveTo,
             piece: newPieceType, takeOnPassage: takeOnPassage}});
-        state.myMove = false; state.moveFrom = undefined;    
+        state.myMove = false; state.moveFrom = undefined;
     }
 
     isConversion(state, moveTo) {
@@ -202,7 +202,7 @@ export default class GameService {
 }
 
 function detectUseDragAndDrop() {
-	let platform = window.navigator.platform.toUpperCase();    
+	let platform = window.navigator.platform.toUpperCase();
 	return !platform.includes("IPHONE") && !platform.includes("ANDROID");
 }
 
