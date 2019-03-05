@@ -12,7 +12,7 @@ export default class MoveList extends Component {
 
     labelPos = src =>  colLabels[src.substring(2,3)] + src.substring(1,2);
 
-    label(m) {
+    label = m => {
         if( m.castling ) { return m.castling; }
         var r = m.newType ? "" : pieceLabels[m.piece];
         r += this.labelPos(m.moveFrom) + (m.take ? ':' : '-') + this.labelPos(m.moveTo);
@@ -21,31 +21,23 @@ export default class MoveList extends Component {
         return r;
     }
 
-    renderRow(m) {
-        return (
-            <tr key={"m" + m.num}><th scope="row">{m.num}</th>
-                <td>{this.label(m.white)}</td>
-                {m.black 
-                 ? (<td>{this.label(m.black)}</td>)
-                 : (<td></td>)}
-            </tr>
-        );
-    }
+    renderRow = m => <tr key={"m" + m.num}><th scope="row">{m.num}</th>
+            <td>{this.label(m.white)}</td>
+            {m.black
+            ? (<td>{this.label(m.black)}</td>)
+            : (<td></td>)}
+        </tr>
 
-  render() {
-    return (
-        <div className="card move-list">
+  render = () => <div className="card move-list">
           <h5 className="card-header">Moves</h5>
           <div className="card-body move-list-body">
-            <table className="table small">
-              <tbody>
-              {this.props.app.getState().moves.map( m => this.renderRow(m))}
-              </tbody>
-            </table>
-          </div>
+              <table className="table small">
+                  <tbody>
+                      {this.props.app.getState().moves.map( m => this.renderRow(m))}
+                  </tbody>
+              </table>
         </div>
-    );
-  }
+    </div>;
 }
 
 const pieceLabels = { "pawn": "", "rook": "R", "knight": "N", "bishop": "B", "queen": "Q", "king": "K" };

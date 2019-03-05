@@ -4,12 +4,11 @@ import Navigation from './Navigation';
 
 export default class PlayerListPage extends Component {
 
-    componentDidMount() {
+    componentDidMount = () => {
         this.props.app.dispatch({type:"UI_RETRIEVE_PLAYERS"});
     }
 
-    render() {
-        return <div className="container">
+    render = () => <div className="container">
             <Navigation>
                 <span className="navbar-text">{this.props.app.getState().player}</span>
                 <button className="btn btn-outline-secondary" onClick={e => this.props.app.dispatch({type:"UI_LOGOUT"})}>Logout</button>
@@ -18,7 +17,6 @@ export default class PlayerListPage extends Component {
                 {this.props.app.getState().waitingPlayers.map( name => <Player playerName={name} app={this.props.app} key={name} /> )}
             </ul>
         </div>;
-    }
 }
 
 function Player(props) {
@@ -32,8 +30,7 @@ function Player(props) {
 }
 
 function Button(props) {
-    return <button className="btn btn-outline-success" 
-        onClick={e => props.app.dispatch({type:"UI_START_GAME", payload: {from:props.otherPlayer, white:props.white}})}>{props.text}</button>;
+    return <button className="btn btn-outline-success"
+        onClick={e => props.app.dispatch({type:"UI_START_GAME", payload: {from:props.otherPlayer, white:props.white}})}>
+        {props.text}</button>;
 }
-
-
