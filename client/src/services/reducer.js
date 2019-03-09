@@ -1,8 +1,7 @@
 // TODO migrate from gameService to react-redux
 
 import UUID from 'uuid-js';
-import BoardData, {key, startY, y, x} from './boardData';
-import MoveValidator, {isCheck} from './moveValidator';
+import BoardData from './boardData';
 
 const initialState = {
     waitingPlayers: [],
