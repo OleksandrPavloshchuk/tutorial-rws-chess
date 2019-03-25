@@ -1,8 +1,5 @@
-// TODO migrate from gameService to react-redux
-
 import UUID from 'uuid-js';
-import BoardData, {key, startY, y, x} from './boardData';
-import MoveValidator, {isCheck} from './moveValidator';
+import BoardData from './boardData';
 
 const initialState = {
     waitingPlayers: [],
@@ -24,7 +21,6 @@ const initialState = {
     useDragAndDrop: undefined
 };
 
-// TODO gameService is temporary. remove it
 export default ( state = initialState, action, service ) => {
     switch (action.type) {
         // FROM UI:
@@ -38,23 +34,23 @@ export default ( state = initialState, action, service ) => {
             return updateState(state, s => logout(s, service));
         case "UI_ACCEPT_DEUCE":
             return updateState(state, s => acceptDeuce(s, service));
-		    case "UI_RESIGN":
+		case "UI_RESIGN":
             return updateState(state, s => resign(s, service));
-		    case "UI_DEUCE":
+		case "UI_DEUCE":
             return updateState(state, s => deuce(s, service));
-		    case "UI_CANCEL":
+		case "UI_CANCEL":
             return updateState(state, s => cancel(s, service));
-		    case "UI_ASK_RESIGN":
+		case "UI_ASK_RESIGN":
             return updateState(state, s => askResign(s, service));
-		    case "UI_ASK_DEUCE":
+		case "UI_ASK_DEUCE":
             return updateState(state, s => askDeuce(s, service));
-		    case "UI_END_GAME":
+		case "UI_END_GAME":
             return updateState(state, s => endGame(s, service));
-		    case "UI_MOVE_START":
+		case "UI_MOVE_START":
             return updateState(state, s => moveStart(s, action, service));
-		    case "UI_MOVE_END":
+		case "UI_MOVE_END":
             return updateState(state, s => moveEnd(s, action, service));
-		    case "UI_CONVERT_PIECE":
+		case "UI_CONVERT_PIECE":
             return updateState(state, s => convertPiece(s, action, service));
         // FROM WS:
         case "LOGIN_ERROR":
@@ -113,8 +109,7 @@ const startGame = (state, action, service) => {
 }
 
 const logout = (state, service) => {
-    service.mediatorClient.logout(state.player);
-    state.player = undefined;
+    service.mediatorClient.logout(state.player); state.player = undefined;
 }
 
 const acceptDeuce = (state, service) => {
@@ -129,38 +124,28 @@ const resign = (state, service) => {
 }
 
 const deuce = (state, service) => {
-    state.askDeuce = false;
-	  state.myMove = false;
-	  service.sendGameMessage(state, {type:"ASK_DEUCE"});
+    state.askDeuce = false; state.myMove = false;
+    service.sendGameMessage(state, {type:"ASK_DEUCE"});
 }
 
 const cancel = (state, service) => {
-	  state.askResign = false;
-	  state.askDeuce = false;
-	  state.confirmDeuce = false;
+	state.askResign = false; state.askDeuce = false; state.confirmDeuce = false;
 }
 
 const askResign = (state, service) => {
-	  state.askResign = true;
-	  state.acceptDeuce = false;
-	  state.askDeuce = false;
-	  state.confirmDeuce = false;
+    state.askResign = true; state.acceptDeuce = false;
+	state.askDeuce = false;	state.confirmDeuce = false;
 }
 
 const askDeuce = (state, service) => {
-	  state.askResign = false;
-	  state.acceptDeuce = false;
-	  state.askDeuce = true;
-	  state.confirmDeuce = false;
+    state.askResign = false; state.acceptDeuce = false;
+    state.askDeuce = true; state.confirmDeuce = false;
 }
 
 const endGame = (state, service) => {
-	  state.otherPlayer = undefined;
-    state.whiteMe = undefined;
-    state.myMove = undefined;
-    state.endGame = false;
-    state.message = undefined;
-    state.board = undefined;
+    state.otherPlayer = undefined; state.whiteMe = undefined;
+    state.myMove = undefined; state.endGame = false;
+    state.message = undefined;  state.board = undefined;
     state.moveFrom = undefined;
 }
 
@@ -170,11 +155,12 @@ const moveStart = (state, action, service) => {
 }
 
 const moveEnd = (state, action, service) => {
-    if (action.payload.moveFrom!==action.payload.moveTo) {
-        state.myMove = false;
-		    state.message = undefined;
-	  }
-	  service.dropPiece(state, action.payload.moveFrom, action.payload.moveTo);
+    if (state.moveFrom!==action.payload.moveTo) {
+        state.myMove = false; state.message = undefined;
+    } else {
+        state.myMove = true;
+    }
+    service.dropPiece(state, action.payload.moveFrom, action.payload.moveTo);
 }
 
 const loginError = (state, action) => { state.message = action.payload.text; };
@@ -198,16 +184,13 @@ const playersRemove = (state, action) => {
 }
 
 const move = (state, action, service) => {
-    state.myMove = true;
-    state.moveOtherTo = action.payload.moveTo;
+    state.myMove = true; state.moveOtherTo = action.payload.moveTo;
 
-    service.moveOther(state, action.payload.moveFrom, action.payload.moveTo, action.payload.piece,
-        action.payload.text, action.payload.takeOnPassage);
+    service.moveOther(state, action.payload.moveFrom, action.payload.moveTo, 
+        action.payload.piece, action.payload.text, action.payload.takeOnPassage);
 }
 
-const win = (state, action, service) => {
-    sendEndGameMessage(state, action.payload.text, 'X', service);
-}
+const win = (state, action, service) => sendEndGameMessage(state, action.payload.text, 'X', service);
 
 const askAcceptDeuce = (state, action, service) => {
     state.myMove = false; state.confirmDeuce = true;
@@ -222,9 +205,7 @@ const amendLastMove = (state, action, service) => {
     }
 }
 
-const loginOk = (state, action, service) => {
-    state.player = action.payload.from;
-}
+const loginOk = (state, action, service) => { state.player = action.payload.from; }
 
 const convertPiece = (state, action, service) => {
     state.showConversion = false;

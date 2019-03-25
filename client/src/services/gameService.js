@@ -31,46 +31,37 @@ export default class GameService {
     dispatch = action => this.setState( this.reducer( this.getState(), action, this ) );
 
     setInitialState = () => this.setState({
-            waitingPlayers: [],
-            player: undefined,
-            otherPlayer: undefined,
-            whiteMe: undefined,
-            myMove: undefined,
-            endGame: false,
-            message: undefined,
-            board: undefined,
-            newPieceType: undefined,
-            showConversion: false,
-            askDeuce: false,
-            confirmDeuce: false,
-            askResign: false,
-            moves: [],
-            moveOtherTo: undefined,
-            passage: undefined,
-            useDragAndDrop: undefined
-        });
+        waitingPlayers: [],
+        player: undefined,
+        otherPlayer: undefined,
+        whiteMe: undefined,
+        myMove: undefined,
+        endGame: false,
+        message: undefined,
+        board: undefined,
+        newPieceType: undefined,
+        showConversion: false,
+        askDeuce: false,
+        confirmDeuce: false,
+        askResign: false,
+        moves: [],
+        moveOtherTo: undefined,
+        passage: undefined,
+        useDragAndDrop: undefined
+    });
 
     setState = s => this.component.setState(s);
     getState = () => this.component.state;
 
     calculateCellSize(screenWidth) {
         var cellSize = screenWidth / 13;
-        if( cellSize > baseSize ) {
-            cellSize = baseSize;
-        }
-
-        this.setState({
-			useDragAndDrop: detectUseDragAndDrop(),
-            cellSize
-        });
+        if( cellSize > baseSize ) { cellSize = baseSize; }
+        this.setState({ useDragAndDrop: detectUseDragAndDrop(), cellSize });
     }
 
     sendGameMessage(state, m) {
-        if(!m.payload) {
-            m.payload = {};
-        }
-        m.payload.from = state.player;
-        m.payload.to = state.otherPlayer;
+        if(!m.payload) { m.payload = {}; }
+        m.payload.from = state.player; m.payload.to = state.otherPlayer;
         this.mediatorClient.sendGameMessage(m);
     }
 
@@ -84,8 +75,7 @@ export default class GameService {
     moveComplete(state, moveFrom, moveTo, take, newPieceType, takeOnPassage) {
         this.addMoveToList(state, {moveFrom: moveFrom, moveTo: moveTo, take: take, newType: newPieceType});
         state.board.setNewPieceType(moveTo, newPieceType);
-        this.sendGameMessage(state, {type: "MOVE", payload:{moveFrom: moveFrom, moveTo: moveTo,
-            piece: newPieceType, takeOnPassage: takeOnPassage}});
+        this.sendGameMessage(state, {type: "MOVE", payload:{ moveFrom, moveTo, piece: newPieceType, takeOnPassage } });
         state.myMove = false; state.moveFrom = undefined;
     }
 
@@ -120,17 +110,11 @@ export default class GameService {
 
     determinePassage(state, moveFrom, moveTo) {
         const piece = state.board.get(moveFrom);
-        if (!piece) {
-            return undefined;
-        }
-        if ("pawn" !== piece.type) {
-            return undefined;
-        }
+        if (!piece) { return undefined; }
+        if ("pawn" !== piece.type) { return undefined; }
         const yFrom = y(moveFrom);
         const yTo = y(moveTo);
-        if (2 !== Math.abs(yFrom - yTo)) {
-            return undefined;
-        }
+        if (2 !== Math.abs(yFrom - yTo)) { return undefined; }
         return moveTo;
     }
 
@@ -158,7 +142,7 @@ export default class GameService {
             const what = check ? "RESIGN" : "DEUCE";
             const suffix = check ? 'X' : ' deuce';
 
-            this.addMoveToList(state, {moveFrom: moveFrom, moveTo: moveTo, take: take, newType: piece, suffix: suffix});
+            this.addMoveToList(state, {moveFrom, moveTo, take, newType: piece, suffix});
             state.myMove = false; state.endGame = true; state.message = msgMy; state.askResign = false;
             this.sendGameMessage(state, {type: "AMEND_LAST_MOVE", payload:{text: suffix}});
             this.sendGameMessage(state, {type: what, payload:{text: msgOther}});
@@ -169,7 +153,7 @@ export default class GameService {
         }
         const suffix = check ? '+' : undefined;
         this.sendGameMessage(state, {type: "AMEND_LAST_MOVE", payload: {text: suffix}});
-        this.addMoveToList(state, {moveFrom: moveFrom, moveTo: moveTo, take: take, newType: piece, suffix: suffix});
+        this.addMoveToList(state, {moveFrom, moveTo, take, newType: piece, suffix});
         state.myMove = true; state.message = message; state.moveOtherTo = undefined;
     }
 
