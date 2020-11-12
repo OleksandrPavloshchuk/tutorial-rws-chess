@@ -1,7 +1,6 @@
 package dispatcher
 
 import (
-	"../service/authentication"
 	"encoding/json"
 	"errors"
 	"github.com/gorilla/websocket"
@@ -14,14 +13,17 @@ const (
 	playing = iota
 )
 
-type Message struct {
-	What     string   `json:"what"`
+type MessagePayload struct {
 	From     string   `json:"from"`
 	To       string   `json:"to"`
 	Players  []string `json:"players"`
-	Password string   `json:"password"`
 	White    bool     `json:"white"`
-	Text     string   `json:"text"`
+	Text     string   `json:"text"`    
+}
+
+type Message struct {
+	What     string         `json:"type"`
+	Payload  MessagePayload `json:"payload"`
 }
 
 type playerSession struct {
@@ -43,7 +45,7 @@ func RemovePlayer(addr net.Addr) {
 			log.Printf("Connection to player %v is lost\n", name)
 			if session.mode == playing {
 				// Warn opponent that he wins:
-				content, _ := json.Marshal(Message{What: "SURRENDER", Text: "You win, because your opponent is gone"})
+				content, _ := json.Marshal(Message{What: "RESIGN", Payload: MessagePayload{Text: "You win, because your opponent is gone"}})
 				if otherSession, found := activePlayers[session.otherPlayer]; found {
 					changePlayerMode(session.otherPlayer, "", waiting)
 					otherSession.connection.WriteMessage(websocket.TextMessage, content)
@@ -59,26 +61,26 @@ func RemovePlayer(addr net.Addr) {
 func DispatchMessage(msg *Message, unparsedMsg *[]byte, connection *websocket.Conn) (*Message, bool) {
 	switch msg.What {
 	case "ASK_LOGIN":
-		err := login(msg.From, msg.Password, connection)
-		res := Message{What: "LOGIN_OK"}
+		err := login(msg.Payload.From, connection)
+		res := Message{What: "LOGIN_OK", Payload:MessagePayload{From:msg.Payload.From}}
 		if err != nil {
 			res.What = "LOGIN_ERROR"
-			res.Text = err.Error()
+			res.Payload = MessagePayload{Text: err.Error()}
 		}
 		return &res, false
 	case "LOGOUT":
-		log.Printf("logout: %v\n", msg.From)
-		removePlayer(msg.From)
+		log.Printf("logout: %v\n", msg.Payload.From)
+		removePlayer(msg.Payload.From)
 		return nil, true
 	case "ASK_PLAYERS":
-		res := Message{What: "PLAYERS_ADD", Players: retrievePlayers()}
+		res := Message{What: "PLAYERS_ADD", Payload: MessagePayload{Players: retrievePlayers()}}
 		return &res, false
 	case "GAME_START":
 		changePlayersMode(msg, playing)
 		return nil, false
-	case "MOVE", "ASK_DEUCE", "AMEND_LAST_MOVE", "SURRENDER", "DEUCE":
-		passMessageToReceiver(msg.To, unparsedMsg)
-		if msg.What == "SURRENDER" || msg.What == "DEUCE" {
+	case "MOVE", "ASK_DEUCE", "AMEND_LAST_MOVE", "RESIGN", "DEUCE":
+		passMessageToReceiver(msg.Payload.To, unparsedMsg)
+		if msg.What == "RESIGN" || msg.What == "DEUCE" {
 			changePlayersMode(msg, waiting)
 		}
 		return nil, false
@@ -94,11 +96,11 @@ func changePlayersMode(msg *Message, mode int) {
     if mode==playing {
 		what = "PLAYERS_REMOVE"
 	}
-	changePlayerMode(msg.From, msg.To, mode)
-	changePlayerMode(msg.To, msg.From, mode)
-	updatePlayers(what, []string{msg.From, msg.To})
+	changePlayerMode(msg.Payload.From, msg.Payload.To, mode)
+	changePlayerMode(msg.Payload.To, msg.Payload.From, mode)
+	updatePlayers(what, []string{msg.Payload.From, msg.Payload.To})
 	content, _ := json.Marshal(msg)
-	if session, found := activePlayers[msg.To]; found {
+	if session, found := activePlayers[msg.Payload.To]; found {
 		session.connection.WriteMessage(websocket.TextMessage, content)
 	}
 }
@@ -128,26 +130,22 @@ func updatePlayers(what string, players []string) {
 	if len(players) == 0 {
 		return
 	}
-	msg := Message{What: what, Players: players}
+	msg := Message{What: what, Payload: MessagePayload{Players: players}}
 	content, _ := json.Marshal(msg)
 	for _, session := range activePlayers {
 		session.connection.WriteMessage(websocket.TextMessage, content)
 	}
 }
 
-func login(name string, password string, connection *websocket.Conn) error {
+func login(name string, connection *websocket.Conn) error {
 
 	if _, found := activePlayers[name]; found {
 		return errors.New("This player is already logged in")
 	}
-	if authentication.CheckPassword(name, password) {
-		activePlayers[name] = playerSession{name: name, connection: connection, mode: waiting}
-		updatePlayers("PLAYERS_ADD", []string{name})
-		log.Printf("login: %v\n", name)
-		return nil
-	}
-
-	return errors.New("Login failed")
+	activePlayers[name] = playerSession{name: name, connection: connection, mode: waiting}
+	updatePlayers("PLAYERS_ADD", []string{name})
+	log.Printf("login: %v\n", name)
+	return nil
 }
 
 func removePlayer(name string) {

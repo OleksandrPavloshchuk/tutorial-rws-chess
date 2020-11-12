@@ -59,12 +59,10 @@ export default class BoardData {
     }
 
     copyData(src) {
-        let b = {};
-        Object.keys( src.data ).forEach( key => { const v = src.data[key]; b[key] = {type: v.type, white: v.white }; });
+        this.data = Object.assign({}, src.data );
         this.rook1Moved = src.rook1Moved;
         this.rook8Moved = src.rook8Moved;
         this.kingMoved = src.kingMoved;
-        this.data = b;
     }
 
     init() {

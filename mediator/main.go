@@ -2,7 +2,6 @@ package main
 
 import (
 	"./dispatcher"
-	"./service/authentication"
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"io"
@@ -42,7 +41,7 @@ func registerWebSocket() {
 				log.Printf("web socket: can't parse message. Ignored: %v\n", err)
 			} else {
 				// TODO remove trace
-				//log.Printf("TRACE: msg=%v\n", msgSrc)
+				// log.Printf("TRACE: msg=%v\n", msgSrc)
 
 				if msgRes, doExit := dispatcher.DispatchMessage(&msgSrc, &msgData, conn); doExit {
 					return
@@ -67,7 +66,6 @@ func exitIfError(err error, conn *websocket.Conn) bool {
 }
 
 func main() {
-	authentication.Init()
 	dispatcher.Init()
 
 	registerAbout()
@@ -81,4 +79,6 @@ func main() {
 const ABOUT = `
 --------
 Chess React.js + Web Sockets + Go mediator
+
+Version: 0.0.2 (Redux) 2019-02-25
 --------`

@@ -3,50 +3,21 @@ import { Button, Modal, ModalFooter } from 'reactstrap';
 
 import '../assets/css/QuestionModal.css';
 
-export default class QuestionModal extends React.Component {
-  constructor(props) {
-    super(props);
+export default function QuestionModal(props) {
+		const dispatch = actionType => props.app.dispatch({type:actionType});
 
-    this.surrender = this.surrender.bind(this);
-    this.askDeuce = this.askDeuce.bind(this);
-    this.acceptDeuce = this.acceptDeuce.bind(this);
-    this.cancel = this.cancel.bind(this);
-  }
-
-  surrender() {
-      this.props.app.setState({myMove:false, endGame:true, message:'You lose', askSurrender:false});
-      this.props.app.sendGameMessage({what:"SURRENDER",  text:"Your opponent just have surrendered. You win."});
-  }
-
-  askDeuce() {
-      this.props.app.setState({askDeuce:false});
-      this.props.app.sendGameMessage({what:"ASK_DEUCE"});
-  }
-
-  acceptDeuce() {
-      this.props.app.setState({myMove:false, confirmDeuce:false});
-      this.props.app.deuce();
-      this.props.app.sendGameMessage({what:"DEUCE"});
-  }
-
-  cancel = () => this.props.app.setState({askSurrender:false, askDeuce:false, confirmDeuce:false});
-
-  render() {
-    return (
-        <Modal isOpen={this.props.app.isConfirm()} className="modal-narrow" >
-          <ModalFooter className="modal-footer-center">
-            {this.props.app.state.askDeuce &&
-               <Button color="outline-danger" onClick={this.askDeuce}>Ask deuce</Button>
-            }
-            {this.props.app.state.confirmDeuce &&
-               <Button color="outline-primary" onClick={this.acceptDeuce}>Accept deuce</Button>
-            }
-            {this.props.app.state.askSurrender &&
-               <Button color="outline-danger" onClick={this.surrender}>Surrender</Button>
-            }
-            <Button color="outline-secondary" onClick={this.cancel}>Cancel</Button>
-          </ModalFooter>
-        </Modal>
-    );
-  }
+   	return <Modal isOpen={props.app.isConfirm()} className="modal-narrow" >
+						<ModalFooter className="modal-footer-center">
+        				{props.app.getState().askDeuce &&
+           			<Button color="outline-danger" onClick={e => dispatch("UI_DEUCE")}>Ask deuce</Button>
+           			}
+          			{props.app.getState().confirmDeuce &&
+           			<Button color="outline-primary" onClick={e => dispatch("UI_ACCEPT_DEUCE")}>Accept deuce</Button>
+           			}
+           			{props.app.getState().askResign &&
+           			<Button color="outline-danger" onClick={e => dispatch("UI_RESIGN")}>Resign</Button>
+           			}
+           			<Button color="outline-secondary" onClick={e => dispatch("UI_CANCEL")}>Cancel</Button>
+       			</ModalFooter>
+      	</Modal>;
 }

@@ -8,38 +8,32 @@ var sendContent = v => socket.send(JSON.stringify(v));
 var closeSocket = () => { socket.close(); socket = undefined; };
 
 export default class MediatorClient {
-
-    startSession(player, password, dispatcher) {  
+    
+    startSession(player, dispatch) {  
         socket = new WebSocket(new Configuration().webSocketUrl);
 
         socket.onopen = event => {
             console.log("Connected to", event.currentTarget.url);
-            this.sendGameMessage({what:"ASK_LOGIN", from:player, password:password});
+            this.sendGameMessage({type:"ASK_LOGIN", payload:{from:player}});
         };
         socket.onclose = event => console.log("Disconnected");
-        socket.onerror = event => dispatcher["LOGIN_ERROR"]({text:socketErrorText});
+        socket.onerror = event => dispatch({type:"LOGIN_ERROR", payload:{text:socketErrorText}});
         socket.onmessage = event => {
-
-            // console.log('RECEIVED', event.data)
-
-            var msg = JSON.parse(event.data);
-            if( "LOGIN_ERROR"===msg.what) { closeSocket(); }
-            var msgHandler = dispatcher[msg.what];
-            if( msgHandler ) {
-                msgHandler(msg);
-            } else {
-                console.log("WARNING unknown message: ", msg, "ignored");
-            }
+            const action = JSON.parse(event.data);
+            //console.log('RECEIVED', action);
+            dispatch(action);
         }
-    }
+    }    
 
     logout = player => {
-        this.sendGameMessage({ what:"LOGOUT", from:player });
+        this.sendGameMessage({type:"LOGOUT", payload:{from:player}});
         closeSocket();
     };
 
-    retrieveWaitingPlayers = () => this.sendGameMessage({what:"ASK_PLAYERS" });
-    startGame = (player, other, white) => this.sendGameMessage({what:"GAME_START", from:player, to:other, white:white});
-    sendGameMessage = v => sendContent(v);
+    startGame = (player, other, white) => this.sendGameMessage({type:"GAME_START", payload:{from:player, to:other, white:white}});
+    sendGameMessage = v => {
+        //console.log('SENT', v);        
+        sendContent(v);
+    }
 
 }
